@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<input_filter href="/input_filters/91" product="Delta" version="1.7.3.42410">
+  <filter_type>webdav_input</filter_type>
+  <label>STACK</label>
+  <filter_settings>
+    <template_id>OUT</template_id>
+    <content_window_type>keep_seconds</content_window_type>
+    <seconds_to_keep>300</seconds_to_keep>
+    <storage_location>/data/server/content/STACK/</storage_location>
+    <aws_credential_id/>
+    <input_user_id>1</input_user_id>
+    <relative_uri>STACK</relative_uri>
+    <vod_content>false</vod_content>
+  </filter_settings>
+</input_filter>

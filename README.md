@@ -1,16 +1,16 @@
-# elemental-live-streaming
+# live-stream-on-aws
 
-Source code for the AWS solution [Elemental Live Streaming](https://aws.amazon.com/answers/tbc/).
+Source code for the AWS solution [Live Stream on AWS](https://aws.amazon.com/answers/tbc/).
 
 ## CloudFormation template
 
-- elemental-live-streaming.template
-- elemental-live-streaming-ec2.template
+- live-stream-on-aws.template
+- live-stream-on-aws-ec2.template
 
 ## Python source code
 
-- elemental-live-streaming.py
-- elemental-live-streaming-ec2.py
+- live-stream-on-aws.py
+- live-stream-on-aws-ec2.py
 
 ## XML Templates
 - demo.xml

@@ -1,16 +1,16 @@
-# live-stream-on-aws
+# live-streaming
 
-Source code for the AWS solution [Live Stream on AWS](https://aws.amazon.com/answers/tbc/).
+Source code for the AWS solution [Live Stream on AWS](https://aws.amazon.com/answers/media-entertainment/live-streaming/).
 
 ## CloudFormation template
 
-- live-stream-on-aws.template
-- live-stream-on-aws-ec2.template
+- live-streaming.template
+- live-streaming-ec2.template
 
 ## Python source code
 
-- live-stream-on-aws.py
-- live-stream-on-aws-ec2.py
+- live-streaming.py
+- live-streaming-ec2.py
 
 ## XML Templates
 - demo.xml

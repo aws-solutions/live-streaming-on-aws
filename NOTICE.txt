@@ -1,2 +1,2 @@
-Cost Optimization - Monitor and Cost Optimization EC2 Right Sizing
+Live Stream on AWS
 Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved. 

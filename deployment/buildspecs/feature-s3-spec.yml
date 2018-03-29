@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+ install:
+   commands:
+     - echo "nothing to do in install"
+ pre_build:
+   commands:
+     - echo "nothing to do in pre_build"
+
+ build:
+   commands:
+     - echo "Copying assets to output bucket `date` in `pwd`"
+     - echo "Copying S3 assets to /$VERSION/"
+     - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/video-on-demand/$VERSION/ --recursive --acl bucket-owner-full-control
+     - echo "Copying S3 assets to /latest/"
+     - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/video-on-demand/latest/ --recursive --acl bucket-owner-full-control
+     - echo "Copying GitHub assets to /$VERSION/open-source/"
+     - aws s3 cp deployment/open-source/ s3://$BUILD_OUTPUT_BUCKET/video-on-demand/$VERSION/open-source/ --recursive --acl bucket-owner-full-control
+     - echo "Copying assets to output bucket complete `date`"
+
+ post_build:
+   commands:
+     - echo "deployment of assets completed on `date`"

@@ -1,0 +1,91 @@
+Description: '(SO0013) - Live Streaming on AWS'
+
+Parameters:
+
+Metadata:
+    AWS::CloudFormation::Interface:
+        ParameterGroups:
+            -
+              Label:
+
+        ParameterLabels:
+
+
+Mappings:
+  SourceCode:
+    General:
+      S3Bucket: CODEBUCKET
+      KeyPrefix: live-streaming-on-aws/CODEVERSION
+
+  AnonymousData:
+    SendAnonymousData:
+      Data: Yes
+
+Conditions:
+
+Resources:
+
+  CustomResourceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        -
+          PolicyName: !Sub "${AWS::StackName}-custom-resource"
+          PolicyDocument:
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Join ["", ["arn:aws:logs:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":log-group:/aws/lambda/*"]]
+
+  CustomResource:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-custom-resources
+      Description: Used to deploy custom resources and send AnonymousData
+      Handler: index.handler
+      Role: !GetAtt CustomResourceRole.Arn
+      Code:
+        S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+        S3Key: !Join ["/", [!FindInMap ["SourceCode", "General", "KeyPrefix"],  "custom-resources.zip"]]
+      Runtime:  nodejs6.10
+      Timeout: 180
+
+  Uuid:
+    Condition: Metrics
+    Type: "Custom::UUID"
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      Resource: "UUID"
+
+  AnonymousMetric:
+    Condition: Metrics
+    Type: "Custom::LoadLambda"
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      SolutionId: "SO0013"
+      UUID: !GetAtt Uuid.UUID
+      Version: "2.0"
+      Parameters:
+      Resource: "SendMetric"
+
+Outputs:
+    UUID:
+      Condition: Metrics
+      Description: AnonymousMetric UUID
+      Value: !GetAtt Uuid.UUID

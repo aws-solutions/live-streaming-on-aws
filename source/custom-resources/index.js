@@ -14,24 +14,31 @@
 /**
  * @author Solution Builders
  Cloudformation custom resource to create and configure resources as part of the cloudformation deployment.
- Each Create resource has a corrisponding delete functions to clean up the resource on a Stack Delete
  **/
 'use strict';
-const response = require('cfn-response');
-const MetricsHelper = require('./lib/metrics-helper.js');
+const cfn = require('cfn-response');
 const uuid = require('uuid');
 const moment = require('moment');
-const metricsHelper = new MetricsHelper();
+const MetricsHelper = require('./lib/metrics-helper.js');
 
 exports.handler = function(event, context) {
-  console.log('Received event:', JSON.stringify(event, null, 2));
+	console.log('Received event:', JSON.stringify(event, null, 2));
 
-  if (event.RequestType === 'Create') {
+	if (event.RequestType === 'Create') {
 
-    switch (event.ResourceProperties.Resource) {
+		switch (event.LogicalResourceId) {
 
-      case ('SendMetric'):
+      case ('Uuid'):
+        //Creates a UUID for the MetricsHelper function
+        let responseData = {
+          UUID: uuid.v4()
+        };
+        cfn.send(event, context, cfn.SUCCESS, responseData);
+        break;
+
+			case ('AnonymousMetric'):
         //Sends annonomous useage data to AWS
+        let metricsHelper = new MetricsHelper();
         let metric = {
             Solution: event.ResourceProperties.SolutionId,
             UUID: event.ResourceProperties.UUID,
@@ -39,42 +46,35 @@ exports.handler = function(event, context) {
             Data: {
                 Version: event.ResourceProperties.Version,
                 Launched: moment().utc().format(),
-                Transcoder: event.ResourceProperties.Transcoder,
-                Parameters: event.ResourceProperties.Parameters
+                InputType: event.ResourceProperties.InputType,
+                InputCodec: event.ResourceProperties.InputCodec,
+                InputRes: event.ResourceProperties.InputRes
             }
         };
         metricsHelper.sendAnonymousMetric(metric, function(err, data) {
           if (err) {
+            //logging error only to allow stack to complete
             console.log(err, err.stack);
           } else {
             console.log('data sent: ', metric);
-            response.send(event, context, response.SUCCESS);
+            cfn.send(event, context, cfn.SUCCESS);
             return;
           }
         });
         break;
 
-      case ('UUID'):
-        //Creates a UUID for the MetricsHelper function
-        let responseData = {
-          UUID: uuid.v4()
-        };
-        response.send(event, context, response.SUCCESS, responseData);
-        break;
+			default:
+				console.log('no case match, sending success response');
+				cfn.send(event, context, cfn.FAILED);
+		}
+	}
 
-      default:
-        console.log('no case match, sending success response');
-        response.send(event, context, response.SUCCESS);
-        // defualt response if Resource or RequestType (delete update) not defined.
-    }
+		if (event.RequestType === 'Delete') {
 
-  }
+		switch (event.ResourceProperties.Resource) {
 
-  if (event.RequestType === 'Delete') {
-
-    switch (event.ResourceProperties.Resource) {
-
-      case ('SendMetric'):
+			case ('AnonymousMetric'):
+        let metricsHelper = new MetricsHelper();
         let metric = {
             Solution: event.ResourceProperties.solutionId,
             UUID: event.ResourceProperties.UUID,
@@ -89,16 +89,15 @@ exports.handler = function(event, context) {
             console.log(err, err.stack);
           } else {
             console.log('data sent');
-            response.send(event, context, response.SUCCESS);
+            cfn.send(event, context, cfn.SUCCESS);
             return;
           }
         });
         break;
 
-      default:
-        console.log('no case match, sending success response');
-        response.send(event, context, response.SUCCESS);
-        // defualt response if Resource or RequestType (delete update) not defined.
-    }
-  }
+			default:
+				console.log('no delete required, sending success response');
+				cfn.send(event, context, cfn.SUCCESS);
+		}
+	}
 };

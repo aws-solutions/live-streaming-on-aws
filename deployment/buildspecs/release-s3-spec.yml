@@ -10,12 +10,10 @@ phases:
 
   build:
     commands:
-      - echo "Copying assets to output bucket `date` in `pwd`"
-      - echo "Copying S3 assets to /$TEMPLATE_OUTPUT_BUCKET/video-on-demand/$VERSION"
-      - aws s3 cp deployment/dist/video-on-demand-elastic-transcoder.template s3://$TEMPLATE_OUTPUT_BUCKET/video-on-demand/$VERSION/ --acl bucket-owner-full-control
-      - aws s3 cp deployment/dist/video-on-demand-media-convert.template s3://$TEMPLATE_OUTPUT_BUCKET/video-on-demand/$VERSION/ --acl bucket-owner-full-control
+      - echo "Copying assets to output buckets `date` in `pwd`"
       - echo "Copying S3 assets to /$VERSION/"
-      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/video-on-demand/$VERSION/ --recursive --acl bucket-owner-full-control
+      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/%%SOLUTION_NAME%%/$VERSION/ --recursive --acl bucket-owner-full-control
+      - aws s3 cp deployment/dist/%%SOLUTION_NAME%%.template s3://$TEMPLATE_OUTPUT_BUCKET/%%SOLUTION_NAME%%/$VERSION/ --acl bucket-owner-full-control
       - echo "Copying assets to output bucket complete `date`"
       - echo "Copying new buildspec `date` in `pwd`"
       - mv deployment/buildspecs/$PIPELINE_TYPE-github-spec.yml buildspec.yml

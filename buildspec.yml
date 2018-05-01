@@ -3,35 +3,27 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo "This buildspec is based on image - aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0"
-      - yum update -y
-      - yum groupinstall 'Development Tools' -y
-      - yum install wget zip libcurl-devel -y
-      - npm cache clean -f
+      - echo "This buildspec is based on image - aws/codebuild/nodejs:6.3.1"
   pre_build:
     commands:
-      - rm -rf ./sandbox
-      - echo "UNIT TESTS - `pwd`"
+      - echo "Installing dependencies and executing unit tests - `pwd`"
       - cd deployment && chmod +x ./run-unit-tests.sh && ./run-unit-tests.sh
-      - cd ..
       - echo "Installing dependencies and executing unit tests completed `date`"
   build:
     commands:
       - echo "Starting build `date` in `pwd`"
-      - cd deployment
       - chmod +x ./build-s3-dist.sh && ./build-s3-dist.sh $DIST_OUTPUT_BUCKET $VERSION
       - echo "Build completed `date`"
       - echo "Starting open-source-dist `date` in `pwd`"
       - chmod +x ./build-open-source-dist.sh && ./build-open-source-dist.sh
-      - cd ..
       - echo "Open Source Dist completed `date`"
 
   post_build:
     commands:
-      - echo "Renaming build stage buildspec `date` in `pwd`"
-      - mv deployment/buildspecs/$PIPELINE_TYPE-s3-spec.yml buildspec.yml
-      - echo "Renaming build stage buildspec complete `date`"
-      - echo "build completed on `date`"
+      - echo "Copying new buildspec `date` in `pwd`"
+      - mv ./buildspecs/$PIPELINE_TYPE-s3-spec.yml ../buildspec.yml
+      - echo "Copying new buildspec complete `date`"
+      - echo "Post build completed on `date`"
 
 artifacts:
   files:

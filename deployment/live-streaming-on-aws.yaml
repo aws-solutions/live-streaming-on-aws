@@ -2,14 +2,96 @@ Description: '(SO0013) - Live Streaming on AWS'
 
 Parameters:
 
+  InputType:
+    Description: Specify the input type for MediaLive
+    Type: String
+    Default: DEMO
+    AllowedValues:
+      - RTP_PUSH
+      - RTMP_PUSH
+      - RTMP PULL
+      - HLS_PULL
+      - DEMO
+
+  InputCodec:
+    Description: Specify the codec of the source stream for MediaLive (AVC/HEVC/MPEG2)
+    Type: String
+    Default: AVC
+    AllowedValues:
+      - AVC
+      - HEVC
+      - MPEG2
+
+  InputRes:
+    Description: Specify the resolution of the source stream for MediaLive (SD/HD)
+    Type: String
+    Default: HD
+    AllowedValues:
+      - SD
+      - HD
+
+  LiveCIDR:
+    Description: Specify the CIDR Block for the MediaLive SecurityGroup
+    Type: String
+    Default: "0.0.0.0/0"
+
+  PriPullURL:
+    Description: Specify the primary source URL for the PULL input stream
+    Type: String
+    Default: ""
+
+  SecPullURL:
+    Description: Specify the secondary source URL for the PULL input stream
+    Type: String
+    Default: ""
+
+  AdminEmail:
+    Description: Email address for login access to the Demo Frontend and player.
+    Type: String
+    AllowedPattern: "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$"
+
 Metadata:
     AWS::CloudFormation::Interface:
         ParameterGroups:
             -
               Label:
-
+                default: Live Stream Source
+              Parameters:
+                - InputType
+                - InputCodec
+                - InputRes
+            -
+              Label:
+                default: For PUSH Source Input Types
+              Parameters:
+                - LiveCIDR
+            -
+              Label:
+                default: For PULL Source Input Types
+              Parameters:
+                - PriPullURL
+                - SecPullURL
+            -
+              Label:
+                default: Demo Configuration
+              Parameters:
+                - AdminEmail
+                - DemoSource
         ParameterLabels:
-
+          InputType:
+            default: Source Input Type
+          InputCodec:
+            default: Source Codec
+          InputRes:
+            default: Source Resolution
+          LiveCIDR:
+            default: Input CIDR Block
+          PriPullURL:
+            default: Primary Source URL
+          SecPullURL:
+            default: Secondary Source URL
+          AdminEmail:
+            default: Administrator email address
 
 Mappings:
   SourceCode:
@@ -22,6 +104,7 @@ Mappings:
       Data: Yes
 
 Conditions:
+    Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes ]
 
 Resources:
 
@@ -71,7 +154,6 @@ Resources:
     Type: "Custom::UUID"
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
-      Resource: "UUID"
 
   AnonymousMetric:
     Condition: Metrics
@@ -81,8 +163,9 @@ Resources:
       SolutionId: "SO0013"
       UUID: !GetAtt Uuid.UUID
       Version: "2.0"
-      Parameters:
-      Resource: "SendMetric"
+      InputType: !Ref InputType
+      InputCodec: !Ref InputCodec
+      InputRes: !Ref InputRes
 
 Outputs:
     UUID:

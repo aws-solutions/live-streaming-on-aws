@@ -1,4 +1,5 @@
 #!/bin/bash
- AWS_REGION='us-east-1'
 
-echo 'no unit test to run'
+cd ../source/custom-resources/
+npn install --silent
+npm test

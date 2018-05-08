@@ -7,7 +7,7 @@
   "description": "cfn custom resources for vod workflow",
   "main": "na",
   "scripts": {
-    "test": "mocha lib/*.spec.js"
+    "test": "mocha lib/media-live/*.spec.js & mocha lib/media-package/*.spec.js "
   },
   "dependencies": {
     "cfn-response": "*",

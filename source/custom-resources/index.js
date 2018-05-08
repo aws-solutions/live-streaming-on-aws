@@ -20,13 +20,90 @@ const cfn = require('cfn-response');
 const uuid = require('uuid');
 const moment = require('moment');
 const MetricsHelper = require('./lib/metrics-helper.js');
+const MediaPackageChannel = require('./lib/media-package/channel.js');
+const MediaPackageEndpoint = require('./lib/media-package/endpoint.js');
+const MedialiveInput = require('./lib/media-live/input.js');
 
 exports.handler = function(event, context) {
+
 	console.log('Received event:', JSON.stringify(event, null, 2));
+	const config = event.ResourceProperties;
 
 	if (event.RequestType === 'Create') {
 
 		switch (event.LogicalResourceId) {
+
+			case 'MediaLiveInput':
+				if (config.Type.includes('PULL')) {
+					MedialiveInput.createPullInput(config)
+						.then(responseData => {
+							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
+							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
+						})
+						.catch(err => {
+							console.log(err, err.stack);
+							cfn.send(event,context,cfn.FAILED);
+						});
+				} else {
+					MedialiveInput.createPushInput(config)
+						.then(responseData => {
+							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
+							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
+						})
+						.catch(err => {
+							console.log(err, err.stack);
+							cfn.send(event,context,cfn.FAILED);
+						});
+				}
+				break;
+
+			case 'MediaPackageChannel':
+				MediaPackageChannel.createChannel(config)
+					.then(responseData => {
+						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId);
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event,context,cfn.FAILED);
+					});
+				break;
+
+			case 'MediaPackageHlsEndpoint':
+				MediaPackageEndpoint.createHlsEndPoint(config)
+					.then(responseData => {
+						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-hls');
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event,context,cfn.FAILED);
+					});
+				break;
+
+			case 'MediaPackageDashEndpoint':
+				MediaPackageEndpoint.createDashEndPoint(config)
+					.then(responseData => {
+						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-dash');
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event,context,cfn.FAILED);
+					});
+				break;
+
+			case 'MediaPackageMssEndpoint':
+				MediaPackageEndpoint.createMssEndPoint(config)
+					.then(responseData => {
+						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-mss');
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event,context,cfn.FAILED);
+					});
+				break;
 
       case ('Uuid'):
         //Creates a UUID for the MetricsHelper function
@@ -71,7 +148,19 @@ exports.handler = function(event, context) {
 
 		if (event.RequestType === 'Delete') {
 
-		switch (event.ResourceProperties.Resource) {
+		switch (event.LogicalResourceId) {
+
+			case 'MediaPackageChannel':
+				// This function will delete the endpoints and then the channel
+				MediaPackageChannel.deleteChannel(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS);
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+					});
+				break;
 
 			case ('AnonymousMetric'):
         let metricsHelper = new MetricsHelper();

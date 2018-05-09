@@ -25,13 +25,13 @@ function ssmPut(user,pass) {
 }
 
 let CreatePullInput = function(config) {
-	response = new Promise((res, reject) => {
+	let response = new Promise((res, reject) => {
 
 		const medialive = new AWS.MediaLive({
 			region: process.env.AWS_REGION
 		});
 
-		params = {
+		let params = {
 			Name: config.StreamName,
 			Type: config.Type,
 			Sources: [
@@ -57,7 +57,7 @@ let CreatePullInput = function(config) {
 		medialive.createInput(params, function(err, data) {
 			if (err) reject(err);
 			else {
-				responseData = {
+				let responseData = {
 					Id: data.Input.Id,
 				};
 				res(responseData);
@@ -68,13 +68,13 @@ let CreatePullInput = function(config) {
 };
 
 let CreatePushInput = function(config) {
-	response = new Promise((res, reject) => {
+	let response = new Promise((res, reject) => {
 
 		const medialive = new AWS.MediaLive({
 			region: process.env.AWS_REGION
 		});
 
-		params = {
+		let params = {
 			WhitelistRules: [{
 				Cidr: config.Cidr
 			}]
@@ -82,7 +82,7 @@ let CreatePushInput = function(config) {
 		medialive.createInputSecurityGroup(params, function(err, data) {
 			if (err) reject(err);
 			else {
-				params = {
+				let params = {
 					InputSecurityGroups: [data.SecurityGroup.Id],
 					Name: config.StreamName,
 					Destinations: [{
@@ -93,7 +93,7 @@ let CreatePushInput = function(config) {
 				medialive.createInput(params, function(err, data) {
 					if (err) reject(err);
 					else {
-						responseData = {
+						let responseData = {
 							Id: data.Input.Id,
 							EndPoint1: data.Input.Destinations[0].Url,
 							Endpoint2: data.Input.Destinations[1].Url

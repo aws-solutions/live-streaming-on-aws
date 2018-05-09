@@ -170,7 +170,7 @@ Resources:
   CustomResource:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-custom-resources
+      FunctionName: !Sub ${AWS::StackName}-livestream-custom-resources
       Description: Used to deploy custom resources and send AnonymousData
       Handler: index.handler
       Role: !GetAtt CustomResourceRole.Arn
@@ -184,7 +184,7 @@ Resources:
     Type: Custom::MediaLiveInput
     Properties:
       ServiceToken:  !GetAtt CustomResource.Arn
-      StreamName: !Sub ${AWS::StackName}
+      StreamName: !Sub ${AWS::StackName}-livestream
       Type: !Ref InputType
       Cidr: !Ref InputCIDR
       PriUrl: !Ref PriPullURL
@@ -198,28 +198,28 @@ Resources:
     Type: Custom::MediaPackageChannel
     Properties:
       ServiceToken:  !GetAtt CustomResource.Arn
-      ChannelId: !Sub ${AWS::StackName}
+      ChannelId: !Sub ${AWS::StackName}-livestream
 
   MediaPackageHlsEndpoint:
     DependsOn: MediaPackageChannel
     Type: Custom::MediaPackageHlsEndpoint
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
-      ChannelId: !Sub ${AWS::StackName}
+      ChannelId: !Sub ${AWS::StackName}-livestream
 
   MediaPackageDashEndpoint:
     DependsOn: MediaPackageChannel
     Type: Custom::MediaPackageDashEndpoint
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
-      ChannelId: !Sub ${AWS::StackName}
+      ChannelId: !Sub ${AWS::StackName}-livestream
 
   MediaPackageMssEndpoint:
     DependsOn: MediaPackageChannel
     Type: Custom::MediaPackageMssEndpoint
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
-      ChannelId: !Sub ${AWS::StackName}
+      ChannelId: !Sub ${AWS::StackName}-livestream
 
   Uuid:
     Condition: Metrics

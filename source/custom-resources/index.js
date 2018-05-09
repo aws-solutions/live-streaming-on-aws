@@ -60,7 +60,7 @@ exports.handler = function(event, context) {
 			case 'MediaPackageChannel':
 				MediaPackageChannel.createChannel(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId);
+						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId);
 						console.log(responseData);
 					})
 					.catch(err => {
@@ -72,7 +72,7 @@ exports.handler = function(event, context) {
 			case 'MediaPackageHlsEndpoint':
 				MediaPackageEndpoint.createHlsEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-hls');
+						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-hls');
 						console.log(responseData);
 					})
 					.catch(err => {
@@ -84,7 +84,7 @@ exports.handler = function(event, context) {
 			case 'MediaPackageDashEndpoint':
 				MediaPackageEndpoint.createDashEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-dash');
+						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-dash');
 						console.log(responseData);
 					})
 					.catch(err => {
@@ -96,7 +96,7 @@ exports.handler = function(event, context) {
 			case 'MediaPackageMssEndpoint':
 				MediaPackageEndpoint.createMssEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,config.ChannelId+'-mss');
+						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-mss');
 						console.log(responseData);
 					})
 					.catch(err => {

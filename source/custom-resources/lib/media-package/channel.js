@@ -1,12 +1,8 @@
 'use strict';
 const AWS = require('aws-sdk');
 
-let response;
-let responseData;
-let params;
-
 let CreateChannel = function(config) {
-  response = new Promise((res, reject) => {
+  let response = new Promise((res, reject) => {
     const mediapackage = new AWS.MediaPackage({
       region: process.env.AWS_REGION
     });
@@ -14,7 +10,7 @@ let CreateChannel = function(config) {
       region: process.env.AWS_REGION
     });
 
-    params = {
+    let params = {
       Id:config.ChannelId,
       Description:'Live Streaming on AWS Solution'
     };
@@ -22,14 +18,14 @@ let CreateChannel = function(config) {
     mediapackage.createChannel(params, function(err, data) {
       if (err) reject(err);
       else {
-        responseData = {
+        let responseData = {
           ChannelId:config.ChannelId,
           Url:data.HlsIngest.IngestEndpoints[0].Url,
           Username:data.HlsIngest.IngestEndpoints[0].Username,
           PassParam:data.HlsIngest.IngestEndpoints[0].Password
         };
         console.log('Endpoints:', JSON.stringify(responseData, null, 2));
-        params = {
+        let params = {
           Name: data.HlsIngest.IngestEndpoints[0].Username,
           Type: 'String',
           Value: data.HlsIngest.IngestEndpoints[0].Password
@@ -49,14 +45,13 @@ let CreateChannel = function(config) {
 };
 
 let DeleteChannel = function(config) {
-  response = new Promise((res, reject) => {
+  let response = new Promise((res, reject) => {
 
     const mediapackage = new AWS.MediaPackage({
     	region: 'us-east-1'
     });
 
     let promises = [];
-    let params;
 
     function delEndpoint(id) {
     	let response = new Promise((res, reject) => {
@@ -73,7 +68,7 @@ let DeleteChannel = function(config) {
     	return response;
     }
 
-    params = {
+    let params = {
       ChannelId:config.ChannelId
     };
     mediapackage.listOriginEndpoints(params, function(err,data) {
@@ -84,7 +79,7 @@ let DeleteChannel = function(config) {
     		});
     		Promise.all(promises)
     		.then(() =>{
-    			params = {
+    			let params = {
     				Id: config.ChannelId
     			};
     			mediapackage.deleteChannel(params, function(err,data) {

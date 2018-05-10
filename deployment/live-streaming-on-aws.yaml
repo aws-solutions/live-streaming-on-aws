@@ -5,7 +5,7 @@ Parameters:
   InputType:
     Description: Specify the input type for MediaLive
     Type: String
-    Default: DEMO
+    Default: RTP_PUSH
     AllowedValues:
       - RTP_PUSH
       - RTMP_PUSH
@@ -25,10 +25,11 @@ Parameters:
   InputRes:
     Description: Specify the resolution of the source stream for MediaLive (SD/HD)
     Type: String
-    Default: HD
+    Default: 1080
     AllowedValues:
-      - SD
-      - HD
+      - 1080
+      - 720
+      - 480
 
   InputCIDR:
     Description: Specify the CIDR Block for the MediaLive SecurityGroup
@@ -151,18 +152,62 @@ Resources:
               -
                 Effect: Allow
                 Action:
-                  - medialive:*
+                  - medialive:createInputSecurityGroup
+                  - medialive:createInput
+                  - medialive:deleteInput
+                  - medialive:createChannel
+                  - medialive:deleteChannel
+
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
               -
                 Effect: Allow
                 Action:
-                  - mediapackage:*
+                  - mediapackage:createChannel
+                  - mediapackage:deleteChannel
+                  - mediapackage:listOriginEndpoints
+                  - mediapackage:deleteOriginEndpoint
+                  - mediapackage:createOriginEndpoint
+
                 Resource:
                     - !Join ["", ["arn:aws:mediapackage:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
               -
                 Effect: Allow
                 Action:
+                  - ssm:PutParameter
+                Resource:
+                  - !Join ["", ["arn:aws:ssm:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":parameter/*"]]
+              -
+                Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !Join ["", ["arn:aws:iam::", Ref: "AWS::AccountId", ":role/*"]]
+
+  MediaLiveRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - "medialive.amazonaws.com"
+            Action:
+              - sts:AssumeRole
+      Policies:
+        -
+          PolicyName: !Sub "${AWS::StackName}-mediatranscode-role"
+          PolicyDocument:
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - ssm:DescribeParameters
+                  - ssm:GetParameter
+                  - ssm:GetParameters
                   - ssm:PutParameter
                 Resource:
                   - !Join ["", ["arn:aws:ssm:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":parameter/*"]]
@@ -181,6 +226,7 @@ Resources:
       Timeout: 180
 
   MediaLiveInput:
+    DependsOn: MediaPackageChannel
     Type: Custom::MediaLiveInput
     Properties:
       ServiceToken:  !GetAtt CustomResource.Arn
@@ -193,6 +239,20 @@ Resources:
       SecUrl: !Ref SecPullURL
       SecUser: !Ref SecPullUser
       SecPass: !Ref SecPullPass
+
+  MediaLiveChannel:
+    DependsOn: MediaLiveInput
+    Type: Custom::MediaLiveChannel
+    Properties:
+      ServiceToken:  !GetAtt CustomResource.Arn
+      Name: !Sub ${AWS::StackName}-livestream
+      Resolution: !Ref InputRes
+      Codec: !Ref InputCodec
+      Role: !GetAtt MediaLiveRole.Arn
+      InputId: !GetAtt MediaLiveInput.Id
+      MediaPackagePriUrl: !GetAtt MediaPackageChannel.Url
+      MediaPackagePriUser: !GetAtt MediaPackageChannel.User
+      MediaPackagePriPassParam: !GetAtt MediaPackageChannel.PassParam
 
   MediaPackageChannel:
     Type: Custom::MediaPackageChannel
@@ -238,9 +298,29 @@ Resources:
       InputType: !Ref InputType
       InputCodec: !Ref InputCodec
       InputRes: !Ref InputRes
+      InputCIDR: !Ref InputCIDR
+      PriPullURL: !Ref PriPullURL
+      PriPullUser: !Ref PriPullUser
+      PriPullPass: !Ref PriPullPass
+      SecPullURL: !Ref SecPullURL
+      SecPullUser: !Ref SecPullUser
+      SecPullPass: !Ref SecPullPass
 
 Outputs:
-    UUID:
-      Condition: Metrics
-      Description: AnonymousMetric UUID
-      Value: !GetAtt Uuid.UUID
+  UUID:
+    Condition: Metrics
+    Description: AnonymousMetric UUID
+    Value: !GetAtt Uuid.UUID
+
+  MediaLivePrimaryEndpoint:
+    Description: Primary MediaLive input Url
+    Value: !GetAtt MediaLiveInput.EndPoint1
+
+  MediaLiveSecondaryEndpoint:
+    Description: Primary MediaLive input Url
+    Value: !GetAtt MediaLiveInput.EndPoint2
+
+  #CloudFrontHlsEnpoint:
+  #CloudFrontDashEnpoint:
+  #CloudFrontMssEnpoint:
+  #DemoConsoleUrl:

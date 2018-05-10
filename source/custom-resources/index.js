@@ -22,7 +22,8 @@ const moment = require('moment');
 const MetricsHelper = require('./lib/metrics-helper.js');
 const MediaPackageChannel = require('./lib/media-package/channel.js');
 const MediaPackageEndpoint = require('./lib/media-package/endpoint.js');
-const MedialiveInput = require('./lib/media-live/input.js');
+const MediaLiveInput = require('./lib/media-live/input.js');
+const MediaLiveChannel = require('./lib/media-live/channel.js');
 
 exports.handler = function(event, context) {
 
@@ -35,7 +36,7 @@ exports.handler = function(event, context) {
 
 			case 'MediaLiveInput':
 				if (config.Type.includes('PULL')) {
-					MedialiveInput.createPullInput(config)
+					MediaLiveInput.createPullInput(config)
 						.then(responseData => {
 							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
 							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
@@ -45,7 +46,7 @@ exports.handler = function(event, context) {
 							cfn.send(event,context,cfn.FAILED);
 						});
 				} else {
-					MedialiveInput.createPushInput(config)
+					MediaLiveInput.createPushInput(config)
 						.then(responseData => {
 							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
 							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
@@ -56,6 +57,18 @@ exports.handler = function(event, context) {
 						});
 				}
 				break;
+
+				case 'MediaLiveChannel':
+					MediaLiveChannel.createChannel(config)
+						.then(responseData => {
+							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId);
+							console.log(responseData);
+						})
+						.catch(err => {
+							console.log(err, err.stack);
+							cfn.send(event,context,cfn.FAILED);
+						});
+					break;
 
 			case 'MediaPackageChannel':
 				MediaPackageChannel.createChannel(config)
@@ -117,17 +130,25 @@ exports.handler = function(event, context) {
         //Sends annonomous useage data to AWS
         let metricsHelper = new MetricsHelper();
         let metric = {
-            Solution: event.ResourceProperties.SolutionId,
-            UUID: event.ResourceProperties.UUID,
+            Solution: config.SolutionId,
+            UUID: config.UUID,
             TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
             Data: {
-                Version: event.ResourceProperties.Version,
+                Version: config.Version,
                 Launched: moment().utc().format(),
-                InputType: event.ResourceProperties.InputType,
-                InputCodec: event.ResourceProperties.InputCodec,
-                InputRes: event.ResourceProperties.InputRes
+                InputType: config.InputType,
+                InputCodec: config.InputCodec,
+                InputRes: config.InputRes,
+								InputCIDR: config.InputCIDR
             }
         };
+				if (config.PriPullURL != '') metric.Data.PriPullURL = true;
+				if (config.PriPullUser != '') metric.Data.PriPullUser = true;
+				if (config.PriPullPass != '') metric.Data.PriPullPass = true;
+				if (config.SecPullURL != '') metric.Data.SecPullURL = true;
+				if (config.SecPullUser != '') metric.Data.SecPullUser = true;
+				if (config.SecPullPass != '') metric.Data.SecPullPass = true;
+
         metricsHelper.sendAnonymousMetric(metric, function(err, data) {
           if (err) {
             //logging error only to allow stack to complete
@@ -148,45 +169,65 @@ exports.handler = function(event, context) {
 
 		if (event.RequestType === 'Delete') {
 
-		switch (event.LogicalResourceId) {
+				switch (event.LogicalResourceId) {
 
-			case 'MediaPackageChannel':
-				// This function will delete the endpoints and then the channel
-				MediaPackageChannel.deleteChannel(config)
-					.then(responseData => {
+					case 'MediaLiveInput':
+						MediaLiveInput.deleteInput(event.PhysicalResourceId)
+							.then(responseData => {
+								cfn.send(event, context, cfn.SUCCESS);
+							})
+							.catch(err => {
+								console.log(err, err.stack);
+							});
+						break;
+
+					case 'MediaLiveChannel':
+						MediaLiveChannel.deleteChannel(event.PhysicalResourceId)
+							.then(responseData => {
+								cfn.send(event, context, cfn.SUCCESS);
+							})
+							.catch(err => {
+								console.log(err, err.stack);
+							});
+						break;
+
+					case 'MediaPackageChannel':
+						MediaPackageChannel.deleteChannel(config)
+							.then(responseData => {
+								cfn.send(event, context, cfn.SUCCESS);
+							})
+							.catch(err => {
+								console.log(err, err.stack);
+							});
+						break;
+
+					case ('AnonymousMetric'):
+						let metricsHelper = new MetricsHelper();
+						let metric = {
+								Solution: config.solutionId,
+								UUID: config.UUID,
+								TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
+								Data: {
+										Version: config.version,
+										Deleted: moment().utc().format()
+								}
+						};
+						metricsHelper.sendAnonymousMetric(metric, function(err, data) {
+							if (err) {
+								console.log(err, err.stack);
+							} else {
+								console.log('data sent');
+								cfn.send(event, context, cfn.SUCCESS);
+								return;
+							}
+						});
+						break;
+
+					default:
+						console.log(event.LogicalResourceId,': delte not required, sending success response');
 						cfn.send(event, context, cfn.SUCCESS);
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-					});
-				break;
+				}
 
-			case ('AnonymousMetric'):
-        let metricsHelper = new MetricsHelper();
-        let metric = {
-            Solution: event.ResourceProperties.solutionId,
-            UUID: event.ResourceProperties.UUID,
-            TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
-            Data: {
-                Version: event.ResourceProperties.version,
-                Deleted: moment().utc().format()
-            }
-        };
-        metricsHelper.sendAnonymousMetric(metric, function(err, data) {
-          if (err) {
-            console.log(err, err.stack);
-          } else {
-            console.log('data sent');
-            cfn.send(event, context, cfn.SUCCESS);
-            return;
-          }
-        });
-        break;
 
-			default:
-				console.log('no delete required, sending success response');
-				cfn.send(event, context, cfn.SUCCESS);
-		}
 	}
 };

@@ -19,7 +19,8 @@ describe('MEDIALIVE', function() {
 		PriUser:'user1',
 		PriPass: 'pass1',
 		SecUser: 'user2',
-		SecPass: 'pass2'
+		SecPass: 'pass2',
+    InputId: '2468'
   }
 
   let _data = {
@@ -75,6 +76,20 @@ describe('MEDIALIVE', function() {
       lambda.createPushInput(_config)
         .then(responseData => {
           expect(responseData.EndPoint1).to.equal('http://123:5000');
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+    it('should return "sucess" when DELETE input is successful', function(done) {
+
+      AWS.mock('MediaLive', 'deleteInput', function(params, callback) {
+        callback(null, _data);
+      });
+
+      lambda.deleteInput('123456')
+        .then(() => {
           done();
         })
         .catch(err => {

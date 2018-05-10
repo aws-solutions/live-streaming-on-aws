@@ -21,8 +21,8 @@ let CreateChannel = function(config) {
         let responseData = {
           ChannelId:config.ChannelId,
           Url:data.HlsIngest.IngestEndpoints[0].Url,
-          Username:data.HlsIngest.IngestEndpoints[0].Username,
-          PassParam:data.HlsIngest.IngestEndpoints[0].Password
+          User:data.HlsIngest.IngestEndpoints[0].Username,
+          PassParam:data.HlsIngest.IngestEndpoints[0].Username
         };
         console.log('Endpoints:', JSON.stringify(responseData, null, 2));
         let params = {
@@ -48,7 +48,7 @@ let DeleteChannel = function(config) {
   let response = new Promise((res, reject) => {
 
     const mediapackage = new AWS.MediaPackage({
-    	region: 'us-east-1'
+    	region: process.env.AWS_REGION
     });
 
     let promises = [];

@@ -1,10 +1,6 @@
 'use strict';
 const AWS = require('aws-sdk');
 
-let response;
-let responseData;
-let params;
-
 function ssmPut(user,pass) {
 
 	const ssm = new AWS.SSM({
@@ -59,6 +55,8 @@ let CreatePullInput = function(config) {
 			else {
 				let responseData = {
 					Id: data.Input.Id,
+					EndPoint1: 'Push InputType only',
+					EndPoint2: 'Push InputType only'
 				};
 				res(responseData);
 			}
@@ -96,7 +94,7 @@ let CreatePushInput = function(config) {
 						let responseData = {
 							Id: data.Input.Id,
 							EndPoint1: data.Input.Destinations[0].Url,
-							Endpoint2: data.Input.Destinations[1].Url
+							EndPoint2: data.Input.Destinations[1].Url
 						};
 						res(responseData);
 					}
@@ -107,7 +105,25 @@ let CreatePushInput = function(config) {
 	return response;
 };
 
+let DeleteInput = function(PhysicalResourceId) {
+	let response = new Promise((res, reject) => {
+		const medialive = new AWS.MediaLive({
+			region: process.env.AWS_REGION
+		});
+
+		let params = {
+  		InputId: PhysicalResourceId
+		};
+		medialive.deleteInput(params, function(err, data) {
+			if (err) reject(err);
+			else res('success');
+		});
+	});
+	return response;
+};
+
 module.exports = {
 	createPushInput: CreatePushInput,
-	createPullInput: CreatePullInput
+	createPullInput: CreatePullInput,
+	deleteInput: DeleteInput
 };

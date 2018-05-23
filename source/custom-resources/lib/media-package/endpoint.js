@@ -1,5 +1,6 @@
 'use strict';
 const AWS = require('aws-sdk');
+const url = require('url');
 
 let CreateHlsEndPoint = function(config) {
 	let response = new Promise((res, reject) => {
@@ -26,8 +27,10 @@ let CreateHlsEndPoint = function(config) {
 		mediapackage.createOriginEndpoint(params, function(err, data) {
 			if (err) reject(err);
 			else {
+				let Url = url.parse(data.Url);
 				let responseData = {
-					Url: data.Url
+					DomainName:Url.hostname,
+					Path:Url.pathname
 				};
 				console.log('HLS Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);
@@ -61,8 +64,10 @@ let CreateDashEndPoint = function(config) {
 		mediapackage.createOriginEndpoint(params, function(err, data) {
 			if (err) reject(err);
 			else {
+				let Url = url.parse(data.Url);
 				let responseData = {
-					Url: data.Url
+					DomainName:Url.hostname,
+					Path:Url.pathname
 				};
 				console.log('DASH Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);
@@ -92,8 +97,10 @@ let CreateMssEndPoint = function(config) {
 		mediapackage.createOriginEndpoint(params, function(err, data) {
 			if (err) reject(err);
 			else {
+				let Url = url.parse(data.Url);
 				let responseData = {
-					Url: data.Url
+					DomainName:Url.hostname,
+					Path:Url.pathname
 				};
 				console.log('MMS Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);

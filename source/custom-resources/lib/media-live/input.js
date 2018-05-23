@@ -40,6 +40,8 @@ let CreatePullInput = function(config) {
 			]
 		};
 
+		if (config.Type === 'DEMO') params.Type = 'URL_PULL';
+		
 		if (config.PriUser !== null && config.PriUser !== '') {
 			params.Sources[0].Username = config.PriUser;
 			params.Sources[0].PasswordParam = config.PriUser;

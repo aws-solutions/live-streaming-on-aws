@@ -21,9 +21,9 @@ let CreateChannel = function(config) {
 						Username: config.MediaPackagePriPassParam
 					},
 					{
-						PasswordParam: 'c14bf161c23c4bfa80c6631c08cfcaaf',
-						Url: 'https://755ca1af5faa9bea.mediapackage.us-east-1.amazonaws.com/in/v1/0b6efa9d8298415297d01dc2ec88ebff/channel',
-						Username: 'c14bf161c23c4bfa80c6631c08cfcaaf'
+						PasswordParam: 'b277d5c571864636a46a325465da9813',
+						Url: 'https://755ca1af5faa9bea.mediapackage.us-east-1.amazonaws.com/in/v1/775dd08c9b5349599505293f848623c9/channel',
+						Username: 'b277d5c571864636a46a325465da9813'
 					}
 				]
 			}],

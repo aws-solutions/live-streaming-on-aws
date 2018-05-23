@@ -14,7 +14,7 @@ describe('MEDIAPACKAGE', function() {
   }
 
   let data = {
-		Url:'http://test/'
+		Url:'http://test.com/abcd/123'
   };
 
   describe('#MEDIAPACKAGE ENDPOINT TEST', function() {
@@ -37,7 +37,7 @@ describe('MEDIAPACKAGE', function() {
 
       lambda.createHlsEndPoint(_config)
         .then(responseData => {
-          expect(responseData.Url).to.equal('http://test/');
+          expect(responseData.DomainName).to.equal('test.com');
           done();
         })
         .catch(err => {
@@ -54,7 +54,7 @@ describe('MEDIAPACKAGE', function() {
 
 			lambda.createDashEndPoint(_config)
 				.then(responseData => {
-					expect(responseData.Url).to.equal('http://test/');
+					expect(responseData.DomainName).to.equal('test.com');
 					done();
 				})
 				.catch(err => {
@@ -71,7 +71,7 @@ describe('MEDIAPACKAGE', function() {
 
 			lambda.createMssEndPoint(_config)
 				.then(responseData => {
-					expect(responseData.Url).to.equal('http://test/');
+					expect(responseData.DomainName).to.equal('test.com');
 					done();
 				})
 				.catch(err => {

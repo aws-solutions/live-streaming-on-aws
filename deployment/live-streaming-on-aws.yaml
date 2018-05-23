@@ -5,7 +5,7 @@ Parameters:
   InputType:
     Description: Specify the input type for MediaLive
     Type: String
-    Default: RTP_PUSH
+    Default: DEMO
     AllowedValues:
       - RTP_PUSH
       - RTMP_PUSH
@@ -25,7 +25,7 @@ Parameters:
   InputRes:
     Description: Specify the resolution of the source stream for MediaLive (SD/HD)
     Type: String
-    Default: 1080
+    Default: 720
     AllowedValues:
       - 1080
       - 720
@@ -39,6 +39,7 @@ Parameters:
   PriPullURL:
     Description: Specify the primary source URL for the PULL input stream
     Type: String
+    Default: "s3://decepticons97/hls/reinvent.m3u8"
 
   PriPullUser:
     Description: (Optional) Specify a Username for the primary source URL
@@ -51,6 +52,7 @@ Parameters:
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
+    Default: "s3://decepticons97/hls/reinvent.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL
@@ -222,7 +224,7 @@ Resources:
       Code:
         S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
         S3Key: !Join ["/", [!FindInMap ["SourceCode", "General", "KeyPrefix"],  "custom-resources.zip"]]
-      Runtime:  nodejs6.10
+      Runtime:  nodejs8.10
       Timeout: 180
 
   MediaLiveInput:
@@ -252,7 +254,6 @@ Resources:
       InputId: !GetAtt MediaLiveInput.Id
       MediaPackagePriUrl: !GetAtt MediaPackageChannel.Url
       MediaPackagePriUser: !GetAtt MediaPackageChannel.User
-      MediaPackagePriPassParam: !GetAtt MediaPackageChannel.PassParam
 
   MediaPackageChannel:
     Type: Custom::MediaPackageChannel
@@ -281,6 +282,79 @@ Resources:
       ServiceToken: !GetAtt CustomResource.Arn
       ChannelId: !Sub ${AWS::StackName}-livestream
 
+  CloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: livestream
+            DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginKeepaliveTimeout: '6'
+              OriginReadTimeout: '4'
+        Enabled: 'true'
+        Logging:
+          Bucket: !GetAtt LogsBucket.DomainName
+          Prefix: livestream/
+        DefaultCacheBehavior:
+          TargetOriginId: livestream
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: 'true'
+            Cookies:
+              Forward: all
+            Headers:
+              - Origin
+              - Access-Control-Request-Method
+              - Access-Control-Request-Headers
+          ViewerProtocolPolicy: allow-all
+          MinTTL: '6'
+          SmoothStreaming: 'false'
+          Compress: 'true'
+        CacheBehaviors:
+          # HLS CONFIG
+          - ForwardedValues:
+              QueryString: 'true'
+            ViewerProtocolPolicy: allow-all
+            MinTTL: '6'
+            SmoothStreaming: 'false'
+            PathPattern: !GetAtt MediaPackageHlsEndpoint.Path
+            TargetOriginId: livestream
+          # DASH CONFIG
+          - ForwardedValues:
+              QueryString: 'true'
+            ViewerProtocolPolicy: allow-all
+            MinTTL: '2'
+            SmoothStreaming: 'false'
+            PathPattern: !GetAtt MediaPackageDashEndpoint.Path
+            TargetOriginId: livestream
+          # MSS CONFIG
+          - ForwardedValues:
+              QueryString: 'true'
+            ViewerProtocolPolicy: allow-all
+            MinTTL: '2'
+            SmoothStreaming: 'true'
+            PathPattern: !GetAtt MediaPackageMssEndpoint.Path
+            TargetOriginId: livestream
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: '2'
+            ErrorCode: '404'
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+
+  LogsBucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
   Uuid:
     Condition: Metrics
     Type: "Custom::UUID"
@@ -320,7 +394,14 @@ Outputs:
     Description: Primary MediaLive input Url
     Value: !GetAtt MediaLiveInput.EndPoint2
 
-  #CloudFrontHlsEnpoint:
-  #CloudFrontDashEnpoint:
-  #CloudFrontMssEnpoint:
-  #DemoConsoleUrl:
+  CloudFrontHlsEnpoint:
+    Description: HLS CloudFront URL
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Path}
+
+  CloudFrontDashEnpoint:
+    Description: DASH CloudFront URL
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Path}
+
+  CloudFrontMssEnpoint:
+    Description: MSS CloudFront URL
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Path}

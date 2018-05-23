@@ -18,8 +18,7 @@
 'use strict';
 const cfn = require('cfn-response');
 const uuid = require('uuid');
-const moment = require('moment');
-const MetricsHelper = require('./lib/metrics-helper.js');
+const MetricsHelper = require('./lib/metrics/metrics-helper.js');
 const MediaPackageChannel = require('./lib/media-package/channel.js');
 const MediaPackageEndpoint = require('./lib/media-package/endpoint.js');
 const MediaLiveInput = require('./lib/media-live/input.js');
@@ -35,25 +34,25 @@ exports.handler = function(event, context) {
 		switch (event.LogicalResourceId) {
 
 			case 'MediaLiveInput':
-				if (config.Type.includes('PULL')) {
-					MediaLiveInput.createPullInput(config)
-						.then(responseData => {
-							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
-							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
-						})
-						.catch(err => {
-							console.log(err, err.stack);
-							cfn.send(event,context,cfn.FAILED);
-						});
-				} else {
+				if (config.Type.includes('PUSH')) {
 					MediaLiveInput.createPushInput(config)
 						.then(responseData => {
-							console.log('MediaLive ',config.Type, 'Input created: ',JSON.stringify(responseData,null,2));
-							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.Id);
+							console.log('Response: ', JSON.stringify(responseData, null, 2));
+							cfn.send(event, context, cfn.SUCCESS, responseData, responseData.Id);
 						})
 						.catch(err => {
 							console.log(err, err.stack);
-							cfn.send(event,context,cfn.FAILED);
+							cfn.send(event, context, cfn.FAILED);
+						});
+				} else {
+					MediaLiveInput.createPullInput(config)
+						.then(responseData => {
+							console.log('Response: ', JSON.stringify(responseData, null, 2));
+							cfn.send(event, context, cfn.SUCCESS, responseData, responseData.Id);
+						})
+						.catch(err => {
+							console.log(err, err.stack);
+							cfn.send(event, context, cfn.FAILED);
 						});
 				}
 				break;
@@ -118,48 +117,20 @@ exports.handler = function(event, context) {
 					});
 				break;
 
-      case ('Uuid'):
-        //Creates a UUID for the MetricsHelper function
-        let responseData = {
-          UUID: uuid.v4()
-        };
-        cfn.send(event, context, cfn.SUCCESS, responseData);
-        break;
+			case ('Uuid'):
+				cfn.send(event, context, cfn.SUCCESS, {
+					UUID: uuid.v4()
+				});
+				break;
 
 			case ('AnonymousMetric'):
-        //Sends annonomous useage data to AWS
-        let metricsHelper = new MetricsHelper();
-        let metric = {
-            Solution: config.SolutionId,
-            UUID: config.UUID,
-            TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
-            Data: {
-                Version: config.Version,
-                Launched: moment().utc().format(),
-                InputType: config.InputType,
-                InputCodec: config.InputCodec,
-                InputRes: config.InputRes,
-								InputCIDR: config.InputCIDR
-            }
-        };
-				if (config.PriPullURL != '') metric.Data.PriPullURL = true;
-				if (config.PriPullUser != '') metric.Data.PriPullUser = true;
-				if (config.PriPullPass != '') metric.Data.PriPullPass = true;
-				if (config.SecPullURL != '') metric.Data.SecPullURL = true;
-				if (config.SecPullUser != '') metric.Data.SecPullUser = true;
-				if (config.SecPullPass != '') metric.Data.SecPullPass = true;
-
-        metricsHelper.sendAnonymousMetric(metric, function(err, data) {
-          if (err) {
-            //logging error only to allow stack to complete
-            console.log(err, err.stack);
-          } else {
-            console.log('data sent: ', metric);
-            cfn.send(event, context, cfn.SUCCESS);
-            return;
-          }
-        });
-        break;
+				MetricsHelper.sendMetrics(event)
+					.then(() => cfn.send(event, context, cfn.SUCCESS))
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
 
 			default:
 				console.log('no case match, sending success response');
@@ -202,25 +173,12 @@ exports.handler = function(event, context) {
 						break;
 
 					case ('AnonymousMetric'):
-						let metricsHelper = new MetricsHelper();
-						let metric = {
-								Solution: config.solutionId,
-								UUID: config.UUID,
-								TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
-								Data: {
-										Version: config.version,
-										Deleted: moment().utc().format()
-								}
-						};
-						metricsHelper.sendAnonymousMetric(metric, function(err, data) {
-							if (err) {
+						Metrics.sendMetrics(event)
+							.then(() => cfn.send(event, context, cfn.SUCCESS))
+							.catch(err => {
 								console.log(err, err.stack);
-							} else {
-								console.log('data sent');
-								cfn.send(event, context, cfn.SUCCESS);
-								return;
-							}
-						});
+								cfn.send(event, context, cfn.FAILED);
+							});
 						break;
 
 					default:

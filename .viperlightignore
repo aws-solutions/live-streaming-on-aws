@@ -1,1 +1,4 @@
 ^dist/
+CONTRIBUTING.md:50
+CODE_OF_CONDUCT.md:4
+source/custom-resources/lib/media-live/channel.js:25

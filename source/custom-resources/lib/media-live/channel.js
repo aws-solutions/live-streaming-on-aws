@@ -18,12 +18,12 @@ let CreateChannel = function(config) {
 				Settings: [{
 						PasswordParam: config.MediaPackagePriUser,
 						Url: config.MediaPackagePriUrl,
-						Username: config.MediaPackagePriPassParam
+						Username: config.MediaPackagePriUser
 					},
 					{
-						PasswordParam: 'b277d5c571864636a46a325465da9813',
-						Url: 'https://755ca1af5faa9bea.mediapackage.us-east-1.amazonaws.com/in/v1/775dd08c9b5349599505293f848623c9/channel',
-						Username: 'b277d5c571864636a46a325465da9813'
+						PasswordParam: config.MediaPackageSeciUser,
+						Url: config.MediaPackageSecUrl,
+						Username: config.MediaPackageSeciUser
 					}
 				]
 			}],
@@ -35,7 +35,8 @@ let CreateChannel = function(config) {
 			Name: config.Name,
 			RoleArn: config.Role,
 			InputAttachments: [{
-				InputId: config.InputId
+				InputId: config.InputId,
+				InputSettings: {}
 			}],
 			EncoderSettings: {}
 		};
@@ -57,6 +58,8 @@ let CreateChannel = function(config) {
 				params.EncoderSettings = encode480p;
 		}
 
+		if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {SourceEndBehavior:'LOOP'};
+
 		medialive.createChannel(params, function(err, data) {
 			if (err) reject(err);
 			else {
@@ -77,7 +80,7 @@ let DeleteChannel = function(PhysicalResourceId) {
 		});
 
 		let params = {
-  		ChannelId: PhysicalResourceId
+			ChannelId: PhysicalResourceId
 		};
 		medialive.deleteChannel(params, function(err, data) {
 			if (err) reject(err);

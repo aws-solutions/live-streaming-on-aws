@@ -2,6 +2,14 @@ Description: '(SO0013) - Live Streaming on AWS'
 
 Parameters:
 
+  Console:
+    Description: Deploy the demo console (preview player) to Amazon S3
+    Type: String
+    Default: Yes
+    AllowedValues:
+      - Yes
+      - No
+
   InputType:
     Description: Specify the input type for MediaLive
     Type: String
@@ -39,7 +47,7 @@ Parameters:
   PriPullURL:
     Description: Specify the primary source URL for the PULL input stream
     Type: String
-    Default: "s3://decepticons97/hls/reinvent.m3u8"
+    Default: "https://d35c0ph54vn2uv.cloudfront.net/index.m3u8"
 
   PriPullUser:
     Description: (Optional) Specify a Username for the primary source URL
@@ -52,7 +60,7 @@ Parameters:
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
-    Default: "s3://decepticons97/hls/reinvent.m3u8"
+    Default: "https://d35c0ph54vn2uv.cloudfront.net/index.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL
@@ -87,6 +95,12 @@ Metadata:
                 - SecPullURL
                 - SecPullUser
                 - SecPullPass
+            -
+              Label:
+                default: Demo Setup
+              Parameters:
+                - Console
+
         ParameterLabels:
           InputType:
             default: Source Input Type
@@ -108,6 +122,8 @@ Metadata:
             default: Secondary Source Username
           SecPullPass:
             default: Secondary Source Password
+          Console:
+            default: Demo Console
 
 Mappings:
   SourceCode:
@@ -117,10 +133,11 @@ Mappings:
 
   AnonymousData:
     SendAnonymousData:
-      Data: Yes
+      Data: SENDMETRICS
 
 Conditions:
-    Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes ]
+    Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes]
+    Demo: !Equals [ !Ref Console , Yes ]
 
 Resources:
 
@@ -254,12 +271,28 @@ Resources:
       InputId: !GetAtt MediaLiveInput.Id
       MediaPackagePriUrl: !GetAtt MediaPackageChannel.Url
       MediaPackagePriUser: !GetAtt MediaPackageChannel.User
+      MediaPackageSecUrl: !GetAtt TmpMediaPackageChannel.Url
+      MediaPackageSecUser: !GetAtt TmpMediaPackageChannel.User
+      Type: !Ref InputType
 
   MediaPackageChannel:
     Type: Custom::MediaPackageChannel
     Properties:
       ServiceToken:  !GetAtt CustomResource.Arn
       ChannelId: !Sub ${AWS::StackName}-livestream
+
+  TmpMediaPackageChannel:
+    Type: Custom::TmpMediaPackageChannel
+    Properties:
+      ServiceToken:  !GetAtt CustomResource.Arn
+      ChannelId: !Sub ${AWS::StackName}-tmp
+
+  TmpMediaPackageHlsEndpoint:
+    DependsOn: TmpMediaPackageChannel
+    Type: Custom::TmpMediaPackageHlsEndpoint
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      ChannelId: !Sub ${AWS::StackName}-tmp
 
   MediaPackageHlsEndpoint:
     DependsOn: MediaPackageChannel
@@ -287,18 +320,17 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - Id: livestream
+          - Id: hls
             DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
+            OriginPath: /out/v1
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
-              OriginKeepaliveTimeout: '6'
-              OriginReadTimeout: '4'
         Enabled: 'true'
         Logging:
           Bucket: !GetAtt LogsBucket.DomainName
           Prefix: livestream/
         DefaultCacheBehavior:
-          TargetOriginId: livestream
+          TargetOriginId: hls
           AllowedMethods:
             - GET
             - HEAD
@@ -316,37 +348,111 @@ Resources:
               - Access-Control-Request-Method
               - Access-Control-Request-Headers
           ViewerProtocolPolicy: allow-all
-          MinTTL: '6'
-          SmoothStreaming: 'false'
-          Compress: 'true'
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+
+  CloudFront:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: hls
+            DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
+            OriginPath: /out/v1
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+          - Id: dash
+            DomainName: !GetAtt MediaPackageDashEndpoint.DomainName
+            OriginPath: /out/v1
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+          - Id: mss
+            DomainName: !GetAtt MediaPackageMssEndpoint.DomainName
+            OriginPath: /out/v1
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        Enabled: 'true'
+        Logging:
+          Bucket: !GetAtt LogsBucket.DomainName
+          Prefix: livestream/
+        DefaultCacheBehavior:
+          TargetOriginId: hls
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: 'true'
+            Cookies:
+              Forward: all
+            Headers:
+              - Origin
+              - Access-Control-Request-Method
+              - Access-Control-Request-Header
+          ViewerProtocolPolicy: allow-all
         CacheBehaviors:
-          # HLS CONFIG
-          - ForwardedValues:
+          - TargetOriginId: hls
+            PathPattern: MediaPackageHlsEndpoint.Path
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            ForwardedValues:
               QueryString: 'true'
+              Cookies:
+                Forward: all
+              Headers:
+                - Origin
+                - Access-Control-Request-Method
+                - Access-Control-Request-Headers
             ViewerProtocolPolicy: allow-all
-            MinTTL: '6'
-            SmoothStreaming: 'false'
-            PathPattern: !GetAtt MediaPackageHlsEndpoint.Path
-            TargetOriginId: livestream
-          # DASH CONFIG
-          - ForwardedValues:
+          - TargetOriginId: dash
+            PathPattern: MediaPackageDashEndpoint.Path
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            ForwardedValues:
               QueryString: 'true'
+              Cookies:
+                Forward: all
+              Headers:
+                - Origin
+                - Access-Control-Request-Method
+                - Access-Control-Request-Headers
             ViewerProtocolPolicy: allow-all
-            MinTTL: '2'
-            SmoothStreaming: 'false'
-            PathPattern: !GetAtt MediaPackageDashEndpoint.Path
-            TargetOriginId: livestream
-          # MSS CONFIG
-          - ForwardedValues:
+          - TargetOriginId: mss
+            PathPattern: MediaPackageMssEndpoint.Path
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            ForwardedValues:
               QueryString: 'true'
-            ViewerProtocolPolicy: allow-all
-            MinTTL: '2'
+              Cookies:
+                Forward: all
+              Headers:
+                - Origin
+                - Access-Control-Request-Method
+                - Access-Control-Request-Headers
             SmoothStreaming: 'true'
-            PathPattern: !GetAtt MediaPackageMssEndpoint.Path
-            TargetOriginId: livestream
-        CustomErrorResponses:
-          - ErrorCachingMinTTL: '2'
-            ErrorCode: '404'
+            ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           CloudFrontDefaultCertificate: 'true'
 
@@ -355,6 +461,88 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: LogDeliveryWrite
+
+  # Demo Assets
+  DemoBucket:
+    Condition: Demo
+    DeletionPolicy: Retain
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LogsBucket
+        LogFilePrefix: demo_bucket/
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET]
+            AllowedOrigins: ['*']
+            AllowedHeaders: ['*']
+            MaxAge: 3000
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+  DemoBucketPolicy:
+    Condition: Demo
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref DemoBucket
+      PolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join ["", ["arn:aws:s3:::", Ref: "DemoBucket", "/*"]]
+
+  DemoIamPolicy:
+    Condition: Demo
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "livestreamDemoPolicy"
+      Roles:
+        - Ref: "CustomResourceRole"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - s3:putObject
+              - s3:deleteObject
+              - s3:deleteBucket
+            Resource:
+              - !Join ["", ["arn:aws:s3:::", Ref: "DemoBucket"]]
+              - !Join ["", ["arn:aws:s3:::", Ref: "DemoBucket", "/*" ]]
+          -
+            Effect: "Allow"
+            Action:
+              - s3:getObject
+            Resource:
+              - !Join ["", ["arn:aws:s3:::",!FindInMap ["SourceCode", "General", "S3Bucket"], "-", Ref: "AWS::Region"]]
+              - !Join ["", ["arn:aws:s3:::",!FindInMap ["SourceCode", "General", "S3Bucket"], "-", Ref: "AWS::Region","/*"]]
+
+  DemoConsole:
+    Condition: Demo
+    DependsOn: DemoIamPolicy
+    Type: Custom::DemoDeloy
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      SrcBucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+      SrcPath: !FindInMap ["SourceCode", "General", "KeyPrefix"]
+      DemoBucket: !Ref DemoBucket
+      Exports:
+        !Sub |
+          //Configuration file generated by cloudformation
+          'us strict'
+          const exports = {
+            mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${AWS::Region}#/channels/${MediaLiveChannel.ChannelId}',
+            hls_manifest: 'https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Manifest}',
+            dash_manifest: 'https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Manifest}',
+            mss_manifest: 'https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Manifest}'
+          }
+
+  # Metrics
   Uuid:
     Condition: Metrics
     Type: "Custom::UUID"
@@ -396,12 +584,16 @@ Outputs:
 
   CloudFrontHlsEnpoint:
     Description: HLS CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Path}
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Manifest}
 
   CloudFrontDashEnpoint:
     Description: DASH CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Path}
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Manifest}
 
   CloudFrontMssEnpoint:
     Description: MSS CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Path}
+    Value: !Sub https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Manifest}
+
+  DemoConsole:
+    Description: Demo Player URL
+    Value: !Sub https://${DemoBucket.DomainName}/console/index.html

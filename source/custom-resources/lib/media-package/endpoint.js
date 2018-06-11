@@ -10,7 +10,7 @@ let CreateHlsEndPoint = function(config) {
 
 		let params = {
 			ChannelId: config.ChannelId,
-			Id: config.ChannelId+'-hls',
+			Id: config.ChannelId + '-hls',
 			Description: 'Live Streaming on AWS Solution',
 			HlsPackage: {
 				IncludeIframeOnlyStream: false,
@@ -29,8 +29,9 @@ let CreateHlsEndPoint = function(config) {
 			else {
 				let Url = url.parse(data.Url);
 				let responseData = {
-					DomainName:Url.hostname,
-					Path:Url.pathname
+  				DomainName: Url.hostname,
+  				Path: '/'+Url.pathname.split('/')[3],
+  				Manifest:Url.pathname.slice(7)
 				};
 				console.log('HLS Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);
@@ -47,7 +48,7 @@ let CreateDashEndPoint = function(config) {
 		});
 		let params = {
 			ChannelId: config.ChannelId,
-			Id: config.ChannelId+'-dash',
+			Id: config.ChannelId + '-dash',
 			Description: 'Live Streaming on AWS Solution',
 			DashPackage: {
 				ManifestWindowSeconds: 60,
@@ -66,8 +67,9 @@ let CreateDashEndPoint = function(config) {
 			else {
 				let Url = url.parse(data.Url);
 				let responseData = {
-					DomainName:Url.hostname,
-					Path:Url.pathname
+  				DomainName: Url.hostname,
+  				Path: '/'+Url.pathname.split('/')[3],
+  				Manifest:Url.pathname.slice(7)
 				};
 				console.log('DASH Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);
@@ -84,7 +86,7 @@ let CreateMssEndPoint = function(config) {
 		});
 		let params = {
 			ChannelId: config.ChannelId,
-			Id: config.ChannelId+'-mss',
+			Id: config.ChannelId + '-mss',
 			Description: 'Live Streaming on AWS Solution',
 			MssPackage: {
 				ManifestWindowSeconds: 60,
@@ -99,8 +101,9 @@ let CreateMssEndPoint = function(config) {
 			else {
 				let Url = url.parse(data.Url);
 				let responseData = {
-					DomainName:Url.hostname,
-					Path:Url.pathname
+  				DomainName: Url.hostname,
+  				Path: '/'+Url.pathname.split('/')[3],
+  				Manifest:Url.pathname.slice(7)
 				};
 				console.log('MMS Endpoint created: ', JSON.stringify(responseData, null, 2));
 				res(responseData);

@@ -23,6 +23,7 @@ const MediaPackageChannel = require('./lib/media-package/channel.js');
 const MediaPackageEndpoint = require('./lib/media-package/endpoint.js');
 const MediaLiveInput = require('./lib/media-live/input.js');
 const MediaLiveChannel = require('./lib/media-live/channel.js');
+const DemoHelper = require('./lib/demo/demo-helper.js');
 
 exports.handler = function(event, context) {
 
@@ -57,63 +58,97 @@ exports.handler = function(event, context) {
 				}
 				break;
 
-				case 'MediaLiveChannel':
-					MediaLiveChannel.createChannel(config)
-						.then(responseData => {
-							cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId);
-							console.log(responseData);
-						})
-						.catch(err => {
-							console.log(err, err.stack);
-							cfn.send(event,context,cfn.FAILED);
-						});
-					break;
-
-			case 'MediaPackageChannel':
-				MediaPackageChannel.createChannel(config)
+			case 'MediaLiveChannel':
+				MediaLiveChannel.createChannel(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId);
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
 						console.log(responseData);
 					})
 					.catch(err => {
 						console.log(err, err.stack);
-						cfn.send(event,context,cfn.FAILED);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+
+			case 'MediaPackageChannel':
+				MediaPackageChannel.createChannel(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
 					});
 				break;
 
 			case 'MediaPackageHlsEndpoint':
 				MediaPackageEndpoint.createHlsEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-hls');
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-hls');
 						console.log(responseData);
 					})
 					.catch(err => {
 						console.log(err, err.stack);
-						cfn.send(event,context,cfn.FAILED);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+
+			//TMP Channel until MediaPackage supports Dual input.
+			case 'TmpMediaPackageChannel':
+				MediaPackageChannel.createChannel(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+			//TMP Endpoint until MediaPackage supports Dual input.
+			case 'TmpMediaPackageHlsEndpoint':
+				MediaPackageEndpoint.createHlsEndPoint(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-hls');
+						console.log(responseData);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
 					});
 				break;
 
 			case 'MediaPackageDashEndpoint':
 				MediaPackageEndpoint.createDashEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-dash');
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-dash');
 						console.log(responseData);
 					})
 					.catch(err => {
 						console.log(err, err.stack);
-						cfn.send(event,context,cfn.FAILED);
+						cfn.send(event, context, cfn.FAILED);
 					});
 				break;
 
 			case 'MediaPackageMssEndpoint':
 				MediaPackageEndpoint.createMssEndPoint(config)
 					.then(responseData => {
-						cfn.send(event,context,cfn.SUCCESS,responseData,responseData.ChannelId+'-mss');
+						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-mss');
 						console.log(responseData);
 					})
 					.catch(err => {
 						console.log(err, err.stack);
-						cfn.send(event,context,cfn.FAILED);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+
+			case ('DemoConsole'):
+				DemoHelper.s3Deploy(config)
+					.then(() => cfn.send(event, context, cfn.SUCCESS))
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
 					});
 				break;
 
@@ -138,54 +173,71 @@ exports.handler = function(event, context) {
 		}
 	}
 
-		if (event.RequestType === 'Delete') {
+	if (event.RequestType === 'Delete') {
 
-				switch (event.LogicalResourceId) {
+		switch (event.LogicalResourceId) {
 
-					case 'MediaLiveInput':
-						MediaLiveInput.deleteInput(event.PhysicalResourceId)
-							.then(responseData => {
-								cfn.send(event, context, cfn.SUCCESS);
-							})
-							.catch(err => {
-								console.log(err, err.stack);
-							});
-						break;
-
-					case 'MediaLiveChannel':
-						MediaLiveChannel.deleteChannel(event.PhysicalResourceId)
-							.then(responseData => {
-								cfn.send(event, context, cfn.SUCCESS);
-							})
-							.catch(err => {
-								console.log(err, err.stack);
-							});
-						break;
-
-					case 'MediaPackageChannel':
-						MediaPackageChannel.deleteChannel(config)
-							.then(responseData => {
-								cfn.send(event, context, cfn.SUCCESS);
-							})
-							.catch(err => {
-								console.log(err, err.stack);
-							});
-						break;
-
-					case ('AnonymousMetric'):
-						Metrics.sendMetrics(event)
-							.then(() => cfn.send(event, context, cfn.SUCCESS))
-							.catch(err => {
-								console.log(err, err.stack);
-								cfn.send(event, context, cfn.FAILED);
-							});
-						break;
-
-					default:
-						console.log(event.LogicalResourceId,': delte not required, sending success response');
+			case 'MediaLiveInput':
+				MediaLiveInput.deleteInput(event.PhysicalResourceId)
+					.then(responseData => {
 						cfn.send(event, context, cfn.SUCCESS);
-				}
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+					});
+				break;
 
+			case 'MediaLiveChannel':
+				MediaLiveChannel.deleteChannel(event.PhysicalResourceId)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+					});
+				break;
 
+			case 'MediaPackageChannel':
+				MediaPackageChannel.deleteChannel(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+					});
+				break;
+
+			case 'TmpMediaPackageChannel':
+				MediaPackageChannel.deleteChannel(config)
+					.then(responseData => {
+						cfn.send(event, context, cfn.SUCCESS);
+					})
+					.catch(err => {
+						console.log(err, err.stack);
+					});
+				break;
+
+			case ('DemoConsole'):
+				DemoHelper.s3Delete(config)
+					.then(() => cfn.send(event, context, cfn.SUCCESS))
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+
+			case ('AnonymousMetric'):
+				MetricsHelper.sendMetrics(event)
+					.then(() => cfn.send(event, context, cfn.SUCCESS))
+					.catch(err => {
+						console.log(err, err.stack);
+						cfn.send(event, context, cfn.FAILED);
+					});
+				break;
+
+			default:
+				console.log(event.LogicalResourceId, ': delte not required, sending success response');
+				cfn.send(event, context, cfn.SUCCESS);
+		}
 	}
 };

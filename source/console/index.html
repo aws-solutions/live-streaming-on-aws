@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="./assets/img/favicon.ico">
+	<title>Live Streaming on AWS</title>
+	<link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+	<link href="./assets/css/video-js.css" rel="stylesheet">
+	<link href="./assets/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+		<img class="header-logo mx-2" src="./assets/img/smile.png" alt="logo">
+		<a class="navbar-brand" href="./index.html">Live Streaming on AWS</a>
+	</nav>
+
+	<!-- Content -->
+	<main role="main" class="container container-fluid">
+
+		<section class="text-center pb-4">
+			<p class="lead">
+				This demo provides links and a preview player for the HLS, DASH and Microsoft Smooth
+				CloudFront endpoints created by the Live Stream on AWS solution.
+				<p>
+		</section>
+
+		<section class="mb-4">
+			<video
+				id="video"
+				class="video-js"
+				height="480"
+				controls
+				poster="./assets/img/aws-logo.png"
+				crossorigin="anonymous"
+				autoplay preload="auto"
+				data-setup='{"fluid": true}'>
+			</video>
+			<div id="stream" class="text-center text-danger p-2"></div>
+		</section>
+
+		<section class="mb-4">
+			<p class="m-4">
+				<strong>Important!</strong>
+				To start the live stream first login to the <a id="live" href="" target="_blank">Medialive Console</a>
+				and start the live channel. Once the Live Channel status has change to running you can return to this
+				page to preview three outputs from Amazon CloudFront.
+			</p>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>HLS </td>
+						<td class="d-none d-sm-block"  style="font-size: 0.9rem;" id="hls"></td>
+						<td><button class="btn btn-success btn-sm" onclick="loadHls(hls_url)">Preview</button></td>
+					</tr>
+					<tr>
+						<td>DASH</td>
+						<td class="d-none d-sm-block" style="font-size: 0.9rem;" id="dash"></td>
+						<td><button class="btn btn-success btn-sm" onclick="loadDash(dash_url)">Preview</button></td>
+					</tr>
+					<tr>
+						<td>MSS</td>
+						<td class="d-none d-sm-block" style="font-size: 0.9rem;" id="mss"></td>
+						<td><button class="btn btn-success btn-sm" onclick="loadMss(mss_url)">Preview</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section class="p-4">
+			<div class="row">
+				<div class="col-sm-6">
+					<div class="card">
+						<div class="card-header">Solution Resources</div>
+						<div class="card-body">
+							<ul>
+								<li><a href="https://aws.amazon.com/answers/media-entertainment/live-streaming/" target="_blank">Solution Brief</a></li>
+								<li><a href="https://docs.aws.amazon.com/solutions/latest/live-streaming/welcome.html" target="_blank">Implementation Guide</a></li>
+								<li><a href="https://github.com/awslabs/live-stream-on-aws" target="_blank">Source Code on AWS Labs</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<div class="card">
+						<div class="card-header">AWS Services Documentation</div>
+						<div class="card-body">
+							<ul>
+								<li><a href="https://aws.amazon.com/medialive/" target="_blank">AWS Elemental MediaLive</a></li>
+								<li><a href="https://aws.amazon.com/mediapackage/" target="_blank">AWS Elemental MediaPackage</a></li>
+								<li><a href="https://aws.amazon.com/cloudfront/" target="_blank">Amazon CloudFront</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+	</main>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<span><a href="https://aws.amazon.com/answers/">AWS Answers</a></span>
+	</footer>
+
+	<!-- Bootstrap core -->
+	<script src="./assets/js/lib/jquery-3.2.1.min.js"></script>
+	<script src="./assets/js/lib/popper.min.js"></script>
+	<script src="./assets/js/lib/bootstrap.min.js"></script>
+	<!-- Video core -->
+	<script src="./assets/js/lib/video.js"></script>
+	<script src="./assets/js/lib/videojs-contrib-hls.js"></script>
+	<script src="./assets/js/lib/dash.all.min.js"></script>
+	<script src="./assets/js/lib/videojs-dash.js"></script>
+	<script src="./assets/js/lib/hasplayer.js"></script>
+	<!-- App -->
+	<script src="./assets/js/exports.js"></script>
+	<script src="./assets/js/app.js"></script>
+
+</body>
+
+</html>

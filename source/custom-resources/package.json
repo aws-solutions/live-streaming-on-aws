@@ -2,12 +2,12 @@
   "name": "vod-deployment",
   "version": "1.0.0",
   "engines": {
-    "node": "^6.10"
+    "node": "^8.10"
   },
   "description": "cfn custom resources for vod workflow",
   "main": "na",
   "scripts": {
-    "test": "mocha lib/media-live/*.spec.js && mocha lib/media-package/*.spec.js"
+    "test": "mocha lib/media-live/*.spec.js && mocha lib/media-package/*.spec.js && mocha lib/demo/*.spec.js --timeout 15000"
   },
   "dependencies": {
     "cfn-response": "*",

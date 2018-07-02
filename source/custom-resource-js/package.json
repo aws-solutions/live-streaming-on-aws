@@ -7,13 +7,13 @@
   "description": "cfn custom resources for vod workflow",
   "main": "na",
   "scripts": {
-    "test": "mocha lib/media-live/*.spec.js && mocha lib/media-package/*.spec.js && mocha lib/demo/*.spec.js --timeout 15000"
+    "test": "mocha lib/mediapackage/*.spec.js && mocha lib/medialive/*.spec.js && mocha lib/demo/*.spec.js "
   },
   "dependencies": {
-    "cfn-response": "*",
     "https": "*",
     "moment": "*",
-    "uuid": "*"
+    "url": "^0.11.0",
+    "uuid": "^3.3.0"
   },
   "devDependencies": {
     "aws-sdk": "*",
@@ -21,7 +21,8 @@
     "chai": "*",
     "mocha": "*",
     "sinon": "*",
-    "sinon-chai": "*"
+    "sinon-chai": "*",
+    "nock": "^9.0.13"
   },
   "repository": {
     "type": "git",

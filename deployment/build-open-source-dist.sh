@@ -4,17 +4,21 @@
 # cd deployment
 # ./build-open-source-dist.sh
 
-echo "mkdir -p open-source/dist/deployment"
+[ -e open-source ] && rm -r open-source
+echo "== mkdir -p open-source/dist/deployment"
 mkdir -p open-source/dist/deployment
-echo "copy cfn template, build-s3-dist.sh & source to open-source/dist"
-cp build-s3-dist.sh open-source/dist/deployment/
-cp live-streaming-on-aws.yaml open-source/dist/deployment/
-cp -r ../LICENSE.txt ../NOTICE.txt ../README.md ../source open-source/dist/
-cd open-source/dist
-echo "zip -rq ../live-streaming-on-aws.zip *"
-zip -rq ../live-streaming-on-aws.zip *
-cd ..
-echo "open-source files::"
+echo "== cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment"
+cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment
+echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md open-source/dist/"
+cp ../LICENSE.txt ../NOTICE.txt ../README.md open-source/dist/
+echo "== cp -r ../source ./open-source/dist/"
+cp -r ../source ./open-source/dist/
+echo "== rm -rf open-source/dist/source/custom-resource-js/node_modules"
+rm -rf open-source/dist/source/custom-resource-js/node_modules
+echo "== ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *"
+cd ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *
+echo "== cd .. && rm -rf dist"
+cd .. && rm -rf dist
+echo "== open-source files:"
 pwd
-ls
-rm -rf dist
+ls -lh

@@ -6,7 +6,7 @@ let path = require('path');
 let AWS = require('aws-sdk-mock');
 AWS.setSDK(path.resolve('./node_modules/aws-sdk'));
 
-let lambda = require('./demo-helper.js');
+let lambda = require('./index.js');
 
 describe('DEMO', function() {
 

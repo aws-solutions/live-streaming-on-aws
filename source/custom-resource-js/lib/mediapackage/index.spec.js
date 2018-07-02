@@ -6,15 +6,18 @@ let path = require('path');
 let AWS = require('aws-sdk-mock');
 AWS.setSDK(path.resolve('./node_modules/aws-sdk'));
 
-let lambda = require('./channel.js');
+let lambda = require('./index.js');
 
 describe('MEDIAPACKAGE', function() {
 
   let _config = {
-		ChannelId:'test'
+		ChannelId:'test',
+    EndPoint: 'HLS',
+    Url:'http://test.com/abcd/123'
   }
 
   let data = {
+    Url:'http://test.com/abcd/123',
     HlsIngest:{
       IngestEndpoints:[
         {
@@ -24,12 +27,14 @@ describe('MEDIAPACKAGE', function() {
         }
       ]
     },
-     OriginEndpoints:[
+    OriginEndpoints:[
        {
          Id:'test-hls'
        }
      ]
   };
+
+  let ChannelId = 'test';
 
   describe('#MEDIAPACKAGE CHANNEL TEST', function() {
 
@@ -42,6 +47,23 @@ describe('MEDIAPACKAGE', function() {
       AWS.restore('SSM');
     });
 
+    it('should return "responseData" when create HLS Endpoint is successful', function(done) {
+
+      AWS.mock('MediaPackage', 'createOriginEndpoint', function(params, callback) {
+        callback(null, data);
+      });
+
+      AWS.mock('SSM', 'putParameter');
+
+      lambda.createEndPoint(_config)
+        .then(responseData => {
+          expect(responseData.DomainName).to.equal('test.com');
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
     it('should return "responseData" when createchannel is successful', function(done) {
 
       AWS.mock('MediaPackage', 'createChannel', function(params, callback) {
@@ -67,7 +89,7 @@ describe('MEDIAPACKAGE', function() {
       AWS.mock('MediaPackage', 'deleteOriginEndpoint');
       AWS.mock('MediaPackage', 'deleteChannel');
 
-      lambda.deleteChannel(_config)
+      lambda.deleteChannel(ChannelId)
         .then(() => {
           done();
         })

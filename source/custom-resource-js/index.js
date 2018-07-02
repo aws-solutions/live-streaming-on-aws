@@ -10,234 +10,99 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-
 /**
  * @author Solution Builders
- Cloudformation custom resource to create and configure resources as part of the cloudformation deployment.
+ Cloudformation custom resource to create and configure resources for MediaLive, MediaPackage and a demo console.
  **/
-'use strict';
-const cfn = require('cfn-response');
-const uuid = require('uuid');
-const MetricsHelper = require('./lib/metrics/metrics-helper.js');
-const MediaPackageChannel = require('./lib/media-package/channel.js');
-const MediaPackageEndpoint = require('./lib/media-package/endpoint.js');
-const MediaLiveInput = require('./lib/media-live/input.js');
-const MediaLiveChannel = require('./lib/media-live/channel.js');
-const DemoHelper = require('./lib/demo/demo-helper.js');
+ const uuid = require('uuid');
+ const cfn = require('./lib/cfn');
+ const MediaPackage = require('./lib/mediapackage');
+ const MediaLive = require('./lib/medialive');
+ const Demo = require('./lib/demo');
 
-exports.handler = function(event, context) {
+// Feature/p333333 updated index.js to use async/await
+ exports.handler = async (event, context) => {
 
-	console.log('Received event:', JSON.stringify(event, null, 2));
-	const config = event.ResourceProperties;
+ 	console.log('REQUEST:: ', JSON.stringify(event, null, 2));
+	let  config = event.ResourceProperties;
+	let responseData;
+ 	let Id;
 
-	if (event.RequestType === 'Create') {
+	// Each resource returns a promise with a json object to return cloudformation.
+ 	try {
+ 		if (event.RequestType === 'Create') {
+ 			switch (config.Resource) {
 
-		switch (event.LogicalResourceId) {
+ 				case 'MediaLiveInput':
+ 					if (config.Type.includes('PUSH')) {
+ 						responseData = await MediaLive.createPushInput(config);
+ 					} else {
+ 						responseData = await MediaLive.createPullInput(config);
+ 					}
+ 					Id = responseData.Id;
+ 					break;
 
-			case 'MediaLiveInput':
-				if (config.Type.includes('PUSH')) {
-					MediaLiveInput.createPushInput(config)
-						.then(responseData => {
-							console.log('Response: ', JSON.stringify(responseData, null, 2));
-							cfn.send(event, context, cfn.SUCCESS, responseData, responseData.Id);
-						})
-						.catch(err => {
-							console.log(err, err.stack);
-							cfn.send(event, context, cfn.FAILED);
-						});
-				} else {
-					MediaLiveInput.createPullInput(config)
-						.then(responseData => {
-							console.log('Response: ', JSON.stringify(responseData, null, 2));
-							cfn.send(event, context, cfn.SUCCESS, responseData, responseData.Id);
-						})
-						.catch(err => {
-							console.log(err, err.stack);
-							cfn.send(event, context, cfn.FAILED);
-						});
-				}
-				break;
+ 				case 'MediaLiveChannel':
+ 					responseData = await MediaLive.createChannel(config);
+ 					Id = responseData.ChannelId;
+ 					break;
 
-			case 'MediaLiveChannel':
-				MediaLiveChannel.createChannel(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case 'MediaPackageChannel':
+ 					responseData = await MediaPackage.createChannel(config);
+ 					Id = responseData.ChannelId;
+ 					break;
 
-			case 'MediaPackageChannel':
-				MediaPackageChannel.createChannel(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case 'MediaPackageEndPoint':
+ 					responseData = await MediaPackage.createEndPoint(config);
+ 					Id = responseData.Id;
+ 					break;
 
-			case 'MediaPackageHlsEndpoint':
-				MediaPackageEndpoint.createHlsEndPoint(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-hls');
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case ('DemoConsole'):
+ 					await Demo.s3Deploy(config)
 
-			//TMP Channel until MediaPackage supports Dual input.
-			case 'TmpMediaPackageChannel':
-				MediaPackageChannel.createChannel(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId);
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
-			//TMP Endpoint until MediaPackage supports Dual input.
-			case 'TmpMediaPackageHlsEndpoint':
-				MediaPackageEndpoint.createHlsEndPoint(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-hls');
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case ('UUID'):
+ 					responseData = {UUID: uuid.v4()};
+ 					break;
 
-			case 'MediaPackageDashEndpoint':
-				MediaPackageEndpoint.createDashEndPoint(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-dash');
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case ('AnonymousMetric'):
+ 					await Metrics.send(event);
 
-			case 'MediaPackageMssEndpoint':
-				MediaPackageEndpoint.createMssEndPoint(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS, responseData, responseData.ChannelId + '-mss');
-						console.log(responseData);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				default:
+ 					console.log(config.Resource, ': not defined as a custom resource, sending success response');
+ 			}
+ 		}
+ 		if (event.RequestType === 'Delete') {
+ 			switch (config.Resource) {
 
-			case ('DemoConsole'):
-				DemoHelper.s3Deploy(config)
-					.then(() => cfn.send(event, context, cfn.SUCCESS))
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case 'MediaLiveChannel':
+ 					await MediaLive.deleteChannel(event.PhysicalResourceId);
+ 					break;
 
-			case ('Uuid'):
-				cfn.send(event, context, cfn.SUCCESS, {
-					UUID: uuid.v4()
-				});
-				break;
+ 				case 'MediaPackageChannel':
+ 					await MediaPackage.deleteChannel(event.PhysicalResourceId);
+ 					break;
 
-			case ('AnonymousMetric'):
-				MetricsHelper.sendMetrics(event)
-					.then(() => cfn.send(event, context, cfn.SUCCESS))
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
+ 				case ('DemoConsole'):
+ 					await Demo.s3Delete(config);
+ 					break;
 
-			default:
-				console.log('no case match, sending success response');
-				cfn.send(event, context, cfn.FAILED);
-		}
-	}
+ 				case ('AnonymousMetric'):
+ 					await Metrics.send(event);
+ 					break;
 
-	if (event.RequestType === 'Delete') {
+ 				default:
+					// medialive inputs and mediapackage endpoints are deleted as part of
+					// the the channel deletes so not included here, sending default success response
+ 					console.log(event.LogicalResourceId, ': delte not required, sending success response');
+ 			}
+ 		}
 
-		switch (event.LogicalResourceId) {
-
-			case 'MediaLiveInput':
-				MediaLiveInput.deleteInput(event.PhysicalResourceId)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-					});
-				break;
-
-			case 'MediaLiveChannel':
-				MediaLiveChannel.deleteChannel(event.PhysicalResourceId)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-					});
-				break;
-
-			case 'MediaPackageChannel':
-				MediaPackageChannel.deleteChannel(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-					});
-				break;
-
-			case 'TmpMediaPackageChannel':
-				MediaPackageChannel.deleteChannel(config)
-					.then(responseData => {
-						cfn.send(event, context, cfn.SUCCESS);
-					})
-					.catch(err => {
-						console.log(err, err.stack);
-					});
-				break;
-
-			case ('DemoConsole'):
-				DemoHelper.s3Delete(config)
-					.then(() => cfn.send(event, context, cfn.SUCCESS))
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
-
-			case ('AnonymousMetric'):
-				MetricsHelper.sendMetrics(event)
-					.then(() => cfn.send(event, context, cfn.SUCCESS))
-					.catch(err => {
-						console.log(err, err.stack);
-						cfn.send(event, context, cfn.FAILED);
-					});
-				break;
-
-			default:
-				console.log(event.LogicalResourceId, ': delte not required, sending success response');
-				cfn.send(event, context, cfn.SUCCESS);
-		}
-	}
-};
+ 		let response = await cfn.send(event, context,'SUCCESS',responseData, Id);
+ 		console.log('RESPONSE:: ',responseData);
+ 		console.log('CFN STATUS:: ',response);
+ 	}
+ 	catch (err) {
+ 		console.log('ERROR:: ',err, err.stack);
+ 		cfn.send(event, context,'FAILED');
+ 	}
+ };

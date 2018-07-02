@@ -1,5 +1,76 @@
 'use strict';
 const AWS = require('aws-sdk');
+const url = require('url');
+
+
+let CreateEndPoint = function(config) {
+	let response = new Promise((res, reject) => {
+		const mediapackage = new AWS.MediaPackage({
+			region: process.env.AWS_REGION
+		});
+		let packages = {
+		  HlsPackage: {
+		    IncludeIframeOnlyStream: false,
+		    PlaylistType: 'NONE',
+		    PlaylistWindowSeconds: 60,
+		    ProgramDateTimeIntervalSeconds: 0,
+		    SegmentDurationSeconds: 6,
+		    UseAudioRenditionGroup: false
+		  },
+		  DashPackage: {
+		    ManifestWindowSeconds: 60,
+		    MinBufferTimeSeconds: 30,
+		    MinUpdatePeriodSeconds: 15,
+		    Profile: 'NONE',
+		    SegmentDurationSeconds: 2,
+		    SuggestedPresentationDelaySeconds: 25
+		  },
+		  MssPackage: {
+		    ManifestWindowSeconds: 60,
+		    SegmentDurationSeconds: 2
+		  }
+		}
+		let params = {
+			ChannelId: config.ChannelId,
+			Description: 'Live Streaming on AWS Solution',
+			ManifestName: 'index',
+			StartoverWindowSeconds: 0,
+			TimeDelaySeconds: 0,
+		};
+		switch (config.EndPoint) {
+			case 'HLS':
+				params.Id = config.ChannelId + '-hls';
+				params.HlsPackage = packages.HlsPackage;
+				break;
+			case 'DASH':
+				params.Id = config.ChannelId + '-dash';
+				params.DashPackage = packages.DashPackage;
+				break;
+			case 'MSS':
+				params.Id = config.ChannelId + '-mss';
+				params.MssPackage = packages.MssPackage;
+				break;
+			default:
+				reject('Error EndPoint not defined')
+		}
+		mediapackage.createOriginEndpoint(params, function(err, data) {
+			if (err) reject(err);
+			else {
+				let Url = url.parse(data.Url);
+				let responseData = {
+					Id:data.Id,
+  				DomainName: Url.hostname,
+  				Path: '/'+Url.pathname.split('/')[3],
+  				Manifest:Url.pathname.slice(7)
+				};
+				console.log(config.EndPoint,' Endpoint created: ', JSON.stringify(responseData, null, 2));
+				res(responseData);
+			}
+		});
+	});
+	return response;
+};
+
 
 let CreateChannel = function(config) {
   let response = new Promise((res, reject) => {
@@ -34,7 +105,7 @@ let CreateChannel = function(config) {
         ssm.putParameter(params, function(err, data) {
           if (err) reject(err);
           else {
-            console.log('Channel created and credentials stored in SSM ParameterStore: ',JSON.stringify(responseData,null,2));
+            console.log('RESPONSE::\n ',JSON.stringify(responseData,null,2));
             res(responseData);
           }
         });
@@ -44,15 +115,13 @@ let CreateChannel = function(config) {
   return response;
 };
 
-let DeleteChannel = function(config) {
-  let response = new Promise((res, reject) => {
 
+let DeleteChannel = function(ChannelId) {
+  let response = new Promise((res, reject) => {
     const mediapackage = new AWS.MediaPackage({
     	region: process.env.AWS_REGION
     });
-
     let promises = [];
-
     function delEndpoint(id) {
     	let response = new Promise((res, reject) => {
     		let params = {
@@ -69,7 +138,7 @@ let DeleteChannel = function(config) {
     }
 
     let params = {
-      ChannelId:config.ChannelId
+      ChannelId:ChannelId
     };
     mediapackage.listOriginEndpoints(params, function(err,data) {
     	if (err) console.log(err);
@@ -80,7 +149,7 @@ let DeleteChannel = function(config) {
     		Promise.all(promises)
     		.then(() =>{
     			let params = {
-    				Id: config.ChannelId
+    				Id:ChannelId
     			};
     			mediapackage.deleteChannel(params, function(err,data) {
     				if (err) reject(err);
@@ -94,6 +163,7 @@ let DeleteChannel = function(config) {
 };
 
 module.exports = {
+  createEndPoint: CreateEndPoint,
 	createChannel: CreateChannel,
   deleteChannel: DeleteChannel
 };

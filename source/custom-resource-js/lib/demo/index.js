@@ -21,7 +21,7 @@ let CopyFile = function(config, key) {
 
 let S3Deploy = function(config) {
 	const s3 = new AWS.S3();
-	let manifest = require('./manifest.json');
+	let manifest = require('./console-manifest.json');
 
 	let response = new Promise((res, reject) => {
 		let promises = [];
@@ -53,7 +53,7 @@ let S3Deploy = function(config) {
 
 let S3Delete = function(config) {
 	const s3 = new AWS.S3();
-	let manifest = require('./manifest.json');
+	let manifest = require('./console-manifest.json');
 	let objects = [];
 
 	let response = new Promise((res, reject) => {

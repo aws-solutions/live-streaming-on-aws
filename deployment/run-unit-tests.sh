@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd ../source/custom-resources/
+cd ../source/custom-resource-js/
 npm install --silent
 npm test

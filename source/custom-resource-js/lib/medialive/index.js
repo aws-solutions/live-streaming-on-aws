@@ -2,27 +2,23 @@
 const AWS = require('aws-sdk');
 
 function ssmPut(user,pass) {
-
 	const ssm = new AWS.SSM({
 	 region:  process.env.AWS_REGION
 	});
-
   let _ssm = {
     Name:user,
     Description:'Live Stream solution input credentials',
     Type:'String',
     Value:pass
   };
-
 	ssm.putParameter(_ssm, function(err, data) {
 		if (err) throw(err);
 		else console.log(user, ' credentials stored in SSM ParameterStore');
 	});
-}
+};
 
 let CreatePullInput = function(config) {
 	let response = new Promise((res, reject) => {
-
 		const medialive = new AWS.MediaLive({
 			region: process.env.AWS_REGION
 		});
@@ -41,7 +37,7 @@ let CreatePullInput = function(config) {
 		};
 
 		if (config.Type === 'DEMO') params.Type = 'URL_PULL';
-		
+
 		if (config.PriUser !== null && config.PriUser !== '') {
 			params.Sources[0].Username = config.PriUser;
 			params.Sources[0].PasswordParam = config.PriUser;
@@ -107,16 +103,88 @@ let CreatePushInput = function(config) {
 	return response;
 };
 
-let DeleteInput = function(PhysicalResourceId) {
+
+let CreateChannel = function(config) {
+	let response = new Promise((res, reject) => {
+
+		const medialive = new AWS.MediaLive({
+			region: process.env.AWS_REGION
+		});
+		const encode1080p = require('./encoding-profiles/medialive-1080p');
+		const encode720p = require('./encoding-profiles/medialive-720p');
+		const encode480p = require('./encoding-profiles/medialive-480p');
+
+		// Second destination is set to a tmp test deployment until dual input for MediaPackage is rolled out
+		let params = {
+			Destinations: [{
+				Id: "destination1",
+				Settings: [{
+						PasswordParam: config.MediaPackagePriUser,
+						Url: config.MediaPackagePriUrl,
+						Username: config.MediaPackagePriUser
+					},
+					{
+						PasswordParam: config.MediaPackageSeciUser,
+						Url: config.MediaPackageSecUrl,
+						Username: config.MediaPackageSeciUser
+					}
+				]
+			}],
+			InputSpecification: {
+				Codec: config.Codec,
+				Resolution: '',
+				MaximumBitrate: ''
+			},
+			Name: config.Name,
+			RoleArn: config.Role,
+			InputAttachments: [{
+				InputId: config.InputId,
+				InputSettings: {}
+			}],
+			EncoderSettings: {}
+		};
+
+		switch (config.Resolution) {
+			case '1080':
+				params.InputSpecification.Resolution = 'HD';
+				params.InputSpecification.MaximumBitrate = 'MAX_20_MBPS';
+				params.EncoderSettings = encode1080p;
+				break;
+			case '720':
+				params.InputSpecification.Resolution = 'HD';
+				params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
+				params.EncoderSettings = encode720p;
+				break;
+			default:
+				params.InputSpecification.Resolution = 'SD';
+				params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
+				params.EncoderSettings = encode480p;
+		}
+
+		if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {SourceEndBehavior:'LOOP'};
+
+		medialive.createChannel(params, function(err, data) {
+			if (err) reject(err);
+			else {
+				let responseData = {
+					ChannelId: data.Channel.Id
+				};
+				res(responseData);
+			}
+		});
+	});
+	return response;
+};
+
+let DeleteChannel = function(PhysicalResourceId) {
 	let response = new Promise((res, reject) => {
 		const medialive = new AWS.MediaLive({
 			region: process.env.AWS_REGION
 		});
-
 		let params = {
-  		InputId: PhysicalResourceId
+			ChannelId: PhysicalResourceId
 		};
-		medialive.deleteInput(params, function(err, data) {
+		medialive.deleteChannel(params, function(err, data) {
 			if (err) reject(err);
 			else res('success');
 		});
@@ -127,5 +195,6 @@ let DeleteInput = function(PhysicalResourceId) {
 module.exports = {
 	createPushInput: CreatePushInput,
 	createPullInput: CreatePullInput,
-	deleteInput: DeleteInput
+	createChannel: CreateChannel,
+	deleteChannel: DeleteChannel
 };

@@ -19,8 +19,9 @@
  const MediaPackage = require('./lib/mediapackage');
  const MediaLive = require('./lib/medialive');
  const Demo = require('./lib/demo');
+ const Metrics = require('./lib/metrics');
 
-// Feature/p333333 updated index.js to use async/await
+//updated index.js to use async/await
  exports.handler = async (event, context) => {
 
  	console.log('REQUEST:: ', JSON.stringify(event, null, 2));
@@ -58,7 +59,7 @@
  					break;
 
  				case ('DemoConsole'):
- 					await Demo.s3Deploy(config)
+ 					await Demo.s3Deploy(config);
 
  				case ('UUID'):
  					responseData = {UUID: uuid.v4()};

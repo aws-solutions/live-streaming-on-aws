@@ -2,3 +2,4 @@ node_modules/
 dev/
 dist/
 open-source/
+.DS_Store

@@ -572,5 +572,6 @@ Outputs:
     Value: !Sub https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Manifest}
 
   DemoConsole:
+    Condition: Demo
     Description: Demo Player URL
     Value: !Sub https://${DemoBucket.DomainName}/console/index.html

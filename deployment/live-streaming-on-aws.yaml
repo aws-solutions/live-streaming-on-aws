@@ -475,6 +475,11 @@ Resources:
             Principal: '*'
             Action: 's3:GetObject'
             Resource: !Join ["", ["arn:aws:s3:::", Ref: "DemoBucket", "/*"]]
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F16
+            reason: "This is a policy for a demo bucket hosting a static website and is required for site access"
 
   DemoIamPolicy:
     Condition: Demo

@@ -11,16 +11,16 @@ phases:
   build:
     commands:
       - echo "Copying assets to output bucket `date` in `pwd`"
-      - echo "Copying CFN Template to /$TEMPLATE_OUTPUT_BUCKET/live-streming-on-aws/$VERSION"
-      - aws s3 cp deployment/dist/live-streming-on-aws.template s3://$TEMPLATE_OUTPUT_BUCKET/live-streming-on-aws/$VERSION/ --acl bucket-owner-full-control
+      - echo "Copying CFN Template to /$TEMPLATE_OUTPUT_BUCKET/live-streaming-on-aws/$VERSION"
+      - aws s3 cp deployment/dist/live-streaming-on-aws.template s3://$TEMPLATE_OUTPUT_BUCKET/live-streaming-on-aws/$VERSION/ --acl bucket-owner-full-control
       - echo "Copying CFN Template to /latest/"
-      - aws s3 cp deployment/dist/live-streming-on-aws.template s3://$TEMPLATE_OUTPUT_BUCKET/live-streming-on-aws/latest/ --acl bucket-owner-full-control
-      - echo "Copying S3 assets to /$BUILD_OUTPUT_BUCKET/live-streming-on-aws/$VERSION"
-      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/live-streming-on-aws/$VERSION/ --recursive --acl bucket-owner-full-control
+      - aws s3 cp deployment/dist/live-streaming-on-aws.template s3://$TEMPLATE_OUTPUT_BUCKET/live-streaming-on-aws/latest/ --acl bucket-owner-full-control
+      - echo "Copying S3 assets to /$BUILD_OUTPUT_BUCKET/live-streaming-on-aws/$VERSION"
+      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/live-streaming-on-aws/$VERSION/ --recursive --acl bucket-owner-full-control
       - echo "Copying S3 assets to /latest/"
-      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/live-streming-on-aws/latest/ --recursive --acl bucket-owner-full-control
+      - aws s3 cp deployment/dist/ s3://$BUILD_OUTPUT_BUCKET/live-streaming-on-aws/latest/ --recursive --acl bucket-owner-full-control
       - echo "Copying GitHub assets to /$GITHUB_OUTPUT_BUCKET/"
-      - aws s3 cp deployment/open-source s3://$GITHUB_OUTPUT_BUCKET/live-streming-on-aws/$VERSION/open-source/ --recursive --acl bucket-owner-full-control
+      - aws s3 cp deployment/open-source s3://$GITHUB_OUTPUT_BUCKET/live-streaming-on-aws/$VERSION/open-source/ --recursive --acl bucket-owner-full-control
       - echo "Copying assets to output bucket complete `date`"
 
   post_build:

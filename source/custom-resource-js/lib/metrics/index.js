@@ -1,49 +1,42 @@
-// https.request rapped in a promise to send Anonymous Metric back to AWS.
+/**
+ * @author Solution Builders
+ * @function Metrics Helper
+ * @description Send Anonymous Metrics to Amazon Web Services
+*/
 
-const https = require('https');
+// FEATURE/P15424610 update to use AXIOS which has support for promises and Async/Await.
+const axios = require('axios');
 const moment = require('moment');
 
-let Send = function(event) {
-	let response = new Promise((res, reject) => {
 
-		let now = moment().utc().format('YYYY-MM-DD HH:mm:ss.S');
-
+let  sendMetrics = async (config) => {
+  let data;
+  try {
 		let metrics = {
-			Solution: event.ResourceProperties.SolutionId,
-			UUID: event.ResourceProperties.UUID,
-			TimeStamp: now,
-			Data: event.ResourceProperties
+			Solution: config.SolutionId,
+			UUID: config.UUID,
+			TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
+			Data: config
 		};
-
-		// Remove unwanted data and set request type Create/Update/Delete
-		delete metrics.Data.ServiceToken;
-		metrics.Data[event.RequestType] = now;
-
-		let options = {
-			//hostname: 'metrics.awssolutionsbuilder.com',
-			hostname: 'https://oszclq8tyh.execute-api.us-east-1.amazonaws.com',
-			port: 443,
-			//path: '/generic',
-			path: '/prod/generic',
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		};
-
-		let request = https.request(options, (data) => {
-			res(data.statusCode);
-		});
-		request.on('error', (err) => {
-			console.error(err);
-			reject(err);
-		});
-		request.write(metrics);
-		request.end();
-	});
-	return response;
+		let params = {
+      method: 'post',
+      port: 443,
+			url: 'https://metrics.awssolutionsbuilder.com/generic',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: metrics
+    };
+    //Send Metrics & retun status code.
+    data = await axios(params);
+  }
+	catch (err) {
+    throw err;
+  }
+  return data.status;
 };
 
+
 module.exports = {
-	send: Send
+	send: sendMetrics
 };

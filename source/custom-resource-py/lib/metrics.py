@@ -19,24 +19,17 @@ import datetime
 import json
 import urllib.request
 
+# FEATURE/P15424610
+# Update:: passing config(event.ResourceProperties) not event as request type
+# nolonger needed.
 
-def send_metrics(event):
-    config = event['ResourceProperties']
+def send_metrics(config):
     metrics = {}
-    metrics['Solution'] = 'SO0013'
+    metrics['Solution'] = config['SO0013']
     metrics['UUID'] = config['UUID']
     metrics['TimeStamp'] = str(datetime.datetime.utcnow().isoformat())
     metrics['Data'] = config
-    del metrics['Data']['ServiceToken']
-
-    if event['RequestType'] == 'Create':
-        metrics['Data']['Launched'] = str(datetime.datetime.utcnow().isoformat())
-
-    if event['RequestType'] == 'Delete':
-        metrics['Data']['Deleted'] = str(datetime.datetime.utcnow().isoformat())
-
-    #url = 'https://metrics.awssolutionsbuilder.com/generic'
-    url = 'https://oszclq8tyh.execute-api.us-east-1.amazonaws.com/prod/generic'
+    url = 'https://metrics.awssolutionsbuilder.com/generic'
     data = json.dumps(metrics).encode('utf8')
     headers = {'content-type': 'application/json'}
     req = urllib.request.Request(url, data,headers)

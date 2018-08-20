@@ -1,5 +1,5 @@
 {
-  "name": "vod-deployment",
+  "name": "live-streaming-on-aws",
   "version": "1.0.0",
   "engines": {
     "node": "^8.10"
@@ -7,22 +7,19 @@
   "description": "cfn custom resources for vod workflow",
   "main": "na",
   "scripts": {
-    "test": "mocha lib/mediapackage/*.spec.js && mocha lib/medialive/*.spec.js && mocha lib/demo/*.spec.js "
+    "test": "mocha lib/cfn/*.spec.js && mocha lib/demo/*.spec.js && mocha lib/medialive/*.spec.js && mocha lib/mediapackage/*.spec.js && mocha lib/metrics/*.spec.js"
   },
   "dependencies": {
-    "https": "*",
+    "axios": "*",
     "moment": "*",
-    "url": "^0.11.0",
     "uuid": "^3.3.0"
   },
   "devDependencies": {
     "aws-sdk": "*",
     "aws-sdk-mock": "*",
-    "chai": "*",
     "mocha": "*",
-    "sinon": "*",
-    "sinon-chai": "*",
-    "nock": "^9.0.13"
+    "chai": "*",
+    "axios-mock-adapter": "*"
   },
   "repository": {
     "type": "git",

@@ -1,19 +1,20 @@
-/*********************************************************************************************************************
- *  Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
- *                                                                                                                    *
- *  Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance        *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://aws.amazon.com/asl/                                                                                    *
- *                                                                                                                    *
- *  or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
-/**
+/***********************************************************************************************
+ *  Copyright 2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Amazon Software License (the "License"). You may not use
+ *  this file except in compliance with the License. A copy of the License is located at
+ *
+ *      http://aws.amazon.com/asl/
+ *
+ *  or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *                                                                                 *
  * @author Solution Builders
- Cloudformation custom resource to create and configure resources for MediaLive, MediaPackage and a demo console.
- **/
+ * @function CFN Custom Resource
+ * @description cloudformation custom resource to create MediaLive and MediaPackage resources
+ *
+ *********************************************************************************************/
  const uuid = require('uuid');
  const cfn = require('./lib/cfn');
  const MediaPackage = require('./lib/mediapackage');
@@ -26,11 +27,12 @@
 
  	console.log('REQUEST:: ', JSON.stringify(event, null, 2));
 	let  config = event.ResourceProperties;
-	let responseData;
+	let responseData = {};
  	let Id;
 
 	// Each resource returns a promise with a json object to return cloudformation.
  	try {
+    console.log('RESOURCE:: ',config.Resource);
  		if (event.RequestType === 'Create') {
  			switch (config.Resource) {
 
@@ -60,13 +62,15 @@
 
  				case ('DemoConsole'):
  					await Demo.s3Deploy(config);
+          break;
 
  				case ('UUID'):
  					responseData = {UUID: uuid.v4()};
  					break;
 
  				case ('AnonymousMetric'):
- 					await Metrics.send(event);
+ 					await Metrics.send(config);
+          break;
 
  				default:
  					console.log(config.Resource, ': not defined as a custom resource, sending success response');
@@ -87,9 +91,9 @@
  					await Demo.s3Delete(config);
  					break;
 
- 				case ('AnonymousMetric'):
- 					await Metrics.send(event);
- 					break;
+        // FEATURE/P15424610:: Removed Metrics as create/delete captured by CFN metrics
+
+
 
  				default:
 					// medialive inputs and mediapackage endpoints are deleted as part of

@@ -29,13 +29,28 @@ def create_channel(config):
         Id=config['ChannelId']
     )
     responseData['ChannelId'] = config['ChannelId']
-    responseData['Url'] = response['HlsIngest']['IngestEndpoints'][0]['Url']
-    responseData['User'] = response['HlsIngest']['IngestEndpoints'][0]['Username']
-    responseData['PassParam'] = response['HlsIngest']['IngestEndpoints'][0]['Username']
+    responseData['PrimaryUrl'] = response['HlsIngest']['IngestEndpoints'][0]['Url']
+    responseData['PrimaryUser'] = response['HlsIngest']['IngestEndpoints'][0]['Username']
+    responseData['PrimaryPassParam'] = response['HlsIngest']['IngestEndpoints'][0]['Username']
+
+    # Adding Primary U/P to SSM Parameter store
     ssm.put_parameter(
         Name=response['HlsIngest']['IngestEndpoints'][0]['Username'],
-        Description='live-streaming-on-aws',
+        Description='live-streaming-on-aws MediaPackage Primary Ingest Username',
         Value=response['HlsIngest']['IngestEndpoints'][0]['Password'],
+        Type='String'
+    )
+    # FEATURE/P15424610
+    # Dual ingest support added to MediaPackage, returning details for both Ingest
+    # Endpoints. Update due for GA 08/28
+    responseData['SecondaryUrl'] = response['HlsIngest']['IngestEndpoints'][1]['Url']
+    responseData['SecondaryUser'] = response['HlsIngest']['IngestEndpoints'][1]['Username']
+    responseData['SecondaryPassParam'] = response['HlsIngest']['IngestEndpoints'][1]['Username']
+    # Adding Secondary U/P to SSM Parameter store
+    ssm.put_parameter(
+        Name=response['HlsIngest']['IngestEndpoints'][1]['Username'],
+        Description='live-streaming-on-aws MediaPackage Secondary Ingest Username',
+        Value=response['HlsIngest']['IngestEndpoints'][1]['Password'],
         Type='String'
     )
     print('RESPONSE::{}'.format(responseData))

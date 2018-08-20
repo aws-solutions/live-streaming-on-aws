@@ -143,7 +143,7 @@ Mappings:
 
   AnonymousData:
     SendAnonymousData:
-      Data: SENDMETRICS
+      Data: Yes
 
 Conditions:
     Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes]
@@ -214,7 +214,7 @@ Resources:
                 Action:
                   - iam:PassRole
                 Resource:
-                  - !Join ["", ["arn:aws:iam::", Ref: "AWS::AccountId", ":role/*"]]
+                  -  !GetAtt MediaLiveRole.Arn
 
   MediaLiveRole:
     Type: AWS::IAM::Role
@@ -264,13 +264,6 @@ Resources:
       ServiceToken: !GetAtt CustomResource.Arn
       Resource: MediaPackageChannel
       ChannelId: !Sub ${AWS::StackName}-livestream
-
-  TmpMediaPackageChannel:
-    Type: Custom::TmpMediaPackageChannel
-    Properties:
-      ServiceToken: !GetAtt CustomResource.Arn
-      Resource: MediaPackageChannel
-      ChannelId: !Sub ${AWS::StackName}-tmp
 
   MediaPackageHlsEndpoint:
     DependsOn: MediaPackageChannel
@@ -326,11 +319,11 @@ Resources:
       Codec: !Ref InputCodec
       Role: !GetAtt MediaLiveRole.Arn
       InputId: !GetAtt MediaLiveInput.Id
-      MediaPackagePriUrl: !GetAtt MediaPackageChannel.Url
-      MediaPackagePriUser: !GetAtt MediaPackageChannel.User
-      MediaPackageSecUrl: !GetAtt TmpMediaPackageChannel.Url
-      MediaPackageSecUser: !GetAtt TmpMediaPackageChannel.User
-
+      MediaPackagePriUrl: !GetAtt MediaPackageChannel.PrimaryUrl
+      MediaPackagePriUser: !GetAtt MediaPackageChannel.PrimaryUser
+      # FEATURE/P15424610 Dual ingest support for MediaPackage
+      MediaPackageSecUrl: !GetAtt MediaPackageChannel.SecondaryUrl
+      MediaPackageSecUser: !GetAtt MediaPackageChannel.SecondaryUser
 
   CloudFront:
     Type: AWS::CloudFront::Distribution
@@ -535,12 +528,14 @@ Resources:
     Type: "Custom::UUID"
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
+      Resource: UUID
 
   AnonymousMetric:
     Condition: Metrics
     Type: "Custom::AnonymousMetric"
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
+      Resouce: AnonymousMetric
       SolutionId: "SO0013"
       UUID: !GetAtt Uuid.UUID
       Version: "2.0"

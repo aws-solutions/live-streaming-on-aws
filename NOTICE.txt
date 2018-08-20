@@ -17,7 +17,11 @@ AWS SDK under the Apache License Version 2.0
 
 Stanford Javascript Crypto Library under the BSD license or under the GNU GPL, version 2.0
 Moment.js under the Massachusetts Institute of Technology (MIT) license
-Cfn-response.js under the Apache License Version 2.0
 uuid.js under the Massachusetts Institute of Technology (MIT) license
+axios under the Massachusetts Institute of Technology (MIT) license
+axios-mock-adapter under the Massachusetts Institute of Technology (MIT) license
+chai under the Massachusetts Institute of Technology (MIT) license
+mocha under the Massachusetts Institute of Technology (MIT) license
+aws-sdk-mock under the Massachusetts Institute of Technology (MIT) license
 
 The licenses for these third party components are included in LICENSE.txt

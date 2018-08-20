@@ -1,7 +1,7 @@
 #!/bin/bash
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Please provide the base source bucket name and version where the lambda code will eventually reside."
+    echo "Please provide the base source bucket name and version (subfolder) where the lambda code will eventually reside."
     echo "For example: ./build-s3-dist.sh solutions v1.0.0"
     exit 1
 fi
@@ -11,8 +11,11 @@ echo "== mkdir -p dist"
 mkdir -p dist
 echo "== cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.template"
 cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.template
-sed  -i "" "s/CODEBUCKET/$1/g" dist/live-streaming-on-aws.template
-sed  -i "" "s/CODEVERSION/$2/g" dist/live-streaming-on-aws.template
+echo "== update CODEBUCKET CODEVERSION"
+replace="s/%%CODEBUCKET%%/$1/g"
+sed -i '' -e $replace dist/live-streaming-on-aws.template
+replace="s/%%CODEVERSION%%/$2/g"
+sed -i '' -e $replace dist/live-streaming-on-aws.template
 cd ../source/
 echo "== generate console-manifest.json"
 find console/* -type f | awk ' BEGIN { ORS = ""; print "["; } { print "\/\@"$0"\/\@"; } END { print "]"; }' | sed "s^\"^\\\\\"^g;s^\/\@\/\@^\", \"^g;s^\/\@^\"^g" > ./console-manifest.json

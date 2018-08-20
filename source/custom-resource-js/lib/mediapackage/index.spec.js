@@ -1,102 +1,78 @@
-
-'use strict';
 let assert = require('chai').assert;
 let expect = require('chai').expect;
-let path = require('path');
+var path = require('path');
 let AWS = require('aws-sdk-mock');
 AWS.setSDK(path.resolve('./node_modules/aws-sdk'));
 
 let lambda = require('./index.js');
 
-describe('MEDIAPACKAGE', function() {
+let _config = {
+  ChannelId:'test',
+  EndPoint: 'HLS',
+  Url:'http://test.com/123'
+}
+let data = {
+  Url:'http://test.com/123',
+  HlsIngest:{
+    IngestEndpoints:[
+      {
+        Username:'name',
+        Password:'password',
+        Url:'http://test/'
+      },
+      {
+        Username:'name2 ',
+        Password:'password2',
+        Url:'http://test2/'
+      }
+    ]
+  },
+  OriginEndpoints:[
+     {
+       Id:'test-hls'
+     }
+   ]
+};
+let ChannelId = 'test';
+let end_data = [
+  {Id:'111'}
+];
 
-  let _config = {
-		ChannelId:'test',
-    EndPoint: 'HLS',
-    Url:'http://test.com/abcd/123'
-  }
+describe('#MEDIAPACKAGE::', () => {
 
-  let data = {
-    Url:'http://test.com/abcd/123',
-    HlsIngest:{
-      IngestEndpoints:[
-        {
-          Username:'name',
-          Password:'password',
-          Url:'http://test/'
-        }
-      ]
-    },
-    OriginEndpoints:[
-       {
-         Id:'test-hls'
-       }
-     ]
-  };
+	afterEach(() => {
+    AWS.restore('MediaPackage');
+    AWS.restore('SSM');
+	});
 
-  let ChannelId = 'test';
+	it('should return "responseData" on mediapackage create EndPoint', async () => {
 
-  describe('#MEDIAPACKAGE CHANNEL TEST', function() {
+		AWS.mock('MediaPackage', 'createOriginEndpoint', Promise.resolve(data));
 
-    beforeEach(function() {
-      process.env.AWS_REGION = 'us-east-1'
-    });
+		lambda.createEndPoint	(_config,(err, responseData) => {
+				expect(responseData.DomainName).to.equal('test.com');
+		});
+	});
 
-    afterEach(function() {
-      AWS.restore('MediaPackage');
-      AWS.restore('SSM');
-    });
+	it('should return "responseData" on mediapackage create Channel', async () => {
 
-    it('should return "responseData" when create HLS Endpoint is successful', function(done) {
+		AWS.mock('MediaPackage', 'createChannel', Promise.resolve(data));
+    AWS.mock('SSM', 'putParameter');
 
-      AWS.mock('MediaPackage', 'createOriginEndpoint', function(params, callback) {
-        callback(null, data);
-      });
+		lambda.createChannel(_config,(err, responseData) => {
+					expect(responseData.Url).to.equal('http://test/');
+		});
+	});
 
-      AWS.mock('SSM', 'putParameter');
+  it('should return "responseData" on mediapackage delete channel',async () => {
 
-      lambda.createEndPoint(_config)
-        .then(responseData => {
-          expect(responseData.DomainName).to.equal('test.com');
-          done();
-        })
-        .catch(err => {
-          done(err);
-        });
-    });
-    it('should return "responseData" when createchannel is successful', function(done) {
+		AWS.mock('MediaPackage', 'listOriginEndpoints', Promise.resolve(data));
+    AWS.mock('MediaPackage', 'deleteOriginEndpoint');
+    AWS.mock('MediaPackage', 'deleteChannel');
 
-      AWS.mock('MediaPackage', 'createChannel', function(params, callback) {
-        callback(null, data);
-      });
+		lambda.deleteChannel	(ChannelId,(err, responseData) => {
+				expect(responseData).to.equal('success');
+		});
+	});
 
-      AWS.mock('SSM', 'putParameter');
-
-      lambda.createChannel(_config)
-        .then(responseData => {
-          expect(responseData.Url).to.equal('http://test/');
-          done();
-        })
-        .catch(err => {
-          done(err);
-        });
-    });
-    it('should return "data" when deletechannel is successful', function(done) {
-
-      AWS.mock('MediaPackage', 'listOriginEndpoints', function(params, callback) {
-        callback(null, data);
-      });
-      AWS.mock('MediaPackage', 'deleteOriginEndpoint');
-      AWS.mock('MediaPackage', 'deleteChannel');
-
-      lambda.deleteChannel(ChannelId)
-        .then(() => {
-          done();
-        })
-        .catch(err => {
-          done(err);
-        });
-    });
-
-  });
 });

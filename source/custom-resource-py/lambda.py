@@ -12,10 +12,13 @@
 #  or in the "license" file accompanying this file. This file is distributed #
 #  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,        #
 #  express or implied. See the License for the specific language governing   #
-#  permissions and limitations under the License.                            #
+#  permissions and limitations under the License.
+# @author Solution Builders
+# @function CFN Custom Resource
+# @description cloudformation custom resource to create MediaLive and
+# MediaPackage resources
+#
 ##############################################################################
-# Cloudformation custom resource to create and configure resources for MediaLive, MediaPackage and a demo console.
-
 import json
 import urllib
 import boto3
@@ -66,7 +69,7 @@ def handler(event, context):
                 id =  responseData['UUID']
 
             elif resource == 'AnonymousMetric':
-                Metrics.send_metrics(event)
+                Metrics.send_metrics(config)
                 id = 'Metrics Sent'
 
             else:
@@ -86,8 +89,6 @@ def handler(event, context):
             elif resource == 'DemoConsole':
                 Demo.s3_delete(config)
 
-            elif resource == 'AnonymousMetric':
-                MetricsHelper.send_metrics(event)
             else:
                 #medialive inputs and mediapackage endpoints are deleted as part of
                 #the the channel deletes so not included here, sending default success response

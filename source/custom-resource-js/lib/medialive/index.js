@@ -1,68 +1,74 @@
-'use strict';
+/**
+ * @function MediaLive
+ * @description AWS Elemental MediaLive module for Node 8.10+ to create/delete
+ * MediaLive Inputs and Channels
+*/
+
 const AWS = require('aws-sdk');
 
-function ssmPut(user,pass) {
-	const ssm = new AWS.SSM({
-	 region:  process.env.AWS_REGION
-	});
-  let _ssm = {
-    Name:user,
-    Description:'Live Stream solution input credentials',
-    Type:'String',
-    Value:pass
-  };
-	ssm.putParameter(_ssm, function(err, data) {
-		if (err) throw(err);
-		else console.log(user, ' credentials stored in SSM ParameterStore');
-	});
+
+// FEATURE/P15424610:: Function updated to use Async & removed ssmPut functions as nolnger required.
+let CreatePullInput = async (config) => {
+  const medialive = new AWS.MediaLive({
+    region: process.env.AWS_REGION
+  });
+  const ssm = new AWS.SSM({
+    region: process.env.AWS_REGION
+  });
+  let responseData;
+  try {
+    let params = {
+      Name: config.StreamName,
+      Type: config.Type,
+      Sources: [{
+          Url: config.PriUrl
+        },
+        {
+          Url: config.SecUrl
+        }
+      ]
+    };
+    //If authentication is required, update params & store U/P in Parameter Store
+    if (config.PriUser !== null && config.PriUser !== '') {
+      params.Sources[0].Username = config.PriUser;
+      params.Sources[0].PasswordParam = config.PriUser;
+      let ssm_params = {
+        Name: config.PriUser,
+        Description: 'Live Stream solution input credentials',
+        Type: 'String',
+        Value: config.PriPass
+      };
+      await ssm.putParameter(ssm_params).promise();
+    }
+    if (config.SecUser !== null && config.SecUser !== '') {
+      params.Sources[1].Username = config.SecUser;
+      params.Sources[1].PasswordParam = config.SecUser;
+      let ssm_params = {
+        Name: config.SecUser,
+        Description: 'Live Stream solution input credentials',
+        Type: 'String',
+        Value: config.SecPass
+      };
+      await ssm.putParameter(ssm_params).promise();
+    }
+    //Create input
+    let data = await medialive.createInput(params).promise();
+
+    responseData = {
+      Id: data.Input.Id,
+      EndPoint1: 'Push InputType only',
+      EndPoint2: 'Push InputType only'
+    };
+  }
+  catch (err) {
+    throw err;
+  }
+  return responseData;
 };
 
-let CreatePullInput = function(config) {
-	let response = new Promise((res, reject) => {
-		const medialive = new AWS.MediaLive({
-			region: process.env.AWS_REGION
-		});
 
-		let params = {
-			Name: config.StreamName,
-			Type: config.Type,
-			Sources: [
-				{
-					Url: config.PriUrl
-				},
-				{
-					Url: config.SecUrl
-				}
-			]
-		};
-
-		if (config.Type === 'DEMO') params.Type = 'URL_PULL';
-
-		if (config.PriUser !== null && config.PriUser !== '') {
-			params.Sources[0].Username = config.PriUser;
-			params.Sources[0].PasswordParam = config.PriUser;
-			ssmPut(config.PriUser,config.PriPass);
-		}
-		if (config.SecUser !== null && config.SecUser !== '') {
-			params.Sources[1].Username = config.SecUser;
-			params.Sources[1].PasswordParam = config.SecUser;
-			ssmPut(config.SecUser,config.SecPass);
-		}
-		medialive.createInput(params, function(err, data) {
-			if (err) reject(err);
-			else {
-				let responseData = {
-					Id: data.Input.Id,
-					EndPoint1: 'Push InputType only',
-					EndPoint2: 'Push InputType only'
-				};
-				res(responseData);
-			}
-		});
-	});
-	return response;
-};
-
+//FEATURE/P15424610:: There is a bug with the current version of the SDK that casues
+// the Async/Await version of this function to fail.
 let CreatePushInput = function(config) {
 	let response = new Promise((res, reject) => {
 
@@ -104,97 +110,107 @@ let CreatePushInput = function(config) {
 };
 
 
-let CreateChannel = function(config) {
-	let response = new Promise((res, reject) => {
+// FEATURE/P15424610:: Function updated to use Async
+let CreateChannel = async (config) => {
+  const medialive = new AWS.MediaLive({
+    region: process.env.AWS_REGION
+  });
+  const encode1080p = require('./encoding-profiles/medialive-1080p');
+  const encode720p = require('./encoding-profiles/medialive-720p');
+  const encode480p = require('./encoding-profiles/medialive-480p');
+  let responseData;
+  try {
+    // Define baseline Paameters for cheate channel
+    let params = {
+      Destinations: [{
+        Id: "destination1",
+        Settings: [{
+            PasswordParam: config.MediaPackagePriUser,
+            Url: config.MediaPackagePriUrl,
+            Username: config.MediaPackagePriUser
+          },
+          {
+            PasswordParam: config.MediaPackageSeciUser,
+            Url: config.MediaPackageSecUrl,
+            Username: config.MediaPackageSeciUser
+          }
+        ]
+      }],
+      InputSpecification: {
+        Codec: config.Codec,
+        Resolution: '',
+        MaximumBitrate: ''
+      },
+      Name: config.Name,
+      RoleArn: config.Role,
+      InputAttachments: [{
+        InputId: config.InputId,
+        InputSettings: {}
+      }],
+      EncoderSettings: {}
+    };
+    // Update parameters based on source resolution (defined in cloudformation)
+    switch (config.Resolution) {
+      case '1080':
+        params.InputSpecification.Resolution = 'HD';
+        params.InputSpecification.MaximumBitrate = 'MAX_20_MBPS';
+        params.EncoderSettings = encode1080p;
+        break;
+      case '720':
+        params.InputSpecification.Resolution = 'HD';
+        params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
+        params.EncoderSettings = encode720p;
+        break;
+      default:
+        params.InputSpecification.Resolution = 'SD';
+        params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
+        params.EncoderSettings = encode480p;
+    }
+    // Set the demo input to loop as the demo video is only one a minute long.
+    if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {
+      SourceEndBehavior: 'LOOP'
+    };
+    //Create Channel & return Channel ID
+    let data = await medialive.createChannel(params).promise();
 
-		const medialive = new AWS.MediaLive({
-			region: process.env.AWS_REGION
-		});
-		const encode1080p = require('./encoding-profiles/medialive-1080p');
-		const encode720p = require('./encoding-profiles/medialive-720p');
-		const encode480p = require('./encoding-profiles/medialive-480p');
-
-		// Second destination is set to a tmp test deployment until dual input for MediaPackage is rolled out
-		let params = {
-			Destinations: [{
-				Id: "destination1",
-				Settings: [{
-						PasswordParam: config.MediaPackagePriUser,
-						Url: config.MediaPackagePriUrl,
-						Username: config.MediaPackagePriUser
-					},
-					{
-						PasswordParam: config.MediaPackageSeciUser,
-						Url: config.MediaPackageSecUrl,
-						Username: config.MediaPackageSeciUser
-					}
-				]
-			}],
-			InputSpecification: {
-				Codec: config.Codec,
-				Resolution: '',
-				MaximumBitrate: ''
-			},
-			Name: config.Name,
-			RoleArn: config.Role,
-			InputAttachments: [{
-				InputId: config.InputId,
-				InputSettings: {}
-			}],
-			EncoderSettings: {}
-		};
-
-		switch (config.Resolution) {
-			case '1080':
-				params.InputSpecification.Resolution = 'HD';
-				params.InputSpecification.MaximumBitrate = 'MAX_20_MBPS';
-				params.EncoderSettings = encode1080p;
-				break;
-			case '720':
-				params.InputSpecification.Resolution = 'HD';
-				params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
-				params.EncoderSettings = encode720p;
-				break;
-			default:
-				params.InputSpecification.Resolution = 'SD';
-				params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
-				params.EncoderSettings = encode480p;
-		}
-
-		if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {SourceEndBehavior:'LOOP'};
-
-		medialive.createChannel(params, function(err, data) {
-			if (err) reject(err);
-			else {
-				let responseData = {
-					ChannelId: data.Channel.Id
-				};
-				res(responseData);
-			}
-		});
-	});
-	return response;
+    responseData = {
+      ChannelId: data.Channel.Id
+    };
+  }
+  catch (err) {
+    throw err;
+  }
+  return responseData;
 };
 
-let DeleteChannel = function(PhysicalResourceId) {
-	let response = new Promise((res, reject) => {
-		const medialive = new AWS.MediaLive({
-			region: process.env.AWS_REGION
-		});
-		let params = {
-			ChannelId: PhysicalResourceId
-		};
-		medialive.deleteChannel(params, function(err, data) {
-			if (err) reject(err);
-			else res('success');
-		});
-	});
-	return response;
+
+// FEATURE/P15424610:: Function updated to use Async & support to stop the
+// channel before atempting to delte it (required to avoid a stack failure)
+let DeleteChannel = async (ChannelId) => {
+  const medialive = new AWS.MediaLive({
+    region: process.env.AWS_REGION
+  });
+  //Sleep function to set a time delay between stopping & deleting the channel
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  try {
+    let params = {
+      ChannelId: ChannelId
+    };
+    await medialive.stopChannel(params).promise();
+    // wait 30 seconds
+    await sleep(30000);
+    // delete channel
+    await medialive.deleteChannel(params).promise();
+  }
+  catch (err) {
+    throw err;
+  }
+  return;
 };
 
 module.exports = {
-	createPushInput: CreatePushInput,
-	createPullInput: CreatePullInput,
-	createChannel: CreateChannel,
-	deleteChannel: DeleteChannel
+  createPushInput: CreatePushInput,
+  createPullInput: CreatePullInput,
+  createChannel: CreateChannel,
+  deleteChannel: DeleteChannel
 };

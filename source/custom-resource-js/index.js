@@ -92,9 +92,6 @@
  					break;
 
         // FEATURE/P15424610:: Removed Metrics as create/delete captured by CFN metrics
-
-
-
  				default:
 					// medialive inputs and mediapackage endpoints are deleted as part of
 					// the the channel deletes so not included here, sending default success response

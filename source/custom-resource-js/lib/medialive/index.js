@@ -87,11 +87,21 @@ let CreatePushInput = function(config) {
 				let params = {
 					InputSecurityGroups: [data.SecurityGroup.Id],
 					Name: config.StreamName,
-					Destinations: [{
-						StreamName: config.StreamName
-					}],
 					Type: config.Type
 				};
+
+        //Feature/xxxx RTMP Requires Stream names for each input Destination.
+        if (config.Type === 'RTMP_PUSH') {
+          params.Destinations = [
+            {
+        		StreamName: config.StreamName+'/primary'
+        	  },
+        	  {
+        		StreamName: config.StreamName+'/secondary'
+        	 }
+         ];
+        }
+
 				medialive.createInput(params, function(err, data) {
 					if (err) reject(err);
 					else {
@@ -117,7 +127,7 @@ let CreateChannel = async (config) => {
   });
   const encode1080p = require('./encoding-profiles/medialive-1080p');
   const encode720p = require('./encoding-profiles/medialive-720p');
-  const encode480p = require('./encoding-profiles/medialive-480p');
+  const encode540p = require('./encoding-profiles/medialive-540p');
   let responseData;
   try {
     // Define baseline Paameters for cheate channel
@@ -164,7 +174,7 @@ let CreateChannel = async (config) => {
       default:
         params.InputSpecification.Resolution = 'SD';
         params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
-        params.EncoderSettings = encode480p;
+        params.EncoderSettings = encode540p;
     }
     // Set the demo input to loop as the demo video is only one a minute long.
     if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {
@@ -200,7 +210,15 @@ let DeleteChannel = async (ChannelId) => {
     // wait 30 seconds
     await sleep(30000);
     // delete channel
-    await medialive.deleteChannel(params).promise();
+    let data = await medialive.deleteChannel(params).promise();
+    // wait 10 seconds
+    await sleep(10000);
+    // delete input
+    params = {
+      InputId:data.InputAttachments[0].InputId
+    };
+    await medialive.deleteInput(params).promise();
+
   }
   catch (err) {
     throw err;

@@ -27,7 +27,7 @@ import lib.cfnresponse as cfn
 import lib.mediapackage as MediaPackage
 import lib.medialive as MediaLive
 import lib.demo as Demo
-import lib.metrics as MetricsHelper
+import lib.metrics as Metrics
 
 def handler(event, context):
     #Each resource returns a promise with a json object to return cloudformation.

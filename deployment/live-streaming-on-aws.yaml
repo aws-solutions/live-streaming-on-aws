@@ -54,28 +54,32 @@ Parameters:
   PriPullURL:
     Description: Specify the primary source URL for the PULL input stream
     Type: String
-    Default: "https://d35c0ph54vn2uv.cloudfront.net/index.m3u8"
+    Default: "https://live1.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
 
   PriPullUser:
     Description: (Optional) Specify a Username for the primary source URL
     Type: String
+    Default: ""
 
   PriPullPass:
     Description: (Optional) Specify a Password for the primary source URL
     Type: String
+    Default: ""
 
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
-    Default: "https://d35c0ph54vn2uv.cloudfront.net/index.m3u8"
+    Default: "https://live2.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL
     Type: String
+    Default: ""
 
   SecPullPass:
     Description: (Optional) Specify a Username for the secondary source URL
     Type: String
+    Default: ""
 
 Metadata:
     AWS::CloudFormation::Interface:
@@ -535,7 +539,7 @@ Resources:
     Type: "Custom::AnonymousMetric"
     Properties:
       ServiceToken: !GetAtt CustomResource.Arn
-      Resouce: AnonymousMetric
+      Resource: AnonymousMetric
       SolutionId: "SO0013"
       UUID: !GetAtt Uuid.UUID
       Version: "2.0"

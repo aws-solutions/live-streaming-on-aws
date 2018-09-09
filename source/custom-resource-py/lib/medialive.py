@@ -32,16 +32,26 @@ def create_push_input(config):
             }
         ]
     )
+
+    #Feature/xxxx RTMP Requires Stream names for each input Destination.
+    if config['Type'] == 'RTMP_PUSH':
+        Destination = [
+            {
+                'StreamName': config['StreamName']+'primary'
+            },
+            {
+                'StreamName': config['StreamName']+'secondary'
+            }
+        ]
+    else:
+        Destination = []
+
     response = medialive.create_input(
         InputSecurityGroups=[
             sg['SecurityGroup']['Id'],
         ],
         Name = config['StreamName'],
-        Destinations=[
-            {
-                'StreamName': config['StreamName']
-            }
-        ],
+        Destinations= Destination,
         Type=config['Type']
     )
     responseData['Id'] = response['Input']['Id']
@@ -65,7 +75,7 @@ def create_pull_input(config):
     # store input u/p in SSM
     if config['PriUser']:
         Sources[0]['Username'] = config['PriUser']
-        Sources[0]['Username'] = config['PriUser']
+        #Sources[0]['Username'] = config['PriUser']
         ssm.put_parameter(
             Name = config['PriUser'],
             Description = 'Live Stream solution Primary input credentials',
@@ -75,7 +85,7 @@ def create_pull_input(config):
     # store input u/p in SSM
     if config['SecUser']:
         Sources[1]['Username'] = config['SecUser']
-        Sources[1]['Username'] = config['SecUser']
+        #Sources[1]['Username'] = config['SecUser']
         ssm.put_parameter(
             Name = config['PriUser'],
             Description = 'Live Stream solution Primary input credentials',
@@ -107,7 +117,7 @@ def create_channel(config):
     else:
         res = 'SD'
         bitrate = 'MAX_10_MBPS'
-        profile = './encoding-profiles/medialive-480p.json'
+        profile = './encoding-profiles/medialive-540p.json'
 
     with open(profile) as encoding:
         EncoderSettings = json.load(encoding)

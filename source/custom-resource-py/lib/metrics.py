@@ -25,7 +25,7 @@ import urllib.request
 
 def send_metrics(config):
     metrics = {}
-    metrics['Solution'] = config['SO0013']
+    metrics['Solution'] = config['SolutionId']
     metrics['UUID'] = config['UUID']
     metrics['TimeStamp'] = str(datetime.datetime.utcnow().isoformat())
     metrics['Data'] = config

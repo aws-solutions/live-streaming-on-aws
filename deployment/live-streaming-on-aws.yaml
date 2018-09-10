@@ -54,7 +54,7 @@ Parameters:
   PriPullURL:
     Description: Specify the primary source URL for the PULL input stream
     Type: String
-    Default: "https://live1.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
+    Default: "http://live1.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
 
   PriPullUser:
     Description: (Optional) Specify a Username for the primary source URL
@@ -69,7 +69,7 @@ Parameters:
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
-    Default: "https://live2.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
+    Default: "http://live2.awssolutionsbuilder.com/live_stream_v2/ott_demo.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL

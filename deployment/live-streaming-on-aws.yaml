@@ -5,7 +5,6 @@ Parameters:
   Code:
     Description: Select the Code Base to use to deploy the media services.
     Type: String
-    Default: Python-3.6
     AllowedValues:
       - NodeJS-8.10
       - Python-3.6
@@ -69,7 +68,7 @@ Parameters:
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
-    Default: "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/ott_demo.m3u8"
+    Default: "https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/ott_demo.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL

@@ -11,11 +11,12 @@ echo "== mkdir -p dist"
 mkdir -p dist
 echo "== cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.template"
 cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.template
-echo "== update CODEBUCKET CODEVERSION"
+echo "==update CODEBUCKET in template with `$1`"
 replace="s/%%CODEBUCKET%%/$1/g"
-sed -i '' -e $replace dist/live-streaming-on-aws.template
+sed -i '' -e $replace dist/media-analysis-deploy.template
+echo "==update CODEVERSION in template with `$2`"
 replace="s/%%CODEVERSION%%/$2/g"
-sed -i '' -e $replace dist/live-streaming-on-aws.template
+sed -i '' -e $replace dist/media-analysis-deploy.template
 cd ../source/
 echo "== generate console-manifest.json"
 find console/* -type f | awk ' BEGIN { ORS = ""; print "["; } { print "\/\@"$0"\/\@"; } END { print "]"; }' | sed "s^\"^\\\\\"^g;s^\/\@\/\@^\", \"^g;s^\/\@^\"^g" > ./console-manifest.json

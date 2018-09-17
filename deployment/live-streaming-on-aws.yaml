@@ -53,7 +53,7 @@ Parameters:
   PriPullURL:
     Description: Specify the primary source URL for the PULL input stream
     Type: String
-    Default: "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/ott_demo.m3u8"
+    Default: "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8"
 
   PriPullUser:
     Description: (Optional) Specify a Username for the primary source URL
@@ -68,7 +68,7 @@ Parameters:
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
     Type: String
-    Default: "https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/ott_demo.m3u8"
+    Default: "https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8"
 
   SecPullUser:
     Description: (Optional) Specify a Username for the secondary source URL

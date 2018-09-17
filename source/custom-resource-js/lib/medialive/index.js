@@ -155,7 +155,10 @@ let CreateChannel = async (config) => {
       RoleArn: config.Role,
       InputAttachments: [{
         InputId: config.InputId,
-        InputSettings: {}
+        InputSettings: {
+          //Feature/V49924004:: Adding loop as default.
+          SourceEndBehavior: 'LOOP'
+        }
       }],
       EncoderSettings: {}
     };
@@ -176,10 +179,7 @@ let CreateChannel = async (config) => {
         params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
         params.EncoderSettings = encode540p;
     }
-    // Set the demo input to loop as the demo video is only one a minute long.
-    if (config.Type === 'DEMO') params.InputAttachments[0].InputSettings = {
-      SourceEndBehavior: 'LOOP'
-    };
+
     //Create Channel & return Channel ID
     let data = await medialive.createChannel(params).promise();
 

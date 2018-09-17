@@ -140,9 +140,9 @@ let CreateChannel = async (config) => {
             Username: config.MediaPackagePriUser
           },
           {
-            PasswordParam: config.MediaPackageSeciUser,
+            PasswordParam: config.MediaPackageSecUser,
             Url: config.MediaPackageSecUrl,
-            Username: config.MediaPackageSeciUser
+            Username: config.MediaPackageSecUser
           }
         ]
       }],

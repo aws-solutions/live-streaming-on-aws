@@ -37,7 +37,7 @@ Parameters:
       - MPEG2
 
   InputRes:
-    Description: Specify the resolution of the source stream for MediaLive (SD/HD)
+    Description: Specify the Encoding Profile to use for MediaLive
     Type: String
     Default: 1080
     AllowedValues:
@@ -118,7 +118,7 @@ Metadata:
           InputCodec:
             default: Source Codec
           InputRes:
-            default: Source Resolution
+            default: Encoding Profile
           InputCIDR:
             default: Input CIDR Block
           PriPullURL:

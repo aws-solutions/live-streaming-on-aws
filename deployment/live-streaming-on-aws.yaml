@@ -322,6 +322,7 @@ Resources:
       Codec: !Ref InputCodec
       Role: !GetAtt MediaLiveRole.Arn
       InputId: !GetAtt MediaLiveInput.Id
+      Type: !Ref InputType
       MediaPackagePriUrl: !GetAtt MediaPackageChannel.PrimaryUrl
       MediaPackagePriUser: !GetAtt MediaPackageChannel.PrimaryUser
       # FEATURE/P15424610 Dual ingest support for MediaPackage

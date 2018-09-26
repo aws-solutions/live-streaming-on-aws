@@ -119,6 +119,14 @@ def create_channel(config):
         bitrate = 'MAX_10_MBPS'
         profile = './encoding-profiles/medialive-540p.json'
 
+    #hotfix/V52152945 loop only supported in HLS_PULL
+    if config['Type'] == 'URL_PULL':
+        settings = {
+            'SourceEndBehavior': 'LOOP'
+        }
+    else:
+        settings = {}
+
     with open(profile) as encoding:
         EncoderSettings = json.load(encoding)
 
@@ -130,9 +138,7 @@ def create_channel(config):
         },
         InputAttachments = [{
             'InputId': config['InputId'],
-            'InputSettings': {
-                'SourceEndBehavior':'LOOP'
-            }
+            'InputSettings': settings
         }],
         Destinations = [{
             'Id': "destination1",

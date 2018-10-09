@@ -155,13 +155,17 @@ let CreateChannel = async (config) => {
       RoleArn: config.Role,
       InputAttachments: [{
         InputId: config.InputId,
-        InputSettings: {
-          //Feature/V49924004:: Adding loop as default.
-          SourceEndBehavior: 'LOOP'
-        }
+        InputSettings: {}
       }],
       EncoderSettings: {}
     };
+
+    //hotfix/V52152945 loop only supported in HLS_PULL
+    if(config.Type ==='URL_PULL') {
+      params.InputAttachments[0].InputSettings = {
+         SourceEndBehavior: 'LOOP'
+      }
+    }
     // Update parameters based on source resolution (defined in cloudformation)
     switch (config.Resolution) {
       case '1080':

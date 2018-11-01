@@ -247,7 +247,6 @@ Resources:
                 Resource:
                   - !Join ["", ["arn:aws:ssm:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":parameter/*"]]
 
-
   CustomResource:
     Type: AWS::Lambda::Function
     Properties:
@@ -449,16 +448,15 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref LogsBucket
         LogFilePrefix: demo_bucket/
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
       CorsConfiguration:
         CorsRules:
           - AllowedMethods: [GET]
             AllowedOrigins: ['*']
             AllowedHeaders: ['*']
             MaxAge: 3000
-      AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: error.html
 
   DemoBucketPolicy:
     Condition: Demo
@@ -469,14 +467,59 @@ Resources:
         Statement:
           -
             Effect: Allow
-            Principal: '*'
+            Principal:
+              CanonicalUser: !GetAtt DemoOriginAccessIdentity.S3CanonicalUserId
             Action: 's3:GetObject'
             Resource: !Join ["", ["arn:aws:s3:::", Ref: "DemoBucket", "/*"]]
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F16
-            reason: "This is a policy for a demo bucket hosting a static website and is required for site access"
+
+  DemoOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub "access-identity-${DemoBucket}"
+
+  DemoCloudFront:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+          DistributionConfig:
+              Comment: "Website distribution for solution"
+              Origins:
+                  -
+                    Id: S3-solution-website
+                    DomainName: !Sub "${DemoBucket}.s3.amazonaws.com"
+                    OriginPath: /console
+                    S3OriginConfig:
+                        OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${DemoOriginAccessIdentity}"
+              DefaultCacheBehavior:
+                  TargetOriginId: S3-solution-website
+                  AllowedMethods:
+                      - GET
+                      - HEAD
+                      - OPTIONS
+                      - PUT
+                      - POST
+                      - PATCH
+                      - DELETE
+                  CachedMethods:
+                      - GET
+                      - HEAD
+                      - OPTIONS
+                  ForwardedValues:
+                      QueryString: 'false'
+                  ViewerProtocolPolicy: redirect-to-https
+              IPV6Enabled: 'true'
+              DefaultRootObject: "index.html"
+              CustomErrorResponses:
+                - ErrorCode: '404'
+                  ResponsePagePath: "/index.html"
+                  ResponseCode: '200'
+                - ErrorCode: '403'
+                  ResponsePagePath: "/index.html"
+                  ResponseCode: '200'
+              ViewerCertificate:
+                  CloudFrontDefaultCertificate: 'true'
+              Enabled: 'true'
+              HttpVersion: 'http2'
 
   DemoIamPolicy:
     Condition: Demo
@@ -492,6 +535,7 @@ Resources:
             Effect: "Allow"
             Action:
               - s3:putObject
+              - s3:putObjectAcl
               - s3:deleteObject
               - s3:deleteBucket
             Resource:

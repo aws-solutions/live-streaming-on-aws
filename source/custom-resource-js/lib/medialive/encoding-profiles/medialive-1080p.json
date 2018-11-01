@@ -121,7 +121,9 @@
 		"Name": "TN2224",
 		"OutputGroupSettings": {
 			"HlsGroupSettings": {
-				"AdMarkers": [],
+				"AdMarkers": [
+					"ELEMENTAL_SCTE35"
+				],
 				"CaptionLanguageMappings": [],
 				"CaptionLanguageSetting": "OMIT",
 				"ClientCache": "ENABLED",
@@ -169,12 +171,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -196,12 +201,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -223,12 +231,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -250,12 +261,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -277,12 +291,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -304,12 +321,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -331,12 +351,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -358,12 +381,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -385,12 +411,15 @@
 							"StandardHlsSettings": {
 								"AudioRenditionSets": "PROGRAM_AUDIO",
 								"M3u8Settings": {
+									"AudioFramesPerPes": 4,
 									"AudioPids": "492-498",
 									"EcmPid": "8182",
 									"PcrControl": "PCR_EVERY_PES_PACKET",
 									"PmtPid": "480",
-									"Scte35Behavior": "NO_PASSTHROUGH",
+									"ProgramNum": 1,
+									"Scte35Behavior": "PASSTHROUGH",
 									"Scte35Pid": "500",
+									"TimedMetadataPid": "502",
 									"TimedMetadataBehavior": "NO_PASSTHROUGH",
 									"VideoPid": "481"
 								}
@@ -429,13 +458,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 236,
 			"Name": "video_416_234",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 416
+			"Width": 416,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -460,13 +494,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 272,
 			"Name": "video_480_270",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 480
+			"Width": 480,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -491,13 +530,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 360,
 			"Name": "video_640_360",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 640
+			"Width": 640,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -522,13 +566,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 432,
 			"Name": "video_768_432",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 768
+			"Width": 768,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -553,13 +602,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 540,
 			"Name": "video_960_540",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 960
+			"Width": 960,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -584,13 +638,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 720,
 			"Name": "video_1280_720_1",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 1280
+			"Width": 1280,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -615,13 +674,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 720,
 			"Name": "video_1280_720_2",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 1280
+			"Width": 1280,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -646,13 +710,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 720,
 			"Name": "video_1280_720_3",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 1280
+			"Width": 1280,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		},
 		{
 			"CodecSettings": {
@@ -677,13 +746,18 @@
 					"SceneChangeDetect": "ENABLED",
 					"SpatialAq": "ENABLED",
 					"Syntax": "DEFAULT",
-					"TemporalAq": "ENABLED"
+					"TemporalAq": "ENABLED",
+					"TimecodeInsertion": "DISABLED",
+					"NumRefFrames": 1,
+					"AfdSignaling": "NONE"
 				}
 			},
 			"Height": 1080,
 			"Name": "video_1920_1080",
 			"ScalingBehavior": "DEFAULT",
-			"Width": 1920
+			"Width": 1920,
+			"RespondToAfd": "NONE",
+			"Sharpness": 50
 		}
 	]
 }

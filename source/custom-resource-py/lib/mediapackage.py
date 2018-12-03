@@ -28,6 +28,7 @@ def create_channel(config):
         Description='live-streaming-on-aws',
         Id=config['ChannelId']
     )
+    responseData['Arn'] = response['Arn']
     responseData['ChannelId'] = config['ChannelId']
     responseData['PrimaryUrl'] = response['HlsIngest']['IngestEndpoints'][0]['Url']
     responseData['PrimaryUser'] = response['HlsIngest']['IngestEndpoints'][0]['Username']
@@ -69,7 +70,8 @@ def create_endpoint(config):
         		'PlaylistWindowSeconds': 60,
         		'ProgramDateTimeIntervalSeconds': 0,
         		'SegmentDurationSeconds': 6,
-        		'UseAudioRenditionGroup': False
+        		'UseAudioRenditionGroup': False,
+                'AdMarkers':'PASSTHROUGH'
         	},
         	ManifestName='index',
         	StartoverWindowSeconds=0,

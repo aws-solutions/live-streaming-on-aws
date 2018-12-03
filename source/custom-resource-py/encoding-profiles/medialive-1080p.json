@@ -1,4 +1,12 @@
 {
+	"AvailConfiguration": {
+			"AvailSettings": {
+					"Scte35SpliceInsert": {
+							"NoRegionalBlackoutFlag": "FOLLOW",
+							"WebDeliveryAllowedFlag": "FOLLOW"
+					}
+			}
+	},
 	"AudioDescriptions": [{
 			"AudioSelectorName": "default",
 			"AudioTypeControl": "FOLLOW_INPUT",

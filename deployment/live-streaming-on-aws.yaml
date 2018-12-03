@@ -329,31 +329,19 @@ Resources:
       MediaPackageSecUser: !GetAtt MediaPackageChannel.SecondaryUser
 
   CloudFront:
+    DependsOn: MediaPackageChannel
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
-          - Id: hls
+          - Id: mediapackage
             DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
-            OriginPath: /out/v1
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-          - Id: dash
-            DomainName: !GetAtt MediaPackageDashEndpoint.DomainName
-            OriginPath: /out/v1
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-          - Id: mss
-            DomainName: !GetAtt MediaPackageMssEndpoint.DomainName
-            OriginPath: /out/v1
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         Enabled: 'true'
-        Logging:
-          Bucket: !GetAtt LogsBucket.DomainName
-          Prefix: livestream/
         DefaultCacheBehavior:
-          TargetOriginId: hls
+          TargetOriginId: mediapackage
+          SmoothStreaming: 'false'
           AllowedMethods:
             - GET
             - HEAD
@@ -371,67 +359,11 @@ Resources:
               - Access-Control-Request-Method
               - Access-Control-Request-Header
           ViewerProtocolPolicy: allow-all
-        CacheBehaviors:
-          - TargetOriginId: hls
-            PathPattern: MediaPackageHlsEndpoint.Path
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            CachedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            ForwardedValues:
-              QueryString: 'true'
-              Cookies:
-                Forward: all
-              Headers:
-                - Origin
-                - Access-Control-Request-Method
-                - Access-Control-Request-Headers
-            ViewerProtocolPolicy: allow-all
-          - TargetOriginId: dash
-            PathPattern: MediaPackageDashEndpoint.Path
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            CachedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            ForwardedValues:
-              QueryString: 'true'
-              Cookies:
-                Forward: all
-              Headers:
-                - Origin
-                - Access-Control-Request-Method
-                - Access-Control-Request-Headers
-            ViewerProtocolPolicy: allow-all
-          - TargetOriginId: mss
-            PathPattern: MediaPackageMssEndpoint.Path
-            AllowedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            CachedMethods:
-              - GET
-              - HEAD
-              - OPTIONS
-            ForwardedValues:
-              QueryString: 'true'
-              Cookies:
-                Forward: all
-              Headers:
-                - Origin
-                - Access-Control-Request-Method
-                - Access-Control-Request-Headers
-            SmoothStreaming: 'true'
-            ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           CloudFrontDefaultCertificate: 'true'
+      Tags:
+        - Key: MP-Endpoint-ARN
+          Value: !GetAtt MediaPackageChannel.Arn
 
   LogsBucket:
     DeletionPolicy: Retain
@@ -440,6 +372,8 @@ Resources:
       AccessControl: LogDeliveryWrite
 
   # Demo Assets
+
+
   DemoBucket:
     Condition: Demo
     DeletionPolicy: Retain
@@ -486,7 +420,7 @@ Resources:
               Origins:
                   -
                     Id: S3-solution-website
-                    DomainName: !Sub "${DemoBucket}.s3.amazonaws.com"
+                    DomainName: !Sub "${DemoBucket}.s3.${AWS::Region}.amazonaws.com"
                     OriginPath: /console
                     S3OriginConfig:
                         OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${DemoOriginAccessIdentity}"
@@ -565,9 +499,9 @@ Resources:
           'us strict'
           const exports = {
             mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${AWS::Region}#/channels/${MediaLiveChannel.ChannelId}',
-            hls_manifest: 'https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Manifest}',
-            dash_manifest: 'https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Manifest}',
-            mss_manifest: 'https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Manifest}'
+            hls_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageHlsEndpoint.Manifest}',
+            dash_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageDashEndpoint.Manifest}',
+            mss_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}'
           }
 
   # Metrics
@@ -609,17 +543,17 @@ Outputs:
 
   CloudFrontHlsEnpoint:
     Description: HLS CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageHlsEndpoint.Manifest}
+    Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageHlsEndpoint.Manifest}
 
   CloudFrontDashEnpoint:
     Description: DASH CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageDashEndpoint.Manifest}
+    Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageDashEndpoint.Manifest}
 
   CloudFrontMssEnpoint:
     Description: MSS CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}${MediaPackageMssEndpoint.Manifest}
+    Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}
 
   DemoConsole:
     Condition: Demo
     Description: Demo Player URL
-    Value: !Sub https://${DemoBucket.DomainName}/console/index.html
+    Value: !Sub https://${DemoCloudFront.DomainName}/index.html

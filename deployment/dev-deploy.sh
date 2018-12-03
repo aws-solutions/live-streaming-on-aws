@@ -1,7 +1,7 @@
 #!/bin/bash
 regions="us-east-1 us-west-2 eu-west-1 eu-central-1"
-bucket="solutions-test"
-profile="builder"
+bucket="decepticons"
+profile="default"
 
 [ -e dist ] && rm -r dist
 echo "== mkdir -p dist"
@@ -9,7 +9,7 @@ mkdir -p dist
 echo "== cp sslive-streaming-on-aws.yaml dist/live-streaming-on-aws.template"
 cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.yaml
 sed  -i "" "s/CODEBUCKET/$bucket/g" dist/live-streaming-on-aws.yaml
-sed  -i "" "s/CODEVERSION/2.0/g" dist/live-streaming-on-aws.yaml
+sed  -i "" "s/CODEVERSION/2.1/g" dist/live-streaming-on-aws.yaml
 cd ../source/
 echo "== generate console-manifest.json"
 find console/* -type f | awk ' BEGIN { ORS = ""; print "["; } { print "\/\@"$0"\/\@"; } END { print "]"; }' | sed "s^\"^\\\\\"^g;s^\/\@\/\@^\", \"^g;s^\/\@^\"^g" > ./console-manifest.json
@@ -32,5 +32,5 @@ cd dist/
 
 echo "sync files to solutions buckets"
 for region in $regions; do
-	aws s3 sync . s3://$bucket-$region/live-streaming-on-aws/2.0/ --region $region --acl public-read --delete --profile $profile
+	aws s3 sync . s3://$bucket-$region/live-streaming-on-aws/2.1/ --region $region --acl public-read --delete --profile $profile
 done

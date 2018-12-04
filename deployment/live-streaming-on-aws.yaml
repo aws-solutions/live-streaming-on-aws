@@ -469,7 +469,6 @@ Resources:
             Effect: "Allow"
             Action:
               - s3:putObject
-              - s3:putObjectAcl
               - s3:deleteObject
               - s3:deleteBucket
             Resource:

@@ -10,7 +10,7 @@ mkdir -p open-source/dist/deployment
 echo "== cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment"
 cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment
 echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md open-source/dist/"
-cp ../LICENSE.txt ../NOTICE.txt ../README.md ../architecture.png open-source/dist/
+cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png open-source/dist/
 echo "== cp -r ../source ./open-source/dist/"
 cp -r ../source ./open-source/dist/
 echo "== rm -rf open-source/dist/source/custom-resource-js/node_modules"

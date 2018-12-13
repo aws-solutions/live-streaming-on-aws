@@ -20,7 +20,8 @@ let CreateEndPoint = async (config) => {
         PlaylistWindowSeconds: 60,
         ProgramDateTimeIntervalSeconds: 0,
         SegmentDurationSeconds: 6,
-        UseAudioRenditionGroup: false
+        UseAudioRenditionGroup: false,
+        AdMarkers:'PASSTHROUGH'
       },
       DashPackage: {
         ManifestWindowSeconds: 60,
@@ -96,6 +97,7 @@ let CreateChannel = async (config) => {
     let data = await mediapackage.createChannel(params).promise();
 
     responseData = {
+      Arn: data.Arn,
       ChannelId: config.ChannelId,
       PrimaryUrl: data.HlsIngest.IngestEndpoints[0].Url,
       PrimaryUser: data.HlsIngest.IngestEndpoints[0].Username,

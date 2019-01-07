@@ -43,7 +43,7 @@ Parameters:
     AllowedValues:
       - 1080
       - 720
-      - 480
+      - 540
 
   InputCIDR:
     Description: Specify the CIDR Block for the MediaLive SecurityGroup

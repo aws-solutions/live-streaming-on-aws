@@ -130,6 +130,36 @@
 			}
 		},
 		"Outputs": [{
+			"AudioDescriptionNames": [
+				"audio_3_aac96"
+			],
+			"CaptionDescriptionNames": [],
+			"OutputSettings": {
+				"HlsOutputSettings": {
+					"HlsSettings": {
+						"StandardHlsSettings": {
+							"AudioRenditionSets": "PROGRAM_AUDIO",
+							"M3u8Settings": {
+								"AudioFramesPerPes": 4,
+								"AudioPids": "492-498",
+								"EcmPid": "8182",
+								"PcrControl": "PCR_EVERY_PES_PACKET",
+								"PmtPid": "480",
+								"ProgramNum": 1,
+								"Scte35Behavior": "PASSTHROUGH",
+								"Scte35Pid": "500",
+								"TimedMetadataPid": "502",
+								"TimedMetadataBehavior": "NO_PASSTHROUGH",
+								"VideoPid": "481"
+							}
+						}
+					},
+					"NameModifier": "_1280x540_2000k"
+				}
+			},
+			"VideoDescriptionName": "video_1280_540"
+		},
+		{
 				"AudioDescriptionNames": [
 					"audio_2_aac96"
 				],

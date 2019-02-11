@@ -25,7 +25,7 @@
 
 		<section class="text-center pb-4">
 			<p class="lead">
-				This demo provides links and a preview player for the HLS, DASH and Microsoft Smooth
+				This demo provides links and a preview player for the HLS, DASH, Microsoft Smooth and CMAF
 				CloudFront endpoints created by the Live Stream on AWS solution.
 				<p>
 		</section>
@@ -67,6 +67,11 @@
 						<td>MSS</td>
 						<td class="d-none d-sm-block" style="font-size: 0.9rem;" id="mss"></td>
 						<td><button class="btn btn-success btn-sm" onclick="loadMss(mss_url)">Preview</button></td>
+					</tr>
+					<tr>
+						<td>CMAF </td>
+						<td class="d-none d-sm-block"  style="font-size: 0.9rem;" id="cmaf"></td>
+						<td><button class="btn btn-success btn-sm" onclick="loadCmaf(cmaf_url)">Preview</button></td>
 					</tr>
 				</tbody>
 			</table>

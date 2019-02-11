@@ -294,6 +294,15 @@ Resources:
       EndPoint: MSS
       ChannelId: !GetAtt MediaPackageChannel.ChannelId
 
+  MediaPackageCmafEndpoint:
+    DependsOn: MediaPackageChannel
+    Type: Custom::MediaPackageCmafEndpoint
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      Resource: MediaPackageEndPoint
+      EndPoint: CMAF
+      ChannelId: !GetAtt MediaPackageChannel.ChannelId
+
   MediaLiveInput:
     Type: Custom::MediaLiveInput
     Properties:
@@ -500,7 +509,8 @@ Resources:
             mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${AWS::Region}#/channels/${MediaLiveChannel.ChannelId}',
             hls_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageHlsEndpoint.Manifest}',
             dash_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageDashEndpoint.Manifest}',
-            mss_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}'
+            mss_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}',
+            cmaf_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageCmafEndpoint.Manifest}'
           }
 
   # Metrics
@@ -551,6 +561,10 @@ Outputs:
   CloudFrontMssEnpoint:
     Description: MSS CloudFront URL
     Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}
+
+  CloudFrontCmafEnpoint:
+      Description: CMAF CloudFront URL
+      Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageCmafEndpoint.Manifest}
 
   DemoConsole:
     Condition: Demo

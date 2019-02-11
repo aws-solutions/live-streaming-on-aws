@@ -12,7 +12,7 @@ let CreateEndPoint = async (config) => {
   const mediapackage = new AWS.MediaPackage();
   let responseData;
   try {
-    //Define specific configuration settings for each endpoint type (HLS/DASH/MSS)
+    //Define specific configuration settings for each endpoint type (HLS/DASH/MSS/CMAF)
     let packages = {
       HlsPackage: {
         IncludeIframeOnlyStream: false,
@@ -34,6 +34,17 @@ let CreateEndPoint = async (config) => {
       MssPackage: {
         ManifestWindowSeconds: 60,
         SegmentDurationSeconds: 2
+      },
+      CmafPackage: {
+        SegmentDurationSeconds: 6,
+        HlsManifests: [{
+                    Id: config.ChannelId + '-cmaf-hls',
+                    AdMarkers: 'PASSTHROUGH',
+                    IncludeIframeOnlyStream: false,
+                    PlaylistType: 'NONE',
+                    PlaylistWindowSeconds: 60,
+                    ProgramDateTimeIntervalSeconds: 0
+                }]
       }
     };
     let params = {
@@ -57,6 +68,10 @@ let CreateEndPoint = async (config) => {
         params.Id = config.ChannelId + '-mss';
         params.MssPackage = packages.MssPackage;
         break;
+      case 'CMAF':
+          params.Id = config.ChannelId + '-cmaf';
+          params.CmafPackage = packages.CmafPackage;
+          break;
       default:
         console.log('Error EndPoint not defined');
     }

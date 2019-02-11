@@ -84,7 +84,7 @@ let CreateEndPoint = async (config) => {
         } else {
           Url = url.parse(data.Url);
         }
-        
+
         responseData = {
             Id: data.Id,
             DomainName: Url.hostname,
@@ -179,7 +179,7 @@ let DeleteChannel = async (ChannelId) => {
     } catch (err) {
         throw err;
     }
-    return;
+    return 'success';
 };
 
 

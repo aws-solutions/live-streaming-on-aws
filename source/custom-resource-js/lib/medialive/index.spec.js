@@ -70,47 +70,25 @@ describe('#MEDIALIVE::', () => {
 		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
     AWS.mock('SSM', 'putParameter');
 
-		lambda.createPullInput(pull_config,(err, responseData) => {
-				expect(responseData.Id).to.equal('2468');
-		});
+    let response = await lambda.createPullInput(pull_config)
+    expect(response.Id).to.equal('2468');
 	});
-
-  it('should return "responseData" when create PUSH input is successful', function(done) {
-
-    AWS.mock('MediaLive', 'createInputSecurityGroup', function(params, callback) {
-      callback(null, input_data);
-    });
-    AWS.mock('MediaLive', 'createInput', function(params, callback) {
-      callback(null, input_data);
-    });
-
-    lambda.createPushInput(push_config)
-      .then(responseData => {
-        expect(responseData.EndPoint1).to.equal('http://123:5000');
-        done();
-      })
-      .catch(err => {
-        done(err);
-      });
-  });
 
   it('should return "responseData" when create Channel is successful',async () => {
 
-		AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
 
-    lambda.createChannel(channel_config ,(err, responseData) => {
-				expect(responseData.ChannelId).to.equal('2468');
-		});
+    let response = await lambda.createChannel(channel_config)
+    expect(response.ChannelId).to.equal('2468');
 	});
-  /*
-  it('should return "responseData" when delete Channel is successful',async () => {
 
-      AWS.mock('MediaLive', 'stopChannel', Promise.resolve());
-        AWS.mock('MediaLive', 'deleteChannel', Promise.resolve());
+  it('should return "ERROR" on MediaLive create Channel', async () => {
 
-    lambda.deleteChannel(ChannelId ,(err, responseData) => {
-        expect(responseData.ChannelId).to.equal('2468');
+    AWS.mock('MediaLive', 'createChannel', Promise.reject('ERROR'));
+
+    await lambda.createChannel(channel_config).catch(err => {
+      expect(err).to.equal('ERROR');
     });
   });
-  */
+
 });

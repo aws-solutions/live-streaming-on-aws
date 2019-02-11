@@ -7,21 +7,21 @@ let lambda = require('./index.js');
   let _event = {
     RequestType: "Create",
     ServiceToken: "arn:aws:lambda",
-    ResponseURL: "https://cloudformation.s3.amazonaws.com/",
+    ResponseURL: "https://cloudformation",
     StackId: "arn:aws:cloudformation",
-    RequestId: "111111",
+    RequestId: "63e8ffa2-3059-4607-a450-119d473c73bc",
     LogicalResourceId: "Uuid",
     ResourceType: "Custom::UUID",
     ResourceProperties: {
         ServiceToken: "arn:aws:lambda",
-        Resource: "UUID"
+        Resource: "abc"
     }
   }
   let _context = {
     logStreamName: 'cloudwatch'
   }
-  let responseStatus = 'ok'
-  let responseData = {
+  let _responseStatus = 'ok'
+  let _responseData = {
     test: 'testing'
   }
 
@@ -32,8 +32,19 @@ let lambda = require('./index.js');
   		let mock = new MockAdapter(axios);
   		mock.onPut().reply(200, {});
 
-  		lambda.send(_event, (err, data) => {
-  				expect(data).to.equal(200);
+  		lambda.send(_event,_context, _responseStatus, _responseData, (err, res) => {
+  				expect(res.status).to.equal(200);
   		});
   	});
+
+    it('should return "Network Error" on connection timedout', async () => {
+
+      let mock = new MockAdapter(axios);
+      mock.onPut().networkError();
+
+      await lambda.send(_event,_context, _responseStatus, _responseData).catch(err => {
+        expect(err.toString()).to.equal("Error: Network Error");
+      });
+    });
+
 });

@@ -24,20 +24,35 @@ describe('#DEMO::', () => {
 		AWS.mock('S3', 'copyObject', Promise.resolve());
     AWS.mock('S3', 'putObject', Promise.resolve());
 
-		lambda.s3Deploy	(_config,(err, responseData) => {
-				expect(responseData).to.equal('sucess');
-		});
+    let response = await lambda.s3Deploy(_config)
+    expect(response).to.equal('success');
 	});
+
+  it('should return "ERROR" s3 copy Object', async () => {
+
+    AWS.mock('S3', 'copyObject', Promise.reject('ERROR'));
+
+    await lambda.s3Deploy(_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
 
   it('should return "responseData" on S3 Delete  sucess', async () => {
 
 		AWS.mock('S3', 'deleteObjects', Promise.resolve());
     AWS.mock('S3', 'deleteBucket', Promise.resolve());
 
-		lambda.s3Delete	(_config,(err, responseData) => {
-				expect(responseData).to.equal('sucess');
-		});
+    let response = await lambda.s3Delete(_config)
+    expect(response).to.equal('success');
 	});
 
+  it('should return "ERROR" s3 delete Object', async () => {
+
+    AWS.mock('S3', 'deleteObjects',Promise.reject('ERROR'));
+
+    await lambda.s3Delete(_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
 
 });

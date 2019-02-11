@@ -31,7 +31,7 @@ let S3Deploy = async (config) => {
 	catch (err) {
     throw err;
   }
-  return;
+  return 'success';
 };
 
 
@@ -67,7 +67,7 @@ let S3Delete = async (config) => {
 	catch (err) {
     throw err;
   }
-  return;
+  return 'success';
 };
 
 

@@ -37,11 +37,7 @@
  			switch (config.Resource) {
 
  				case 'MediaLiveInput':
- 					if (config.Type.includes('PUSH')) {
- 						responseData = await MediaLive.createPushInput(config);
- 					} else {
- 						responseData = await MediaLive.createPullInput(config);
- 					}
+ 					responseData = await MediaLive.createInput(config);
  					Id = responseData.Id;
  					break;
 

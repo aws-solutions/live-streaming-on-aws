@@ -80,6 +80,10 @@ Parameters:
     Type: String
     Default: ""
 
+    MediaConnectArn1
+
+    MediaConnectArn2
+
 Metadata:
     AWS::CloudFormation::Interface:
         ParameterGroups:

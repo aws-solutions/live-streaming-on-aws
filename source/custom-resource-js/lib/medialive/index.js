@@ -222,6 +222,16 @@ let DeleteChannel = async (ChannelId) => {
       InputId:data.InputAttachments[0].InputId
     };
     await medialive.deleteInput(params).promise();
+    // wait 10 seconds
+    await sleep(10000);
+    //delete security group if it exists
+    data = await medialive.describeInput(params).promise();
+    if(data.SecurityGroups.length>0){
+          let params={
+            InputSecurityGroupId: data.SecurityGroups[0]
+        }
+        await medialive.deleteInputSecurityGroup(params).promise();
+    };
 
   }
   catch (err) {

@@ -192,6 +192,7 @@ Resources:
                   - medialive:stopChannel
                   - medialive:createChannel
                   - medialive:deleteChannel
+                  - medialive:deleteInputSecurityGroup
 
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]

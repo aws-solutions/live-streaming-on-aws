@@ -37,6 +37,18 @@ let CreateInput = async (config) => {
 
             case 'MEDIACONNECT':
                 //Requires 2 Mediaconnect Arns
+                params = {
+                    Name: config.StreamName,
+                    Type: config.Type,
+                    RoleArn: config.Role,
+                    MediaConnectFlows: [{
+                            FlowArn: config.PriMediaConnectArn
+                        },
+                        {
+                            FlowArn: config.SecMediaConnectArn
+                        }
+                    ]
+                };
                 break;
 
             default:

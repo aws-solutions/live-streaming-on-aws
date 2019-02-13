@@ -35,6 +35,7 @@ let CreateEndPoint = async (config) => {
                 ManifestWindowSeconds: 60,
                 SegmentDurationSeconds: 2
             },
+            //feature/P20903447 adding CMAF as an endpoint.
             CmafPackage: {
                 SegmentDurationSeconds: 6,
                 HlsManifests: [{

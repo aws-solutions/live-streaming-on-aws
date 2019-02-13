@@ -41,11 +41,7 @@ def handler(event, context):
 
         if request == 'Create':
             if resource == 'MediaLiveInput':
-
-                if 'PUSH' in config['Type']:
-                    responseData = MediaLive.create_push_input(config)
-                else:
-                    responseData = MediaLive.create_pull_input(config)
+                responseData = MediaLive.create_input(config)
                 id = responseData['Id']
 
             elif resource == 'MediaLiveChannel':

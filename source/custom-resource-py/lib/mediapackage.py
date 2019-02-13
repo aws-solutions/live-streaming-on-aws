@@ -63,7 +63,7 @@ def create_endpoint(config):
         response = mediapackage.create_origin_endpoint(
         	ChannelId=config['ChannelId'],
         	Id=config['ChannelId']+'-hls',
-        	Description='Live Streaming on AWS Solution',
+        	Description='SO00013 Live Streaming on AWS',
         	HlsPackage={
         		'IncludeIframeOnlyStream': False,
         		'PlaylistType': 'NONE',
@@ -81,7 +81,7 @@ def create_endpoint(config):
         response = mediapackage.create_origin_endpoint(
         	ChannelId=config['ChannelId'],
         	Id=config['ChannelId']+'-dash',
-        	Description='Live Streaming on AWS Solution',
+        	Description='SO00013 Live Streaming on AWS',
         	DashPackage={
     			'ManifestWindowSeconds': 60,
     			'MinBufferTimeSeconds': 30,
@@ -98,7 +98,7 @@ def create_endpoint(config):
         response = mediapackage.create_origin_endpoint(
         	ChannelId=config['ChannelId'],
         	Id=config['ChannelId']+'-mss',
-        	Description='Live Streaming on AWS Solution',
+        	Description='SO00013 Live Streaming on AWS',
         	MssPackage={
     			'ManifestWindowSeconds': 60,
     			'SegmentDurationSeconds': 2,
@@ -107,11 +107,36 @@ def create_endpoint(config):
         	StartoverWindowSeconds=0,
         	TimeDelaySeconds=0,
         )
+    elif config.get('EndPoint') == 'CMAF':
+        response = mediapackage.create_origin_endpoint(
+        	ChannelId=config['ChannelId'],
+        	Id=config['ChannelId']+'-cmaf',
+        	Description='SO00013 Live Streaming on AWS',
+            CmafPackage={
+            	'HlsManifests':[{
+            	    'Id': config['ChannelId']+'-cmaf-hls',
+            		'IncludeIframeOnlyStream': False,
+            		'PlaylistType': 'NONE',
+            		'PlaylistWindowSeconds': 60,
+            		'ProgramDateTimeIntervalSeconds': 0,
+                    'AdMarkers':'PASSTHROUGH'
+            	}],
+                'SegmentDurationSeconds':6
+            },
+        	ManifestName='index',
+        	StartoverWindowSeconds=0,
+        	TimeDelaySeconds=0,
+        )
     else:
         print('RESPONSE:: EndPoint type [HLS,DASH,MSS] not defined')
         return
 
-    url = urlparse(response['Url'])
+
+    if config.get('EndPoint') == 'CMAF':
+        url = urlparse(response['CmafPackage']['HlsManifests'][0]['Url'])
+    else:
+        url = urlparse(response['Url'])
+
     responseData['Id'] = response['Id']
     responseData['DomainName']=url.hostname
     responseData['Path']='/'+url.path.split('/')[-3]

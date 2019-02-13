@@ -23,6 +23,7 @@ let CreateInput = async (config) => {
 
             case 'RTP_PUSH':
                 //requires Security group
+
                 break;
 
             case 'RTMP_PUSH':

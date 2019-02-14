@@ -27,6 +27,7 @@ responseData = {}
 def create_input(config):
     print('Creating::{} Input'.format(config['Type']))
 
+
     if config['Type'] == 'RTP_PUSH':
         sg = medialive.create_input_security_group(
             WhitelistRules=[
@@ -73,6 +74,7 @@ def create_input(config):
         responseData['EndPoint1'] = response['Input']['Destinations'][0]['Url']
         responseData['EndPoint2'] = response['Input']['Destinations'][1]['Url']
 
+
     if config['Type'] == 'RTMP_PULL' or config['Type'] == 'URL_PULL' :
         Name = config['StreamName']
         Sources = [
@@ -113,7 +115,7 @@ def create_input(config):
         responseData['EndPoint1'] = 'Push InputType only'
         responseData['EndPoint2'] = 'Push InputType only'
 
-    if config['Type'] == 'MEDIACONNECT':
+    if config['Type'] == 'MEDIACONVERT':
         response = medialive.create_input(
             Name = config['StreamName'],
             Type=config['Type'],
@@ -175,7 +177,7 @@ def create_channel(config):
                 {
                     'PasswordParam': config['MediaPackagePriUser'],
                     'Url': config['MediaPackagePriUrl'],
-                    'Username': config['MediaPackagePriUser']x`
+                    'Username': config['MediaPackagePriUser']
                 },
                 {
                     'PasswordParam': config['MediaPackageSecUser'],
@@ -215,10 +217,12 @@ def delete_channel(ChannelId):
         InputId=InputId
     )
     if input['SecurityGroups']:
-        delete_input_security_group(
-            InputSecurityGroupId=input['SecurityGroups'][0]
-        )
+        sg = input['SecurityGroups'][0]
     medialive.delete_input(
         InputId = InputId
+    )
+    time.sleep(3)
+    medialive.delete_input_security_group(
+        InputSecurityGroupId=sg
     )
     return

@@ -133,7 +133,7 @@ def create_endpoint(config):
 
 
     if config.get('EndPoint') == 'CMAF':
-        url = urlparse(response['CmafPackage']['HlsManifests'][0]['Url'])
+        url= urlparse(response['CmafPackage']['HlsManifests'][0]['Url'])
     else:
         url = urlparse(response['Url'])
 

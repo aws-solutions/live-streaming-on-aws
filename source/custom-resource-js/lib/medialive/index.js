@@ -16,7 +16,9 @@ let CreateInput = async (config) => {
         region: process.env.AWS_REGION
     });
 
-    let responseData;
+    let responseData,
+        params,
+        data;
 
     try {
 
@@ -25,12 +27,12 @@ let CreateInput = async (config) => {
             //Create input for RTP_PUSH input type
             case 'RTP_PUSH':
                 //Requires security group
-                let params = {
+                params = {
                 			WhitelistRules: [{
                 				Cidr: config.Cidr
                 			}]
                 		};
-                let data = await medialive.createInputSecurityGroup(params).promise();
+                data = await medialive.createInputSecurityGroup(params).promise();
                 params = {
                 					InputSecurityGroups: [data.SecurityGroup.Id],
                 					Name: config.StreamName,
@@ -48,12 +50,12 @@ let CreateInput = async (config) => {
             //Create input for RTMP_PUSH input type
             case 'RTMP_PUSH':
                 //Requires SG and 2 destinations
-                let params = {
+                params = {
                 			WhitelistRules: [{
                 				Cidr: config.Cidr
                 			}]
                 		};
-                let data = await medialive.createInputSecurityGroup(params).promise();
+                data = await medialive.createInputSecurityGroup(params).promise();
                 params = {
                 					InputSecurityGroups: [data.SecurityGroup.Id],
                 					Name: config.StreamName,
@@ -79,7 +81,7 @@ let CreateInput = async (config) => {
             case 'RTMP_PULL':
             case 'URL_PULL':
                 //Requires 2 source URLs, authentication is optional.
-                let params = {
+                params = {
                     Name: config.StreamName,
                     Type: config.Type,
                     Sources: [{
@@ -114,7 +116,7 @@ let CreateInput = async (config) => {
                     await ssm.putParameter(ssm_params).promise();
                   }
                   //Create input
-                  let data = await medialive.createInput(params).promise();
+                  data = await medialive.createInput(params).promise();
                   responseData = {
                     Id: data.Input.Id,
                     EndPoint1: 'Push InputType only',
@@ -125,7 +127,7 @@ let CreateInput = async (config) => {
             //Create input for MEDIACONNECT input type
             case 'MEDIACONNECT':
                 //Requires 2 Mediaconnect Arns
-                let params = {
+                params = {
                     Name: config.StreamName,
                     Type: config.Type,
                     RoleArn: config.Role,
@@ -138,7 +140,7 @@ let CreateInput = async (config) => {
                     ]
                 };
                 //Create input
-                let data = await medialive.createInput(params).promise();
+                data = await medialive.createInput(params).promise();
                 responseData = {
                   Id: data.Input.Id,
                   EndPoint1: 'Push InputType only',

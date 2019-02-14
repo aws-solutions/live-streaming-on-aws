@@ -37,6 +37,7 @@
  			switch (config.Resource) {
 
  				case 'MediaLiveInput':
+          //FEATURE/P20903447 Mediaconnect added as an input
  					responseData = await MediaLive.createInput(config);
  					Id = responseData.Id;
  					break;
@@ -91,7 +92,7 @@
  				default:
 					// medialive inputs and mediapackage endpoints are deleted as part of
 					// the the channel deletes so not included here, sending default success response
- 					console.log(event.LogicalResourceId, ': delte not required, sending success response');
+ 					console.log(event.LogicalResourceId, ': delete not required, sending success response');
  			}
  		}
 

@@ -2,123 +2,160 @@
  * @function MediaLive
  * @description AWS Elemental MediaLive module for Node 8.10+ to create/delete
  * MediaLive Inputs and Channels
-*/
+ */
 
 const AWS = require('aws-sdk');
 
+//Create input given an input type
+//FEATURE/P20903447 Mediaconnect added as an input
+let CreateInput = async (config) => {
+    const medialive = new AWS.MediaLive({
+        region: process.env.AWS_REGION
+    });
+    const ssm = new AWS.SSM({
+        region: process.env.AWS_REGION
+    });
 
-// FEATURE/P15424610:: Function updated to use Async & removed ssmPut functions as nolnger required.
-let CreatePullInput = async (config) => {
-  const medialive = new AWS.MediaLive({
-    region: process.env.AWS_REGION
-  });
-  const ssm = new AWS.SSM({
-    region: process.env.AWS_REGION
-  });
-  let responseData;
-  try {
-    let params = {
-      Name: config.StreamName,
-      Type: config.Type,
-      Sources: [{
-          Url: config.PriUrl
-        },
-        {
-          Url: config.SecUrl
-        }
-      ]
-    };
-    //If authentication is required, update params & store U/P in Parameter Store
-    if (config.PriUser !== null && config.PriUser !== '') {
-      params.Sources[0].Username = config.PriUser;
-      params.Sources[0].PasswordParam = config.PriUser;
-      let ssm_params = {
-        Name: config.PriUser,
-        Description: 'Live Stream solution input credentials',
-        Type: 'String',
-        Value: config.PriPass
-      };
-      await ssm.putParameter(ssm_params).promise();
+    let responseData;
+
+    try {
+
+        switch (config.Type) {
+
+            //Create input for RTP_PUSH input type
+            case 'RTP_PUSH':
+                //Requires security group
+                let params = {
+                			WhitelistRules: [{
+                				Cidr: config.Cidr
+                			}]
+                		};
+                let data = await medialive.createInputSecurityGroup(params).promise();
+                params = {
+                					InputSecurityGroups: [data.SecurityGroup.Id],
+                					Name: config.StreamName,
+                					Type: config.Type
+                        };
+                //Create input
+                data = await medialive.createInput(params).promise();
+                responseData = {
+            							Id: data.Input.Id,
+            							EndPoint1: data.Input.Destinations[0].Url,
+            							EndPoint2: data.Input.Destinations[1].Url
+            						};
+                break;
+
+            //Create input for RTMP_PUSH input type
+            case 'RTMP_PUSH':
+                //Requires SG and 2 destinations
+                let params = {
+                			WhitelistRules: [{
+                				Cidr: config.Cidr
+                			}]
+                		};
+                let data = await medialive.createInputSecurityGroup(params).promise();
+                params = {
+                					InputSecurityGroups: [data.SecurityGroup.Id],
+                					Name: config.StreamName,
+                					Type: config.Type,
+                          Destinations: [{
+        		                       StreamName: config.StreamName+'/primary'
+        	                       },
+        	                       {
+        		                        StreamName: config.StreamName+'/secondary'
+        	                        }
+                                ]
+                        };
+                //Create input
+                data = await medialive.createInput(params).promise();
+                responseData = {
+              							Id: data.Input.Id,
+              							EndPoint1: data.Input.Destinations[0].Url,
+              							EndPoint2: data.Input.Destinations[1].Url
+              						};
+                break;
+
+            //Create input for RTMP_PULL or URL_PULL input type
+            case 'RTMP_PULL':
+            case 'URL_PULL':
+                //Requires 2 source URLs, authentication is optional.
+                let params = {
+                    Name: config.StreamName,
+                    Type: config.Type,
+                    Sources: [{
+                        Url: config.PriUrl
+                      },
+                      {
+                        Url: config.SecUrl
+                      }
+                    ]
+                  };
+                  //If authentication is required, update params & store U/P in Parameter Store
+                if (config.PriUser !== null && config.PriUser !== '') {
+                    params.Sources[0].Username = config.PriUser;
+                    params.Sources[0].PasswordParam = config.PriUser;
+                    let ssm_params = {
+                      Name: config.PriUser,
+                      Description: 'Live Stream solution input credentials',
+                      Type: 'String',
+                      Value: config.PriPass
+                    };
+                    await ssm.putParameter(ssm_params).promise();
+                  }
+                  if (config.SecUser !== null && config.SecUser !== '') {
+                    params.Sources[1].Username = config.SecUser;
+                    params.Sources[1].PasswordParam = config.SecUser;
+                    let ssm_params = {
+                      Name: config.SecUser,
+                      Description: 'Live Stream solution input credentials',
+                      Type: 'String',
+                      Value: config.SecPass
+                    };
+                    await ssm.putParameter(ssm_params).promise();
+                  }
+                  //Create input
+                  let data = await medialive.createInput(params).promise();
+                  responseData = {
+                    Id: data.Input.Id,
+                    EndPoint1: 'Push InputType only',
+                    EndPoint2: 'Push InputType only'
+                  };
+                break;
+
+            //Create input for MEDIACONNECT input type
+            case 'MEDIACONNECT':
+                //Requires 2 Mediaconnect Arns
+                let params = {
+                    Name: config.StreamName,
+                    Type: config.Type,
+                    RoleArn: config.Role,
+                    MediaConnectFlows: [{
+                            FlowArn: config.PriMediaConnectArn
+                        },
+                        {
+                            FlowArn: config.SecMediaConnectArn
+                        }
+                    ]
+                };
+                //Create input
+                let data = await medialive.createInput(params).promise();
+                responseData = {
+                  Id: data.Input.Id,
+                  EndPoint1: 'Push InputType only',
+                  EndPoint2: 'Push InputType only'
+                };
+                break;
+
+            default:
+                return Promise.reject("input type not defined in request");
+
+        } //End switch (config.Type)
+
+    } catch (err) {
+        throw err;
     }
-    if (config.SecUser !== null && config.SecUser !== '') {
-      params.Sources[1].Username = config.SecUser;
-      params.Sources[1].PasswordParam = config.SecUser;
-      let ssm_params = {
-        Name: config.SecUser,
-        Description: 'Live Stream solution input credentials',
-        Type: 'String',
-        Value: config.SecPass
-      };
-      await ssm.putParameter(ssm_params).promise();
-    }
-    //Create input
-    let data = await medialive.createInput(params).promise();
-
-    responseData = {
-      Id: data.Input.Id,
-      EndPoint1: 'Push InputType only',
-      EndPoint2: 'Push InputType only'
-    };
-  }
-  catch (err) {
-    throw err;
-  }
-  return responseData;
+    return responseData;
 };
-
-
-//FEATURE/P15424610:: There is a bug with the current version of the SDK that casues
-// the Async/Await version of this function to fail.
-let CreatePushInput = function(config) {
-	let response = new Promise((res, reject) => {
-
-		const medialive = new AWS.MediaLive({
-			region: process.env.AWS_REGION
-		});
-
-		let params = {
-			WhitelistRules: [{
-				Cidr: config.Cidr
-			}]
-		};
-		medialive.createInputSecurityGroup(params, function(err, data) {
-			if (err) reject(err);
-			else {
-				let params = {
-					InputSecurityGroups: [data.SecurityGroup.Id],
-					Name: config.StreamName,
-					Type: config.Type
-				};
-
-        //Feature/xxxx RTMP Requires Stream names for each input Destination.
-        if (config.Type === 'RTMP_PUSH') {
-          params.Destinations = [
-            {
-        		StreamName: config.StreamName+'/primary'
-        	  },
-        	  {
-        		StreamName: config.StreamName+'/secondary'
-        	 }
-         ];
-        }
-
-				medialive.createInput(params, function(err, data) {
-					if (err) reject(err);
-					else {
-						let responseData = {
-							Id: data.Input.Id,
-							EndPoint1: data.Input.Destinations[0].Url,
-							EndPoint2: data.Input.Destinations[1].Url
-						};
-						res(responseData);
-					}
-				});
-			}
-		});
-	});
-	return response;
-};
-
 
 // FEATURE/P15424610:: Function updated to use Async
 let CreateChannel = async (config) => {
@@ -197,7 +234,6 @@ let CreateChannel = async (config) => {
   return responseData;
 };
 
-
 // FEATURE/P15424610:: Function updated to use Async & support to stop the
 // channel before atempting to delte it (required to avoid a stack failure)
 let DeleteChannel = async (ChannelId) => {
@@ -242,9 +278,9 @@ let DeleteChannel = async (ChannelId) => {
   return;
 };
 
+//FEATURE/P20903447 Mediaconnect added as an input
 module.exports = {
-  createPushInput: CreatePushInput,
-  createPullInput: CreatePullInput,
-  createChannel: CreateChannel,
-  deleteChannel: DeleteChannel
+    createInput: CreateInput,
+    createChannel: CreateChannel,
+    deleteChannel: DeleteChannel
 };

@@ -100,7 +100,8 @@ let CreateInput = async (config) => {
                       Name: config.PriUser,
                       Description: 'Live Stream solution input credentials',
                       Type: 'String',
-                      Value: config.PriPass
+                      Value: config.PriPass,
+                      Overwrite: true
                     };
                     await ssm.putParameter(ssm_params).promise();
                   }
@@ -111,7 +112,8 @@ let CreateInput = async (config) => {
                       Name: config.SecUser,
                       Description: 'Live Stream solution input credentials',
                       Type: 'String',
-                      Value: config.SecPass
+                      Value: config.SecPass,
+                      Overwrite: true
                     };
                     await ssm.putParameter(ssm_params).promise();
                   }

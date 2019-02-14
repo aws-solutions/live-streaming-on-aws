@@ -93,8 +93,9 @@ def create_input(config):
             ssm.put_parameter(
                 Name = config['PriUser'],
                 Description = 'Live Stream solution Primary input credentials',
-                Type = 'string',
-                Value = config['PriPass']
+                Type = 'String',
+                Value = config['PriPass'],
+                Overwrite=True
             )
         # store input u/p in SSM
         if config['SecUser']:
@@ -103,8 +104,9 @@ def create_input(config):
             ssm.put_parameter(
                 Name = config['PriUser'],
                 Description = 'Live Stream solution Primary input credentials',
-                Type = 'string',
-                Value = config['PriPass']
+                Type = 'String',
+                Value = config['PriPass'],
+                Overwrite=True
             )
             response = medialive.create_input(
                 Name = Name,

@@ -57,6 +57,14 @@ let channel_data = {
 }
 let ChannelId = '2468'
 
+let delete_data = {
+  InputAttachments:[
+    {
+      InputId:'2468'
+    }
+  ]
+}
+
 describe('#MEDIALIVE::', () => {
 
 	afterEach(() => {
@@ -65,14 +73,24 @@ describe('#MEDIALIVE::', () => {
 	});
 
 
-	it('should return "responseData" when create PULL input is successful', async () => {
+	it('should return "responseData" when create input is successful', async () => {
 
 		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
     AWS.mock('SSM', 'putParameter');
 
-    let response = await lambda.createPullInput(pull_config)
+    let response = await lambda.createInput(pull_config)
     expect(response.Id).to.equal('2468');
 	});
+
+  it('should return "ERROR" on MediaLive create input', async () => {
+
+    AWS.mock('SSM', 'putParameter');
+    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+
+    await lambda.createInput(pull_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
 
   it('should return "responseData" when create Channel is successful',async () => {
 

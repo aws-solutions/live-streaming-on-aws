@@ -132,7 +132,7 @@ let CreateInput = async (config) => {
                 params = {
                     Name: config.StreamName,
                     Type: config.Type,
-                    RoleArn: config.Role,
+                    RoleArn: config.RoleArn,
                     MediaConnectFlows: [{
                             FlowArn: config.PriMediaConnectArn
                         },
@@ -268,6 +268,8 @@ let DeleteChannel = async (ChannelId) => {
     }
     //delete input and then SG
     await medialive.deleteInput(params).promise();
+    // wait 10 seconds
+    await sleep(1000);
     //delete SG if sg is not null
     if (sg) {
         params = {

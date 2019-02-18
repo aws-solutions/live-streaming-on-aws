@@ -8,7 +8,7 @@ version="test-f1"
 [ -e dist ] && rm -r dist
 echo "== mkdir -p dist"
 mkdir -p dist
-echo "== cp sslive-streaming-on-aws.yaml dist/live-streaming-on-aws.template"
+echo "== cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.template"
 cp live-streaming-on-aws.yaml dist/live-streaming-on-aws.yaml
 sed  -i "" "s/CODEBUCKET/$bucket/g" dist/live-streaming-on-aws.yaml
 #sed  -i "" "s/CODEVERSION/2.1/g" dist/live-streaming-on-aws.yaml

@@ -82,7 +82,8 @@ def create_input(config):
                 'Url': config['PriUrl']
             },
             {
-                'Url': config['PriUrl']
+                #'Url': config['PriUrl']
+                'Url': config['SecUrl']
             }
         ]
         Type = config['Type']
@@ -102,10 +103,12 @@ def create_input(config):
             Sources[1]['Username'] = config['SecUser']
 
             ssm.put_parameter(
-                Name = config['PriUser'],
+                #Name = config['PriUser'],
+                Name = config['SecUser'],
                 Description = 'Live Stream solution Primary input credentials',
                 Type = 'String',
-                Value = config['PriPass'],
+                #Value = config['PriPass'],
+                Value = config['SecPass'],
                 Overwrite=True
             )
             response = medialive.create_input(
@@ -121,7 +124,7 @@ def create_input(config):
         response = medialive.create_input(
             Name = config['StreamName'],
             Type=config['Type'],
-            RoleArn=config['Role'],
+            RoleArn=config['RoleArn'],
             MediaConnectFlows=[{
                     FlowArn: config['PriMediaConnectArn']
                 },

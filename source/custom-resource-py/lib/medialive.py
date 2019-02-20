@@ -23,10 +23,9 @@ medialive = boto3.client('medialive')
 ssm = boto3.client('ssm')
 responseData = {}
 
-
 def create_input(config):
     print('Creating::{} Input'.format(config['Type']))
-
+    print ('boto3 version: {}'.format(boto3.__version__))
 
     if config['Type'] == 'RTP_PUSH':
         sg = medialive.create_input_security_group(
@@ -120,17 +119,19 @@ def create_input(config):
         responseData['EndPoint1'] = 'Push InputType only'
         responseData['EndPoint2'] = 'Push InputType only'
 
-    if config['Type'] == 'MEDIACONVERT':
+    if config['Type'] == 'MEDIACONNECT':
         response = medialive.create_input(
             Name = config['StreamName'],
-            Type=config['Type'],
-            RoleArn=config['RoleArn'],
-            MediaConnectFlows=[{
-                    FlowArn: config['PriMediaConnectArn']
+            Type = config['Type'],
+            RoleArn = config['RoleArn'],
+            MediaConnectFlows = [
+                {
+                    'FlowArn': config['PriMediaConnectArn']
                 },
                 {
-                    FlowArn: config['SecMediaConnectArn']
-            }]
+                    'FlowArn': config['SecMediaConnectArn']
+                }
+            ]
         )
         responseData['Id'] = response['Input']['Id']
         responseData['EndPoint1'] = 'Push InputType only'

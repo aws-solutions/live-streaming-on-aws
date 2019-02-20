@@ -277,7 +277,7 @@ Resources:
                   - mediaconnect:ManagedAddOutput
                   - mediaconnect:ManagedRemoveOutput
                 Resource:
-                  - !Join ["", ["arn:aws:mediaconnect:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":flow/*"]]
+                  - !Join ["", ["arn:aws:mediaconnect:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
 
   CustomResource:
     Type: AWS::Lambda::Function

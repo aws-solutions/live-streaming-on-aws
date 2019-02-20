@@ -34,6 +34,8 @@ logger = logging.getLogger(__name__)
 logging.getLogger().setLevel(logging.INFO)
 
 def handler(event, context):
+    print ('boto3 version: {}'.format(boto3.__version__))
+
     #Each resource returns a promise with a json object to return cloudformation.
     try:
         logger.info('Event: %s' % json.dumps(event))

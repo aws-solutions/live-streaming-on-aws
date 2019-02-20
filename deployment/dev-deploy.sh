@@ -26,9 +26,29 @@ echo "== zip and copy node source code files"
 npm install --production
 zip -q -r9 ../../deployment/dist/custom-resource-js.zip *
 cd ../custom-resource-py/
-echo "== zip and copy python source code files"
-zip -q -r9 ../../deployment/dist/custom-resource-py.zip *
-cd ../../deployment/
+#feature/P20903447: install the latest boto3 to support mediaconnect
+echo '== generate a setup.cfg file needed for installing boto3'
+printf '[install]\nprefix=\n' > setup.cfg
+mkdir -p latestboto3
+echo '== install latest boto3'
+pip install -r ../requirements.txt -t ./latestboto3/
+echo '== remove setup.cfg file'
+rm setup.cfg
+echo '== copy custom-resource-py/ to /deployment/dist/'
+cp -R ../custom-resource-py ../../deployment/dist/
+echo '== remove latestboto3 folder'
+rm -rf ./latestboto3/
+cd ../../deployment/dist/custom-resource-py/
+echo '== move contents from deployment/dist/custom-resource-py/latestboto3/ to one level up /deployment/dist/custom-resource-py/'
+mv -v ./latestboto3/*  .
+echo '== remove latestboto3 folder'
+rm -rf ./latestboto3/
+echo "== zip python source code files"
+zip -q -r9 ../custom-resource-py.zip *
+#zip -q -r9 ../../deployment/dist/custom-resource-py.zip *
+cd ../../../deployment/
+echo "== remove custom-resource-py folder"
+rm -rf dist/custom-resource-py/
 echo "== s3 files in dist/:"
 ls -lh dist/
 cd dist/

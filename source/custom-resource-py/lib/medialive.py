@@ -73,7 +73,6 @@ def create_input(config):
         responseData['EndPoint1'] = response['Input']['Destinations'][0]['Url']
         responseData['EndPoint2'] = response['Input']['Destinations'][1]['Url']
 
-
     if config['Type'] == 'RTMP_PULL' or config['Type'] == 'URL_PULL' :
         Name = config['StreamName']
         Sources = [
@@ -110,11 +109,11 @@ def create_input(config):
                 Value = config['SecPass'],
                 Overwrite=True
             )
-            response = medialive.create_input(
+        response = medialive.create_input(
                 Name = Name,
                 Type = Type,
                 Sources = Sources
-            )
+        )
         responseData['Id'] = response['Input']['Id']
         responseData['EndPoint1'] = 'Push InputType only'
         responseData['EndPoint2'] = 'Push InputType only'
@@ -222,13 +221,14 @@ def delete_channel(ChannelId):
     input = medialive.describe_input(
         InputId=InputId
     )
-    if input['SecurityGroups']:
-        sg = input['SecurityGroups'][0]
+    # delete input
     medialive.delete_input(
         InputId = InputId
     )
     time.sleep(3)
-    medialive.delete_input_security_group(
-        InputSecurityGroupId=sg
-    )
+    if input['SecurityGroups']:
+        sg = input['SecurityGroups'][0]
+        medialive.delete_input_security_group(
+            InputSecurityGroupId=sg
+        )
     return

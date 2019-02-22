@@ -13,8 +13,6 @@ echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md open-source/dist/"
 cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png open-source/dist/
 echo "== cp -r ../source ./open-source/dist/"
 cp -r ../source ./open-source/dist/
-echo "== rm -rf open-source/dist/source/custom-resource-js/node_modules"
-rm -rf open-source/dist/source/custom-resource-js/node_modules
 echo "== ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *"
 cd ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *
 echo "== cd .. && rm -rf dist"

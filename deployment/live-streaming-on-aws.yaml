@@ -214,6 +214,7 @@ Resources:
                   - medialive:createChannel
                   - medialive:deleteChannel
                   - medialive:deleteInputSecurityGroup
+                  - medialive:describeChannel
                   # feature/P20903447 support deleting input security group
 
                 Resource:

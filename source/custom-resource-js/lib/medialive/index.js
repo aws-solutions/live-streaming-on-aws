@@ -239,7 +239,7 @@ let CreateChannel = async (config) => {
 };
 
 // FEATURE/P15424610:: Function updated to use Async & support to stop the
-// channel before atempting to delte it (required to avoid a stack failure)
+// channel before atempting to delete it (required to avoid a stack failure)
 let DeleteChannel = async (ChannelId) => {
   const medialive = new AWS.MediaLive({
     region: process.env.AWS_REGION
@@ -250,21 +250,35 @@ let DeleteChannel = async (ChannelId) => {
     let params = {
       ChannelId: ChannelId
     };
+    //stop channel
     await medialive.stopChannel(params).promise();
-    // wait 30 seconds
-    await sleep(30000);
+    // get the status of the channel
+    let data = await medialive.describeChannel(params).promise();
+    let state = data.State;
+    while (state !== 'IDLE')//keep checking channel status every 30 seconds till it is stopped
+    {
+        await sleep(30000);
+        data = await medialive.describeChannel(params).promise();
+        state = data.State;
+    }
     // delete channel
-    let data = await medialive.deleteChannel(params).promise();
-    // wait 10 seconds
-    await sleep(10000);
+    data = await medialive.deleteChannel(params).promise();
     //feature/P20903447 Delete SecurityGroup if it was configured.
     let sg;
     params = {
         InputId: data.InputAttachments[0].InputId
     };
+    //Get input information
     data = await medialive.describeInput(params).promise();
     if (data.SecurityGroups) {
         sg = data.SecurityGroups[0];
+    }
+    state = data.State;
+    while (state !== "DETACHED"){ //keep checking input status every 30 seconds till it is detached from the channel
+       //wait 30 seconds
+        await sleep(30000);
+        data = await medialive.describeInput(params).promise();
+        state = data.State;
     }
     //delete input and then SG
     await medialive.deleteInput(params).promise();

@@ -1,0 +1,3 @@
+#feature/P20903447 boto3 1.9.96 or higher is required for MediaConnect
+boto3=1.9.99
+botocore>=1.12.99

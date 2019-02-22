@@ -31,6 +31,8 @@ rm -rf node_modules/
 npm install --production
 zip -q -r9 ../../deployment/dist/custom-resource-js.zip *
 cd ../custom-resource-py/
+echo '== install latest boto3: install -r source/requirements.txt -t ../source/custome-resource-py'
+pip install -r ./requirements.txt -t .
 echo "== zip and copy python source code files"
 zip -q -r9 ../../deployment/dist/custom-resource-py.zip *
 cd ../../deployment/

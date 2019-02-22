@@ -31,7 +31,7 @@ echo '== generate a setup.cfg file needed for installing boto3'
 printf '[install]\nprefix=\n' > setup.cfg
 mkdir -p latestboto3
 echo '== install latest boto3'
-pip install -r ../requirements.txt -t ./latestboto3/
+pip install -r ./requirements.txt -t ./latestboto3/
 echo '== remove setup.cfg file'
 rm setup.cfg
 echo '== copy custom-resource-py/ to /deployment/dist/'

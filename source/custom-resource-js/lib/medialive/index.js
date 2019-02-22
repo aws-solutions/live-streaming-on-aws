@@ -275,8 +275,8 @@ let DeleteChannel = async (ChannelId) => {
     }
     state = data.State;
     while (state !== "DETACHED"){ //keep checking input status every 30 seconds till it is detached from the channel
-       //wait 30 seconds
-        await sleep(30000);
+       //wait 10 seconds
+        await sleep(10000);
         data = await medialive.describeInput(params).promise();
         state = data.State;
     }

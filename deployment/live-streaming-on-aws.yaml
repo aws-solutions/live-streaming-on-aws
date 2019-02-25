@@ -162,8 +162,8 @@ Metadata:
 Mappings:
   SourceCode:
     General:
-      S3Bucket: livestream
-      KeyPrefix: live-streaming-on-aws/test-f1
+      S3Bucket: CODEBUCKET
+      KeyPrefix: live-streaming-on-aws/CODEVERSION
 
   AnonymousData:
     SendAnonymousData:

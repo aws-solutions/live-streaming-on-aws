@@ -80,7 +80,6 @@ def create_input(config):
                 'Url': config['PriUrl']
             },
             {
-                #'Url': config['PriUrl']
                 'Url': config['SecUrl']
             }
         ]

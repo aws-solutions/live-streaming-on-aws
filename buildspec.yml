@@ -4,6 +4,9 @@ phases:
   install:
     commands:
       - echo "This buildspec is based on image - aws/codebuild/nodejs:8.10.0"
+      - sudo apt update
+      - sudo apt install python3
+      - sudo apt install python3-pip
   pre_build:
     commands:
       - echo "Installing dependencies and executing unit tests - `pwd`"

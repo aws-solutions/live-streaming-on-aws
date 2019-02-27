@@ -1,4 +1,4 @@
-#!/bin/bash
+-r ./re #!/bin/bash
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Please provide the base source bucket name and version (subfolder) where the lambda code will eventually reside."
@@ -24,7 +24,7 @@ cd ./dist/custom-resource-js/ && npm install --production
 echo "== zip -q -r9 ../custom-resource-js.zip *"
 zip -q -r9 ../custom-resource-js.zip *
 echo "== cd ../custom-resource-py/ && pip install -r ./requirements.txt -t ."
-cd ../custom-resource-py/ && pip install -r ./requirements.txt -t .
+cd ../custom-resource-py/ && pip3 install -r ./requirements.txt -t .
 echo "== zip -q -r9 ../custom-resource-py.zip *"
 zip -q -r9 ../custom-resource-py.zip *
 echo "== cd ../"

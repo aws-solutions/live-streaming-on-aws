@@ -485,6 +485,11 @@ Resources:
                       - OPTIONS
                   ForwardedValues:
                       QueryString: 'false'
+                      #Feature/P20903447 whitelist added to avoid browser Access-Control-Allow-Origin errors
+                      Headers:
+                        - Access-Control-Request-Headers
+                        - Access-Control-Request-Method
+                        - Origin
                   ViewerProtocolPolicy: redirect-to-https
               IPV6Enabled: 'true'
               DefaultRootObject: "index.html"

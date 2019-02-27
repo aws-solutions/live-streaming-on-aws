@@ -1,27 +1,27 @@
 # Live Streaming on AWS
 
-How to implement Live streaming on AWS  at scale leveraging AWS Elemental MediaLive,  MediaPackage and Amazon CloudFront. This repo contains the source code for the AWS solution [Live Streaming on AWS](https://aws.amazon.com/answers/media-entertainment/live-streaming-on-aws/).
+How to implement Live streaming on AWS  at scale leveraging AWS Elemental MediaLive,  MediaPackage and Amazon CloudFront. This repo contains the source code for the AWS solution [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/).
 
 ## Architecture Overview
 
 ![Architecture](architecture.png)
 
 **AWS Elemental MediaLive**<br/>
-Is configured to ingest 2 live feeds and transcode the content into multiple adaptive bitrate HLS content.  The solution can be configured to ingest RTP RTMP and HLS streams and will apply 1 of 3 encoding profiles which include bitrates of 1080p through 270p. The encoding profile is set at launch and is based on the source resolution (See Encoding Profiles below).
+Is configured to ingest 2 live feeds and transcode the content into multiple adaptive bitrate HLS content.  The solution can be configured to ingest RTP RTMP HLS and MediaConnect streams and will apply 1 of 3 encoding profiles which include bitrates of 1080p through 270p. The encoding profile is set at launch and is based on the source resolution (See Encoding Profiles below).
 
 **AWS Elemental MediaPackage**<br/>
-Ingests the MediaLive Output and package the Live stream into HLS, DASH and MSS formats that are delivered through 3 MediaPackage custom endpoints.
+Ingests the MediaLive Output and package the Live stream into HLS, DASH, MSS and CMAF formats that are delivered through 3 MediaPackage custom endpoints.
 
 **Amazon CloudFront**<br/>
-Is configured with the three MediaPackage custom endpoints as the Origins for the distribution. CloudFront then enable the live stream content to be delivered globally and at scale.
+Is configured with the MediaPackage custom endpoints as the Origins for the distribution. CloudFront then enable the live stream content to be delivered globally and at scale.
 
 **Optional Demo Deployment**<br/>
-As part of the CloudFormation template a Demo HTML preview player is deployed to an Amazon S3 bucket which is a single page HTML/JavaScript application that will playback the HLS, DASH and MMS streams. In addition, the solution can be configured to ingest a Demo HLS feed hosted on AWS.   
+As part of the CloudFormation template a Demo HTML preview player is deployed to an Amazon S3 bucket which is a single page HTML/JavaScript application that will playback the HLS, DASH, MSS and CMAF streams. In addition, the solution can be configured to ingest a Demo HLS feed hosted on AWS.   
 
 
 ## Deployment
 The solution is deployed using a CloudFormation template with a lambda backed custom resource, available in both NodeJS and Python.
-For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/answers/media-entertainment/live-streaming-on-aws/)
+For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/)
 
 ## Encoding Profiles
 To solution Configures AWS Elemental MediaLive with one of three encoding profiles based on the source resolution defined at launch as a CloudFormation parameter. The three options are 1080, 720, 540 and correspond to the following encoding profiles:
@@ -54,7 +54,7 @@ A single page application used to demo playback of the live stream. This is depl
 
 
 ## Creating a custom Build
-To solution can be deployed through the CloudFormation template available on the solution home page: [Live Streaming on AWS](https://aws.amazon.com/answers/media-entertainment/live-streaming-on-aws/).
+To solution can be deployed through the CloudFormation template available on the solution home page: [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/).
  To make changes to the solution, download or clone this repo, update the source code and then run the deployment/build-s3-dist.sh script to deploy the updated Lambda code to an S3 bucket in your account.
 
 ### Pre-requirements:
@@ -70,9 +70,9 @@ Run the build-s3-dist.sh script, passing in 2 variables:
 * CODEVERSION = this will be the subfolder containing the code.
 
 This will:
-* copies the console files to ./deployment/dist/.
-* copies the CloudFormation template to ./deployment/dist/ and updates the source code mappings.
-* zips and copies the source code to ./deployment/dist/
+* copy the console files to ./deployment/dist/.
+* copy the CloudFormation template to ./deployment/dist/ and updates the source code mappings.
+* zip and copy the source code to ./deployment/dist/
 
 Example:
 ```

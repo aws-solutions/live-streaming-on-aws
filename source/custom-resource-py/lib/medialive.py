@@ -101,11 +101,9 @@ def create_input(config):
             Sources[1]['Username'] = config['SecUser']
 
             ssm.put_parameter(
-                #Name = config['PriUser'],
                 Name = config['SecUser'],
                 Description = 'Live Stream solution Primary input credentials',
                 Type = 'String',
-                #Value = config['PriPass'],
                 Value = config['SecPass'],
                 Overwrite=True
             )

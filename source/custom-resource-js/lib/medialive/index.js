@@ -282,7 +282,7 @@ let DeleteChannel = async (ChannelId) => {
     }
     //delete input and then SG
     await medialive.deleteInput(params).promise();
-    // wait 10 seconds
+    // wait 1 seconds
     await sleep(1000);
     //delete SG if sg is not null
     if (sg) {

@@ -9,7 +9,7 @@ let lambda = require('./index.js');
     ServiceToken: "arn:aws:lambda",
     ResponseURL: "https://cloudformation",
     StackId: "arn:aws:cloudformation",
-    RequestId: "63e8ffa2-3059-4607-a450-119d473c73bc",
+    RequestId: "1111111",
     LogicalResourceId: "Uuid",
     ResourceType: "Custom::UUID",
     ResourceProperties: {

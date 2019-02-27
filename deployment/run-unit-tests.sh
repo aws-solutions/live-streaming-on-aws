@@ -5,5 +5,5 @@ npm install --silent
 npm test
 
 # remove unwanted modules folder so not included in build s3 and open source steps.
-rm -rf node_lodules/
+rm -rf node_modules/
 rm package-lock.json

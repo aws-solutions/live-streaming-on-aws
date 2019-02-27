@@ -24,7 +24,7 @@ cd ./dist/custom-resource-js/ && npm install --production
 echo "== zip -q -r9 ../custom-resource-js.zip *"
 zip -q -r9 ../custom-resource-js.zip *
 echo "== cd ../custom-resource-py/ && pip install -r ./requirements.txt -t ."
-cd ../custom-resource-py/ && pip3 install -r ./requirements.txt -t .
+cd ../custom-resource-py/ && pip install -r ./requirements.txt -t .
 echo "== zip -q -r9 ../custom-resource-py.zip *"
 zip -q -r9 ../custom-resource-py.zip *
 echo "== cd ../"

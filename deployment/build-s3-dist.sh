@@ -1,4 +1,4 @@
--r ./re #!/bin/bash
+#!/bin/bash
 # Check to see if input has been provided:
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Please provide the base source bucket name and version (subfolder) where the lambda code will eventually reside."

@@ -400,7 +400,7 @@ Resources:
             Cookies:
               Forward: all
             Headers:
-              - Origin
+              - Access-Control-Allow-Origin
               - Access-Control-Request-Method
               - Access-Control-Request-Header
           ViewerProtocolPolicy: allow-all
@@ -489,7 +489,7 @@ Resources:
                       Headers:
                         - Access-Control-Request-Headers
                         - Access-Control-Request-Method
-                        - Origin
+                        - Access-Control-Allow-Origin
                   ViewerProtocolPolicy: redirect-to-https
               IPV6Enabled: 'true'
               DefaultRootObject: "index.html"

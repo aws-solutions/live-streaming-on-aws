@@ -381,29 +381,62 @@ Resources:
         Origins:
           - Id: mediapackage
             DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
+            OriginPath: ''
             CustomOriginConfig:
-              OriginProtocolPolicy: https-only
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: match-viewer
+          - Id: TEMP_ORIGIN_ID/channel
+            DomainName: mediapackage.amazonaws.com
+            OriginPath: ''
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: match-viewer
         Enabled: 'true'
         DefaultCacheBehavior:
-          TargetOriginId: mediapackage
+          TargetOriginId: TEMP_ORIGIN_ID/channel
           SmoothStreaming: 'false'
           AllowedMethods:
             - GET
             - HEAD
-            - OPTIONS
           CachedMethods:
             - GET
             - HEAD
-            - OPTIONS
           ForwardedValues:
-            QueryString: 'true'
+            QueryString: true
             Cookies:
               Forward: all
-            Headers:
-              - Access-Control-Allow-Origin
-              - Access-Control-Request-Method
-              - Access-Control-Request-Header
-          ViewerProtocolPolicy: allow-all
+          ViewerProtocolPolicy: redirect-to-https
+        CacheBehaviors:
+          - PathPattern: index.ism/*
+            TargetOriginId: mediapackage
+            SmoothStreaming: true
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            ForwardedValues:
+              QueryString: 'true'
+              Cookies:
+                Forward: all
+            ViewerProtocolPolicy: redirect-to-https
+          - PathPattern: '*'
+            TargetOriginId: mediapackage
+            SmoothStreaming: true
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            ForwardedValues:
+              QueryString: false
+              Cookies:
+                Forward: all
+            ViewerProtocolPolicy: redirect-to-https
         ViewerCertificate:
           CloudFrontDefaultCertificate: 'true'
       Tags:

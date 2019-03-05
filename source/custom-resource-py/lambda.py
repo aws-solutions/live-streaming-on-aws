@@ -58,7 +58,7 @@ def handler(event, context):
 
             elif resource == 'MediaPackageChannel':
                 responseData = MediaPackage.create_channel(config)
-                id = 'MediaLiveChannelStart'
+                id = responseData['ChannelId']
 
             elif resource == 'MediaPackageEndPoint':
                 responseData = MediaPackage.create_endpoint(config)

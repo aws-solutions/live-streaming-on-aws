@@ -51,6 +51,7 @@ let sg_data = {
   }
 }
 let channel_data = {
+  ChannelId: '12345',
   Channel: {
     Id:'2468'
   }
@@ -105,6 +106,23 @@ describe('#MEDIALIVE::', () => {
     AWS.mock('MediaLive', 'createChannel', Promise.reject('ERROR'));
 
     await lambda.createChannel(channel_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
+
+  it('should return "success" when start channel is successful', async () => {
+
+    AWS.mock('MediaLive', 'startChannel', Promise.resolve(channel_data));
+
+    let response = await lambda.startChannel(channel_data)
+    expect(response).to.equal('success');
+  });
+
+  it('should return "success" when start channel is successful', async () => {
+
+    AWS.mock('MediaLive', 'startChannel', Promise.reject('ERROR'));
+
+    await lambda.startChannel(channel_config).catch(err => {
       expect(err).to.equal('ERROR');
     });
   });

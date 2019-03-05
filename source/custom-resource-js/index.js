@@ -47,6 +47,10 @@
  					Id = responseData.ChannelId;
  					break;
 
+        case 'MediaLiveChannelStart':
+          await MediaLive.startChannel(config);
+          break;
+
  				case 'MediaPackageChannel':
  					responseData = await MediaPackage.createChannel(config);
  					Id = responseData.ChannelId;

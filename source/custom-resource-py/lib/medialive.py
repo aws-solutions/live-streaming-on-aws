@@ -25,7 +25,6 @@ responseData = {}
 
 def create_input(config):
     print('Creating::{} Input'.format(config['Type']))
-    print ('boto3 version: {}'.format(boto3.__version__))
 
     if config['Type'] == 'RTP_PUSH':
         sg = medialive.create_input_security_group(
@@ -195,6 +194,14 @@ def create_channel(config):
     responseData['ChannelId'] = response['Channel']['Id']
     print('RESPONSE::{}'.format(responseData))
     return responseData
+
+
+def start_channel(config)
+    print('Starting Live Channel::{}'.format(config['ChannelId']))
+    medialive.start_channel(
+        ChannelId = ChannelId
+    )
+    return
 
 
 def delete_channel(ChannelId):

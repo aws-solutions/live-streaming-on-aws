@@ -53,9 +53,13 @@ def handler(event, context):
                 responseData = MediaLive.create_channel(config)
                 id = responseData['ChannelId']
 
+            elif resource == 'MediaLiveChannelStart':
+                MediaLive.start_channel(config)
+                id = responseData['ChannelId']
+
             elif resource == 'MediaPackageChannel':
                 responseData = MediaPackage.create_channel(config)
-                id = responseData['ChannelId']
+                id = 'MediaLiveChannelStart'
 
             elif resource == 'MediaPackageEndPoint':
                 responseData = MediaPackage.create_endpoint(config)
@@ -67,7 +71,7 @@ def handler(event, context):
 
             elif resource == 'UUID':
                 responseData = {'UUID':str(uuid.uuid4())}
-                id =  responseData['UUID']
+                id = responseData['UUID']
 
             elif resource == 'AnonymousMetric':
                 Metrics.send_metrics(config)

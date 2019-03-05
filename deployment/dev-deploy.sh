@@ -1,9 +1,9 @@
 #!/bin/bash
-#regions="us-east-1 us-west-2 eu-west-1 eu-central-1"
-regions="us-east-1"
-bucket="livestream"
+regions="us-east-1 us-west-2 eu-west-1 eu-central-1"
+#regions="us-east-1"
+bucket="decepticons"
 profile="default"
-version="test-f1"
+version="test-f2"
 
 [ -e dist ] && rm -r dist
 echo "== mkdir -p dist"

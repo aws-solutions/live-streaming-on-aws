@@ -65,6 +65,7 @@ Parameters:
     Description: (Optional) Specify a Password for the primary source URL
     Type: String
     Default: ""
+    NoEcho: true
 
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
@@ -80,6 +81,7 @@ Parameters:
     Description: (Optional) Specify a Username for the secondary source URL
     Type: String
     Default: ""
+    NoEcho: true
 
   PriMediaConnectArn:
     Description: (Optional) Specify the Arn for MediaConnect as a source
@@ -90,6 +92,14 @@ Parameters:
     Description: (Optional) Specify the Arn for MediaConnect as a source
     Type: String
     Default: ""
+
+  ChannelStart:
+    Description: Start the Live Channel as part of the deployment
+    Type: String
+    Default: Yes
+    AllowedValues:
+      - Yes
+      - No
 
 Metadata:
     AWS::CloudFormation::Interface:
@@ -107,6 +117,7 @@ Metadata:
                 - InputType
                 - InputCodec
                 - InputRes
+                - ChannelStart
             -
               Label:
                 default: For PUSH Source Types
@@ -124,7 +135,7 @@ Metadata:
                 - SecPullPass
             -
               Label:
-                default: For MediaConnect Source Type
+                default: MediaConnect Source Type
               Parameters:
                 - PriMediaConnectArn
                 - SecMediaConnectArn
@@ -158,6 +169,8 @@ Metadata:
             default: Primary MediaConnect Arn
           SecMediaConnectArn:
             default: Secondary MediaConnect Arn
+          ChannelStart:
+            default: Start MediaLive Channel
 
 Mappings:
   SourceCode:
@@ -173,6 +186,7 @@ Conditions:
     Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes]
     Demo: !Equals [ !Ref Console , Yes ]
     CodeBase: !Equals [!Ref Code, NodeJS-8.10]
+    Start: !Equals [ !Ref ChannelStart , Yes ]
 
 Resources:
 
@@ -215,7 +229,9 @@ Resources:
                   - medialive:deleteChannel
                   - medialive:deleteInputSecurityGroup
                   - medialive:describeChannel
-                  # feature/P20903447 support deleting input security group
+                  - medialive:startChannel
+                  # feature/P20903447 support deleting input security group &
+                  # start channel
 
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
@@ -373,6 +389,15 @@ Resources:
       MediaPackageSecUrl: !GetAtt MediaPackageChannel.SecondaryUrl
       MediaPackageSecUser: !GetAtt MediaPackageChannel.SecondaryUser
 
+  MediaLiveChannelStart:
+    DependsOn: CloudFront
+    Condition: Start
+    Type: Custom::MediaLiveChannelStart
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      Resource: MediaLiveChannelStart
+      ChannelId: !GetAtt MediaLiveChannel.ChannelId
+
   CloudFront:
     DependsOn: MediaPackageChannel
     Type: AWS::CloudFront::Distribution
@@ -381,62 +406,29 @@ Resources:
         Origins:
           - Id: mediapackage
             DomainName: !GetAtt MediaPackageHlsEndpoint.DomainName
-            OriginPath: ''
             CustomOriginConfig:
-              HTTPPort: 80
-              HTTPSPort: 443
-              OriginProtocolPolicy: match-viewer
-          - Id: TEMP_ORIGIN_ID/channel
-            DomainName: mediapackage.amazonaws.com
-            OriginPath: ''
-            CustomOriginConfig:
-              HTTPPort: 80
-              HTTPSPort: 443
-              OriginProtocolPolicy: match-viewer
+              OriginProtocolPolicy: https-only
         Enabled: 'true'
         DefaultCacheBehavior:
-          TargetOriginId: TEMP_ORIGIN_ID/channel
+          TargetOriginId: mediapackage
           SmoothStreaming: 'false'
           AllowedMethods:
             - GET
             - HEAD
+            - OPTIONS
           CachedMethods:
             - GET
             - HEAD
+            - OPTIONS
           ForwardedValues:
-            QueryString: true
+            QueryString: 'true'
             Cookies:
               Forward: all
-          ViewerProtocolPolicy: redirect-to-https
-        CacheBehaviors:
-          - PathPattern: index.ism/*
-            TargetOriginId: mediapackage
-            SmoothStreaming: true
-            AllowedMethods:
-              - GET
-              - HEAD
-            CachedMethods:
-              - GET
-              - HEAD
-            ForwardedValues:
-              QueryString: 'true'
-              Cookies:
-                Forward: all
-            ViewerProtocolPolicy: redirect-to-https
-          - PathPattern: '*'
-            TargetOriginId: mediapackage
-            SmoothStreaming: true
-            AllowedMethods:
-              - GET
-              - HEAD
-            CachedMethods:
-              - GET
-              - HEAD
-            ForwardedValues:
-              QueryString: false
-              Cookies:
-                Forward: all
-            ViewerProtocolPolicy: redirect-to-https
+            Headers:
+              - Access-Control-Allow-Origin
+              - Access-Control-Request-Method
+              - Access-Control-Request-Header
+          ViewerProtocolPolicy: allow-all
         ViewerCertificate:
           CloudFrontDefaultCertificate: 'true'
       Tags:

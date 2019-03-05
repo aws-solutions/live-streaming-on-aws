@@ -202,7 +202,7 @@ def create_channel(config):
 def start_channel(config):
     print('Starting Live Channel::{}'.format(config['ChannelId']))
     medialive.start_channel(
-        ChannelId = ChannelId
+        ChannelId = config.ChannelId
     )
     return
 

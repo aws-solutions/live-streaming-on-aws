@@ -230,6 +230,7 @@ Resources:
                   - medialive:deleteInputSecurityGroup
                   - medialive:describeChannel
                   - medialive:startChannel
+                  - medialive:tagResource
                   # feature/P20903447 support deleting input security group &
                   # start channel
 

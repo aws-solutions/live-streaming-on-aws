@@ -198,7 +198,10 @@ let CreateChannel = async (config) => {
                 InputId: config.InputId,
                 InputSettings: {}
             }],
-            EncoderSettings: {}
+            EncoderSettings: {},
+            Tags: {
+              Solution:'SO0013'
+            }
         };
 
         //hotfix/V52152945 loop only supported in HLS_PULL

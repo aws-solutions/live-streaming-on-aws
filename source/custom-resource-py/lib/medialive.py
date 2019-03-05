@@ -190,6 +190,9 @@ def create_channel(config):
         Name = config['Name'],
         RoleArn = config['Role'],
         EncoderSettings = EncoderSettings,
+        Tags: {
+            'Solution':'SO0013'
+        }
     )
     responseData['ChannelId'] = response['Channel']['Id']
     print('RESPONSE::{}'.format(responseData))

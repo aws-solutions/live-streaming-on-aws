@@ -390,7 +390,7 @@ Resources:
       MediaPackageSecUser: !GetAtt MediaPackageChannel.SecondaryUser
 
   MediaLiveChannelStart:
-    DependsOn: CloudFront
+    DependsOn: MediaLiveChannel
     Condition: Start
     Type: Custom::MediaLiveChannelStart
     Properties:

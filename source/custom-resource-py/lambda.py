@@ -34,7 +34,6 @@ logger = logging.getLogger(__name__)
 logging.getLogger().setLevel(logging.INFO)
 
 def handler(event, context):
-    print ('boto3 version: {}'.format(boto3.__version__))
 
     #Each resource returns a promise with a json object to return cloudformation.
     try:
@@ -55,7 +54,7 @@ def handler(event, context):
 
             elif resource == 'MediaLiveChannelStart':
                 MediaLive.start_channel(config)
-                id = responseData['ChannelId']
+                id = 'MediaLiveChannelStart'
 
             elif resource == 'MediaPackageChannel':
                 responseData = MediaPackage.create_channel(config)

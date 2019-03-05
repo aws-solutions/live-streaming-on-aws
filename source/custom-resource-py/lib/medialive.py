@@ -200,7 +200,16 @@ def create_channel(config):
 
 
 def start_channel(config):
+    # feature/V103650687 check channel create is complete before starting.
     print('Starting Live Channel::{}'.format(config['ChannelId']))
+    while True:
+        channel = medialive.describe_channel(
+            ChannelId = config['ChannelId']
+        )
+        if channel['State'] != 'CREATING':
+            break
+        else:
+            time.sleep(3)
     medialive.start_channel(
         ChannelId = config['ChannelId']
     )

@@ -241,6 +241,7 @@ let CreateChannel = async (config) => {
 };
 
 let StartChannel = async (config) => {
+    //feature/V103650687 check channel create is complete before starting.
     const medialive = new AWS.MediaLive({
         region: process.env.AWS_REGION
     });
@@ -248,6 +249,14 @@ let StartChannel = async (config) => {
         let params = {
             ChannelId: config.ChannelId
         };
+        let data = await medialive.describeChannel(params).promise();
+        let state = data.State;
+        while (state === 'CREATING')
+        {
+            await sleep(3000);
+            data = await medialive.describeChannel(params).promise();
+            state = data.State;
+        }
         await medialive.startChannel(params).promise();
     } catch (err) {
         throw err;

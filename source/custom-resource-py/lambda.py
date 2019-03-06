@@ -30,18 +30,15 @@ import lib.medialive as MediaLive
 import lib.demo as Demo
 import lib.metrics as Metrics
 
-logger = logging.getLogger(__name__)
-logging.getLogger().setLevel(logging.INFO)
-
 def handler(event, context):
 
     #Each resource returns a promise with a json object to return cloudformation.
     try:
-        logger.info('Event: %s' % json.dumps(event))
         request =event['RequestType']
         resource = event['ResourceProperties']['Resource']
         config = event['ResourceProperties']
         responseData = {}
+        print('Request::{} Resource:: {}'.format(request,resource))
 
         if request == 'Create':
             if resource == 'MediaLiveInput':

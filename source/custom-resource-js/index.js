@@ -25,7 +25,6 @@
 //updated index.js to use async/await
  exports.handler = async (event, context) => {
 
- 	console.log('REQUEST:: ', JSON.stringify(event, null, 2));
 	let  config = event.ResourceProperties;
 	let responseData = {};
  	let Id;
@@ -101,7 +100,6 @@
  		}
 
  		let response = await cfn.send(event, context,'SUCCESS',responseData, Id);
- 		console.log('RESPONSE:: ',responseData);
  		console.log('CFN STATUS:: ',response);
  	}
  	catch (err) {

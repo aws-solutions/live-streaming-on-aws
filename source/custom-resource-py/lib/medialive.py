@@ -132,7 +132,6 @@ def create_input(config):
         responseData['EndPoint1'] = 'Push InputType only'
         responseData['EndPoint2'] = 'Push InputType only'
 
-    print('RESPONSE::{}'.format(responseData))
     return responseData
 
 

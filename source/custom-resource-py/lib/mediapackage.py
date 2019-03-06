@@ -54,7 +54,6 @@ def create_channel(config):
         Value=response['HlsIngest']['IngestEndpoints'][1]['Password'],
         Type='String'
     )
-    print('RESPONSE::{}'.format(responseData))
     return responseData
 
 

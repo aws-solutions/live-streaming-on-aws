@@ -33,8 +33,6 @@ def send(event, context, responseStatus, responseData, physicalResourceId=None, 
 
     json_responseBody = json.dumps(responseBody)
 
-    print("Response body:\n" + json_responseBody)
-
     headers = {
         'content-type' : '',
         'content-length' : str(len(json_responseBody))

@@ -51,11 +51,21 @@ let sg_data = {
   }
 }
 let channel_data = {
+  State:'IDLE',
+  ChannelId: '12345',
   Channel: {
     Id:'2468'
   }
 }
 let ChannelId = '2468'
+
+let delete_data = {
+  InputAttachments:[
+    {
+      InputId:'2468'
+    }
+  ]
+}
 
 describe('#MEDIALIVE::', () => {
 
@@ -65,52 +75,59 @@ describe('#MEDIALIVE::', () => {
 	});
 
 
-	it('should return "responseData" when create PULL input is successful', async () => {
+	it('should return "responseData" when create input is successful', async () => {
 
 		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
     AWS.mock('SSM', 'putParameter');
 
-		lambda.createPullInput(pull_config,(err, responseData) => {
-				expect(responseData.Id).to.equal('2468');
-		});
+    let response = await lambda.createInput(pull_config)
+    expect(response.Id).to.equal('2468');
 	});
 
-  it('should return "responseData" when create PUSH input is successful', function(done) {
+  it('should return "ERROR" on MediaLive create input', async () => {
 
-    AWS.mock('MediaLive', 'createInputSecurityGroup', function(params, callback) {
-      callback(null, input_data);
-    });
-    AWS.mock('MediaLive', 'createInput', function(params, callback) {
-      callback(null, input_data);
-    });
+    AWS.mock('SSM', 'putParameter');
+    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
 
-    lambda.createPushInput(push_config)
-      .then(responseData => {
-        expect(responseData.EndPoint1).to.equal('http://123:5000');
-        done();
-      })
-      .catch(err => {
-        done(err);
-      });
+    await lambda.createInput(pull_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
   });
 
   it('should return "responseData" when create Channel is successful',async () => {
 
-		AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
 
-    lambda.createChannel(channel_config ,(err, responseData) => {
-				expect(responseData.ChannelId).to.equal('2468');
-		});
+    let response = await lambda.createChannel(channel_config)
+    expect(response.ChannelId).to.equal('2468');
 	});
-  /*
-  it('should return "responseData" when delete Channel is successful',async () => {
 
-      AWS.mock('MediaLive', 'stopChannel', Promise.resolve());
-        AWS.mock('MediaLive', 'deleteChannel', Promise.resolve());
+  it('should return "ERROR" on MediaLive create Channel', async () => {
 
-    lambda.deleteChannel(ChannelId ,(err, responseData) => {
-        expect(responseData.ChannelId).to.equal('2468');
+    AWS.mock('MediaLive', 'createChannel', Promise.reject('ERROR'));
+
+    await lambda.createChannel(channel_config).catch(err => {
+      expect(err).to.equal('ERROR');
     });
   });
-  */
+
+  it('should return "success" when start channel is successful', async () => {
+
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'startChannel', Promise.resolve(channel_data));
+
+    let response = await lambda.startChannel(channel_data)
+    expect(response).to.equal('success');
+  });
+
+  it('should return "success" when start channel is successful', async () => {
+
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'startChannel', Promise.reject('ERROR'));
+
+    await lambda.startChannel(channel_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
+
 });

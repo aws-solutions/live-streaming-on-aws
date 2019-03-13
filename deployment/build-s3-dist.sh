@@ -17,23 +17,19 @@ sed -i -e $replace dist/live-streaming-on-aws.template
 echo "==update CODEVERSION in template with $2"
 replace="s/CODEVERSION/$2/g"
 sed -i -e $replace dist/live-streaming-on-aws.template
-cd ../source/
-echo "== generate console-manifest.json"
-# awk not working on ubuntu, manually creating manifest before pushing to mainline
-#find console/* -type f | awk ' BEGIN { ORS = ""; print "["; } { print "\/\@"$0"\/\@"; } END { print "]"; }' | sed "s^\"^\\\\\"^g;s^\/\@\/\@^\", \"^g;s^\/\@^\"^g" > ./console-manifest.json
-#cp ./console-manifest.json ./custom-resource-js/lib/demo/console-manifest.json
-#mv ./console-manifest.json ./custom-resource-py/console-manifest.json
-echo "== copy console/ to /deployment/dist/"
-cp -R ./console ../deployment/dist/
-cd ./custom-resource-js/
-echo "== zip and copy node source code files"
-rm -rf node_modules/
-npm install --production
-zip -q -r9 ../../deployment/dist/custom-resource-js.zip *
-cd ../custom-resource-py/
-echo "== zip and copy python source code files"
-zip -q -r9 ../../deployment/dist/custom-resource-py.zip *
-cd ../../deployment/
+echo "== cp -R ../source/console ../source/custom-resource-js ../source/custom-resource-py dist/"
+cp -R ../source/console ../source/custom-resource-js ../source/custom-resource-py dist/
+echo "cd ./dist/custom-resource-js/ && npm install --production"
+cd ./dist/custom-resource-js/ && npm install --production
+echo "== zip -q -r9 ../custom-resource-js.zip *"
+zip -q -r9 ../custom-resource-js.zip *
+echo "== cd ../custom-resource-py/ && pip install -r ./requirements.txt -t ."
+cd ../custom-resource-py/ && pip3 install -r ./requirements.txt -t .
+echo "== zip -q -r9 ../custom-resource-py.zip *"
+zip -q -r9 ../custom-resource-py.zip *
+echo "== cd ../"
+cd ../
+echo "== rm -rf custom-resource-js custom-resource-py"
+rm -rf custom-resource-js custom-resource-py
 echo "== s3 files in dist/:"
-
-ls -lh dist/
+ls -lh .

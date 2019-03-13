@@ -23,84 +23,115 @@ medialive = boto3.client('medialive')
 ssm = boto3.client('ssm')
 responseData = {}
 
+def create_input(config):
+    print('Creating::{} Input'.format(config['Type']))
 
-def create_push_input(config):
-    sg = medialive.create_input_security_group(
-        WhitelistRules=[
-            {
-                'Cidr': config['Cidr']
-            }
-        ]
-    )
+    if config['Type'] == 'RTP_PUSH':
+        sg = medialive.create_input_security_group(
+            WhitelistRules=[
+                {
+                    'Cidr': config['Cidr']
+                }
+            ]
+        )
+        response = medialive.create_input(
+            InputSecurityGroups=[
+                sg['SecurityGroup']['Id'],
+            ],
+            Name = config['StreamName'],
+            Type=config['Type']
+        )
+        responseData['Id'] = response['Input']['Id']
+        responseData['EndPoint1'] = response['Input']['Destinations'][0]['Url']
+        responseData['EndPoint2'] = response['Input']['Destinations'][1]['Url']
 
-    #Feature/xxxx RTMP Requires Stream names for each input Destination.
     if config['Type'] == 'RTMP_PUSH':
-        Destination = [
+        sg = medialive.create_input_security_group(
+            WhitelistRules=[
+                {
+                    'Cidr': config['Cidr']
+                }
+            ]
+        )
+        response = medialive.create_input(
+            InputSecurityGroups=[
+                sg['SecurityGroup']['Id'],
+            ],
+            Name = config['StreamName'],
+            Destinations= [
+                {
+                    'StreamName': config['StreamName']+'primary'
+                },
+                {
+                    'StreamName': config['StreamName']+'secondary'
+                }
+            ],
+            Type=config['Type']
+        )
+        responseData['Id'] = response['Input']['Id']
+        responseData['EndPoint1'] = response['Input']['Destinations'][0]['Url']
+        responseData['EndPoint2'] = response['Input']['Destinations'][1]['Url']
+
+    if config['Type'] == 'RTMP_PULL' or config['Type'] == 'URL_PULL' :
+        Name = config['StreamName']
+        Sources = [
             {
-                'StreamName': config['StreamName']+'primary'
+                'Url': config['PriUrl']
             },
             {
-                'StreamName': config['StreamName']+'secondary'
+                'Url': config['SecUrl']
             }
         ]
-    else:
-        Destination = []
+        Type = config['Type']
+        # store input u/p in SSM
+        if config['PriUser']:
+            Sources[0]['Username'] = config['PriUser']
 
-    response = medialive.create_input(
-        InputSecurityGroups=[
-            sg['SecurityGroup']['Id'],
-        ],
-        Name = config['StreamName'],
-        Destinations= Destination,
-        Type=config['Type']
-    )
-    responseData['Id'] = response['Input']['Id']
-    responseData['EndPoint1'] = response['Input']['Destinations'][0]['Url']
-    responseData['EndPoint2'] = response['Input']['Destinations'][1]['Url']
-    print('RESPONSE::{}'.format(responseData))
-    return responseData
+            ssm.put_parameter(
+                Name = config['PriUser'],
+                Description = 'Live Stream solution Primary input credentials',
+                Type = 'String',
+                Value = config['PriPass'],
+                Overwrite=True
+            )
+        # store input u/p in SSM
+        if config['SecUser']:
+            Sources[1]['Username'] = config['SecUser']
 
-
-def create_pull_input(config):
-    Name = config['StreamName']
-    Sources = [
-        {
-            'Url': config['PriUrl']
-        },
-        {
-            'Url': config['PriUrl']
-        }
-    ]
-    Type = config['Type']
-    # store input u/p in SSM
-    if config['PriUser']:
-        Sources[0]['Username'] = config['PriUser']
-        #Sources[0]['Username'] = config['PriUser']
-        ssm.put_parameter(
-            Name = config['PriUser'],
-            Description = 'Live Stream solution Primary input credentials',
-            Type = 'string',
-            Value = config['PriPass']
+            ssm.put_parameter(
+                Name = config['SecUser'],
+                Description = 'Live Stream solution Primary input credentials',
+                Type = 'String',
+                Value = config['SecPass'],
+                Overwrite=True
+            )
+        response = medialive.create_input(
+                Name = Name,
+                Type = Type,
+                Sources = Sources
         )
-    # store input u/p in SSM
-    if config['SecUser']:
-        Sources[1]['Username'] = config['SecUser']
-        #Sources[1]['Username'] = config['SecUser']
-        ssm.put_parameter(
-            Name = config['PriUser'],
-            Description = 'Live Stream solution Primary input credentials',
-            Type = 'string',
-            Value = config['PriPass']
+        responseData['Id'] = response['Input']['Id']
+        responseData['EndPoint1'] = 'Push InputType only'
+        responseData['EndPoint2'] = 'Push InputType only'
+
+    if config['Type'] == 'MEDIACONNECT':
+        response = medialive.create_input(
+            Name = config['StreamName'],
+            Type = config['Type'],
+            RoleArn = config['RoleArn'],
+            MediaConnectFlows = [
+                {
+                    'FlowArn': config['PriMediaConnectArn']
+                },
+                {
+                    'FlowArn': config['SecMediaConnectArn']
+                }
+            ]
         )
-    response = medialive.create_input(
-        Name = Name,
-        Type = Type,
-        Sources = Sources
-    )
-    responseData['Id'] = response['Input']['Id']
-    responseData['EndPoint1'] = 'Push InputType only'
-    responseData['EndPoint2'] = 'Push InputType only'
-    print('RESPONSE::{}'.format(responseData))
+        responseData['Id'] = response['Input']['Id']
+        responseData['EndPoint1'] = 'Push InputType only'
+        responseData['EndPoint2'] = 'Push InputType only'
+
     return responseData
 
 
@@ -158,10 +189,30 @@ def create_channel(config):
         Name = config['Name'],
         RoleArn = config['Role'],
         EncoderSettings = EncoderSettings,
+        Tags= {
+            'Solution':'SO0013'
+        }
     )
     responseData['ChannelId'] = response['Channel']['Id']
     print('RESPONSE::{}'.format(responseData))
     return responseData
+
+
+def start_channel(config):
+    # feature/V103650687 check channel create is complete before starting.
+    print('Starting Live Channel::{}'.format(config['ChannelId']))
+    while True:
+        channel = medialive.describe_channel(
+            ChannelId = config['ChannelId']
+        )
+        if channel['State'] != 'CREATING':
+            break
+        else:
+            time.sleep(3)
+    medialive.start_channel(
+        ChannelId = config['ChannelId']
+    )
+    return
 
 
 def delete_channel(ChannelId):
@@ -174,14 +225,25 @@ def delete_channel(ChannelId):
     InputId = response['InputAttachments'][0]['InputId']
     # wait for channel delete so that the input state is detached:
     while True:
-        state = medialive.describe_input(
+        input = medialive.describe_input(
             InputId=InputId
         )
-        if state['State'] == 'DETACHED':
+        if input['State'] == 'DETACHED':
             break
         else:
             time.sleep(3)
+    # check for Security Group and delete
+    input = medialive.describe_input(
+        InputId=InputId
+    )
+    # delete input
     medialive.delete_input(
         InputId = InputId
     )
+    time.sleep(3)
+    if input['SecurityGroups']:
+        sg = input['SecurityGroups'][0]
+        medialive.delete_input_security_group(
+            InputSecurityGroupId=sg
+        )
     return

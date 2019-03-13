@@ -16,8 +16,18 @@ describe('#SEND METRICS', () => {
 		let mock = new MockAdapter(axios);
 		mock.onPost().reply(200, {});
 
-		lambda.send(_config, (err, data) => {
-				expect(data).to.equal(200);
+		let response = await lambda.send(_config)
+		expect(response).to.equal(200);
+	});
+
+	it('should return "Network Error" on connection timedout', async () => {
+
+		let mock = new MockAdapter(axios);
+		mock.onPut().networkError();
+
+		await lambda.send(_config).catch(err => {
+			expect(err.toString()).to.equal("Error: Request failed with status code 404");
 		});
 	});
+
 });

@@ -26,6 +26,7 @@ Parameters:
       - RTMP_PUSH
       - RTMP_PULL
       - URL_PULL
+      - MEDIACONNECT
 
   InputCodec:
     Description: Specify the codec of the source stream for MediaLive (AVC/HEVC/MPEG2)
@@ -39,11 +40,11 @@ Parameters:
   InputRes:
     Description: Specify the Encoding Profile to use for MediaLive
     Type: String
-    Default: 1080
+    Default: 720
     AllowedValues:
       - 1080
       - 720
-      - 480
+      - 540
 
   InputCIDR:
     Description: Specify the CIDR Block for the MediaLive SecurityGroup
@@ -64,6 +65,7 @@ Parameters:
     Description: (Optional) Specify a Password for the primary source URL
     Type: String
     Default: ""
+    NoEcho: true
 
   SecPullURL:
     Description: Specify the secondary source URL for the PULL input stream
@@ -79,6 +81,25 @@ Parameters:
     Description: (Optional) Specify a Username for the secondary source URL
     Type: String
     Default: ""
+    NoEcho: true
+
+  PriMediaConnectArn:
+    Description: (Optional) Specify the Arn for MediaConnect as a source
+    Type: String
+    Default: ""
+
+  SecMediaConnectArn:
+    Description: (Optional) Specify the Arn for MediaConnect as a source
+    Type: String
+    Default: ""
+
+  ChannelStart:
+    Description: Start the Live Channel as part of the deployment
+    Type: String
+    Default: Yes
+    AllowedValues:
+      - Yes
+      - No
 
 Metadata:
     AWS::CloudFormation::Interface:
@@ -96,14 +117,15 @@ Metadata:
                 - InputType
                 - InputCodec
                 - InputRes
+                - ChannelStart
             -
               Label:
-                default: For PUSH Source Input Types
+                default: For PUSH Source Types
               Parameters:
                 - InputCIDR
             -
               Label:
-                default: For PULL Source Input Types
+                default: For PULL Source Types
               Parameters:
                 - PriPullURL
                 - PriPullUser
@@ -111,6 +133,12 @@ Metadata:
                 - SecPullURL
                 - SecPullUser
                 - SecPullPass
+            -
+              Label:
+                default: MediaConnect Source Type
+              Parameters:
+                - PriMediaConnectArn
+                - SecMediaConnectArn
 
         ParameterLabels:
           InputType:
@@ -137,6 +165,12 @@ Metadata:
             default: Demo Console
           Code:
             default: Source Code
+          PriMediaConnectArn:
+            default: Primary MediaConnect Arn
+          SecMediaConnectArn:
+            default: Secondary MediaConnect Arn
+          ChannelStart:
+            default: Start MediaLive Channel
 
 Mappings:
   SourceCode:
@@ -152,6 +186,7 @@ Conditions:
     Metrics: !Equals [ !FindInMap [AnonymousData,SendAnonymousData,Data], Yes]
     Demo: !Equals [ !Ref Console , Yes ]
     CodeBase: !Equals [!Ref Code, NodeJS-8.10]
+    Start: !Equals [ !Ref ChannelStart , Yes ]
 
 Resources:
 
@@ -192,6 +227,12 @@ Resources:
                   - medialive:stopChannel
                   - medialive:createChannel
                   - medialive:deleteChannel
+                  - medialive:deleteInputSecurityGroup
+                  - medialive:describeChannel
+                  - medialive:startChannel
+                  - medialive:tagResource
+                  # feature/P20903447 support deleting input security group &
+                  # start channel
 
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
@@ -246,6 +287,15 @@ Resources:
                   - ssm:PutParameter
                 Resource:
                   - !Join ["", ["arn:aws:ssm:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":parameter/*"]]
+              # feature/P20903447 MediaConnect support
+              -
+                Effect: Allow
+                Action:
+                  - mediaconnect:ManagedDescribeFlow
+                  - mediaconnect:ManagedAddOutput
+                  - mediaconnect:ManagedRemoveOutput
+                Resource:
+                  - !Join ["", ["arn:aws:mediaconnect:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
 
   CustomResource:
     Type: AWS::Lambda::Function
@@ -294,6 +344,15 @@ Resources:
       EndPoint: MSS
       ChannelId: !GetAtt MediaPackageChannel.ChannelId
 
+  MediaPackageCmafEndpoint:
+    DependsOn: MediaPackageChannel
+    Type: Custom::MediaPackageCmafEndpoint
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      Resource: MediaPackageEndPoint
+      EndPoint: CMAF
+      ChannelId: !GetAtt MediaPackageChannel.ChannelId
+
   MediaLiveInput:
     Type: Custom::MediaLiveInput
     Properties:
@@ -308,6 +367,9 @@ Resources:
       SecUrl: !Ref SecPullURL
       SecUser: !Ref SecPullUser
       SecPass: !Ref SecPullPass
+      RoleArn: !GetAtt MediaLiveRole.Arn
+      PriMediaConnectArn: !Ref PriMediaConnectArn
+      SecMediaConnectArn: !Ref SecMediaConnectArn
 
   MediaLiveChannel:
     DependsOn: MediaLiveInput
@@ -327,6 +389,15 @@ Resources:
       # FEATURE/P15424610 Dual ingest support for MediaPackage
       MediaPackageSecUrl: !GetAtt MediaPackageChannel.SecondaryUrl
       MediaPackageSecUser: !GetAtt MediaPackageChannel.SecondaryUser
+
+  MediaLiveChannelStart:
+    DependsOn: MediaLiveChannel
+    Condition: Start
+    Type: Custom::MediaLiveChannelStart
+    Properties:
+      ServiceToken: !GetAtt CustomResource.Arn
+      Resource: MediaLiveChannelStart
+      ChannelId: !GetAtt MediaLiveChannel.ChannelId
 
   CloudFront:
     DependsOn: MediaPackageChannel
@@ -355,7 +426,7 @@ Resources:
             Cookies:
               Forward: all
             Headers:
-              - Origin
+              - Access-Control-Allow-Origin
               - Access-Control-Request-Method
               - Access-Control-Request-Header
           ViewerProtocolPolicy: allow-all
@@ -373,7 +444,6 @@ Resources:
 
   # Demo Assets
 
-
   DemoBucket:
     Condition: Demo
     DeletionPolicy: Retain
@@ -382,15 +452,6 @@ Resources:
       LoggingConfiguration:
         DestinationBucketName: !Ref LogsBucket
         LogFilePrefix: demo_bucket/
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: error.html
-      CorsConfiguration:
-        CorsRules:
-          - AllowedMethods: [GET]
-            AllowedOrigins: ['*']
-            AllowedHeaders: ['*']
-            MaxAge: 3000
 
   DemoBucketPolicy:
     Condition: Demo
@@ -500,7 +561,8 @@ Resources:
             mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${AWS::Region}#/channels/${MediaLiveChannel.ChannelId}',
             hls_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageHlsEndpoint.Manifest}',
             dash_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageDashEndpoint.Manifest}',
-            mss_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}'
+            mss_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}',
+            cmaf_manifest: 'https://${CloudFront.DomainName}/out/v1${MediaPackageCmafEndpoint.Manifest}'
           }
 
   # Metrics
@@ -537,7 +599,7 @@ Outputs:
     Value: !GetAtt MediaLiveInput.EndPoint1
 
   MediaLiveSecondaryEndpoint:
-    Description: Primary MediaLive input Url
+    Description: Secondary MediaLive input Url
     Value: !GetAtt MediaLiveInput.EndPoint2
 
   CloudFrontHlsEnpoint:
@@ -551,6 +613,10 @@ Outputs:
   CloudFrontMssEnpoint:
     Description: MSS CloudFront URL
     Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}
+
+  CloudFrontCmafEnpoint:
+      Description: CMAF CloudFront URL
+      Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageCmafEndpoint.Manifest}
 
   DemoConsole:
     Condition: Demo

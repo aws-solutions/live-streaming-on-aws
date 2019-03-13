@@ -71,19 +71,6 @@
 			},
 			"LanguageCodeControl": "FOLLOW_INPUT",
 			"Name": "audio_2_aac96"
-		},
-		{
-			"AudioSelectorName": "default",
-			"AudioTypeControl": "FOLLOW_INPUT",
-			"CodecSettings": {
-				"AacSettings": {
-					"Bitrate": 96000,
-					"RawFormat": "NONE",
-					"Spec": "MPEG4"
-				}
-			},
-			"LanguageCodeControl": "FOLLOW_INPUT",
-			"Name": "audio_3_aac96"
 		}
 	],
 	"OutputGroups": [{

@@ -25,7 +25,6 @@
 //updated index.js to use async/await
  exports.handler = async (event, context) => {
 
- 	console.log('REQUEST:: ', JSON.stringify(event, null, 2));
 	let  config = event.ResourceProperties;
 	let responseData = {};
  	let Id;
@@ -37,11 +36,8 @@
  			switch (config.Resource) {
 
  				case 'MediaLiveInput':
- 					if (config.Type.includes('PUSH')) {
- 						responseData = await MediaLive.createPushInput(config);
- 					} else {
- 						responseData = await MediaLive.createPullInput(config);
- 					}
+          //FEATURE/P20903447 Mediaconnect added as an input
+ 					responseData = await MediaLive.createInput(config);
  					Id = responseData.Id;
  					break;
 
@@ -49,6 +45,10 @@
  					responseData = await MediaLive.createChannel(config);
  					Id = responseData.ChannelId;
  					break;
+
+        case 'MediaLiveChannelStart':
+          await MediaLive.startChannel(config);
+          break;
 
  				case 'MediaPackageChannel':
  					responseData = await MediaPackage.createChannel(config);
@@ -95,12 +95,11 @@
  				default:
 					// medialive inputs and mediapackage endpoints are deleted as part of
 					// the the channel deletes so not included here, sending default success response
- 					console.log(event.LogicalResourceId, ': delte not required, sending success response');
+ 					console.log(event.LogicalResourceId, ': delete not required, sending success response');
  			}
  		}
 
  		let response = await cfn.send(event, context,'SUCCESS',responseData, Id);
- 		console.log('RESPONSE:: ',responseData);
  		console.log('CFN STATUS:: ',response);
  	}
  	catch (err) {

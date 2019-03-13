@@ -23,6 +23,7 @@ import json
 import urllib
 import boto3
 import uuid
+import logging
 import lib.cfnresponse as cfn
 import lib.mediapackage as MediaPackage
 import lib.medialive as MediaLive
@@ -30,27 +31,27 @@ import lib.demo as Demo
 import lib.metrics as Metrics
 
 def handler(event, context):
+
     #Each resource returns a promise with a json object to return cloudformation.
     try:
         request =event['RequestType']
         resource = event['ResourceProperties']['Resource']
         config = event['ResourceProperties']
         responseData = {}
-        print('REQUEST::{}::{}'.format(request,resource))
-        print('CONFIG::{}'.format(config))
+        print('Request::{} Resource:: {}'.format(request,resource))
 
         if request == 'Create':
             if resource == 'MediaLiveInput':
-
-                if 'PUSH' in config['Type']:
-                    responseData = MediaLive.create_push_input(config)
-                else:
-                    responseData = MediaLive.create_pull_input(config)
+                responseData = MediaLive.create_input(config)
                 id = responseData['Id']
 
             elif resource == 'MediaLiveChannel':
                 responseData = MediaLive.create_channel(config)
                 id = responseData['ChannelId']
+
+            elif resource == 'MediaLiveChannelStart':
+                MediaLive.start_channel(config)
+                id = 'MediaLiveChannelStart'
 
             elif resource == 'MediaPackageChannel':
                 responseData = MediaPackage.create_channel(config)
@@ -66,7 +67,7 @@ def handler(event, context):
 
             elif resource == 'UUID':
                 responseData = {'UUID':str(uuid.uuid4())}
-                id =  responseData['UUID']
+                id = responseData['UUID']
 
             elif resource == 'AnonymousMetric':
                 Metrics.send_metrics(config)

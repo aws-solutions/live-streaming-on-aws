@@ -25,9 +25,9 @@
 
 		<section class="text-center pb-4">
 			<p class="lead">
-				This demo provides links and a preview player for the HLS, DASH and Microsoft Smooth
+				This demo provides links and a preview player for the HLS, DASH, Microsoft Smooth and CMAF
 				CloudFront endpoints created by the Live Stream on AWS solution.
-				<p>
+			</p>
 		</section>
 
 		<section class="mb-4">
@@ -44,12 +44,11 @@
 			<div id="stream" class="text-center text-danger p-2"></div>
 		</section>
 
-		<section class="mb-4">
-			<p class="m-4">
+		<section class="text-center mb-4">
+			<p class="mb-4">
 				<strong>Important!</strong>
-				To start the live stream first login to the <a id="live" href="" target="_blank">Medialive Console</a>
-				and start the live channel. Once the Live Channel status has change to running you can return to this
-				page to preview three outputs from Amazon CloudFront.
+				To preview the live stream endpoints bellow first login to the <a id="live" href="" target="_blank">Medialive Console</a>
+				and check the live channel is running.
 			</p>
 			<table class="table">
 				<tbody>
@@ -67,6 +66,11 @@
 						<td>MSS</td>
 						<td class="d-none d-sm-block" style="font-size: 0.9rem;" id="mss"></td>
 						<td><button class="btn btn-success btn-sm" onclick="loadMss(mss_url)">Preview</button></td>
+					</tr>
+					<tr>
+						<td>CMAF </td>
+						<td class="d-none d-sm-block"  style="font-size: 0.9rem;" id="cmaf"></td>
+						<td><button class="btn btn-success btn-sm" onclick="loadCmaf(cmaf_url)">Preview</button></td>
 					</tr>
 				</tbody>
 			</table>

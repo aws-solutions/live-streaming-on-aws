@@ -9,8 +9,8 @@ echo "== mkdir -p open-source/dist/deployment"
 mkdir -p open-source/dist/deployment
 echo "== cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment"
 cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment
-echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md open-source/dist/"
-cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png open-source/dist/
+echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png ../CODE_OF_CONDUCT.md ../CONTRIBUTING.md open-source/dist/"
+cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png ../CODE_OF_CONDUCT.md ../CONTRIBUTING.md open-source/dist/
 echo "== cp -r ../source ./open-source/dist/"
 cp -r ../source ./open-source/dist/
 echo "== ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *"

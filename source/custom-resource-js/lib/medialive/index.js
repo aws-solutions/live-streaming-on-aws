@@ -245,6 +245,8 @@ let StartChannel = async (config) => {
     const medialive = new AWS.MediaLive({
         region: process.env.AWS_REGION
     });
+    //Sleep function to set a time delay between stopping & deleting the channel
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     try {
         let params = {
             ChannelId: config.ChannelId

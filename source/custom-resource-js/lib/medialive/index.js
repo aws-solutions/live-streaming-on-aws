@@ -1,8 +1,20 @@
-/**
+/***********************************************************************************************
+ *  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Amazon Software License (the "License"). You may not use
+ *  this file except in compliance with the License. A copy of the License is located at
+ *
+ *      http://aws.amazon.com/asl/
+ *
+ *  or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
  * @function MediaLive
  * @description AWS Elemental MediaLive module for Node 8.10+ to create/delete
  * MediaLive Inputs and Channels
- */
+ *
+ *********************************************************************************************/
 
 const AWS = require('aws-sdk');
 
@@ -245,7 +257,7 @@ let StartChannel = async (config) => {
     const medialive = new AWS.MediaLive({
         region: process.env.AWS_REGION
     });
-    //feature/V109860985 Sleep function to set a time delay between stopping & deleting the channel
+    //feature/V109860985 Sleep function to set insure Channel create has finsished
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     try {
         let params = {

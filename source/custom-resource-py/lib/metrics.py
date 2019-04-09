@@ -14,7 +14,7 @@
 #  express or implied. See the License for the specific language governing   #
 #  permissions and limitations under the License.                            #
 ##############################################################################
-# Custom resource to send Anonymous Metric back to AWS.
+
 import datetime
 import json
 import urllib.request

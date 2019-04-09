@@ -15,8 +15,6 @@
 #  permissions and limitations under the License.                            #
 ##############################################################################
 
-# console-manifest.json contains a list of all the files that make up the demo console.
-# export.js is generated as part of the cloudformation deployment
 import boto3
 import json
 s3 = boto3.client('s3')

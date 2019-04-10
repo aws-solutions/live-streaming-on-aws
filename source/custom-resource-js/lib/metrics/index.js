@@ -10,10 +10,6 @@
  *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- * @author Solution Builders
- * @function Metrics Helper
- * @description Send Anonymous Metrics to Amazon Web Services
-*
  *********************************************************************************************/
 
 // FEATURE/P15424610 update to use AXIOS which has support for promises and Async/Await.

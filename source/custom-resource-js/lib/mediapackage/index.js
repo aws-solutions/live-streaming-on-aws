@@ -10,10 +10,6 @@
  *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- * @author Solution Builders
- * @function MediaPackage
- * @description AWS Elemental MediaPackage module for Node 8.10+
- *
  *********************************************************************************************/
 
 const AWS = require('aws-sdk');

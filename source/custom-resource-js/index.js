@@ -9,12 +9,9 @@
  *  or in the "license" file accompanying this file. This file is distributed on an "AS IS"
  *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
- *                                                                                 *
- * @author Solution Builders
- * @function CFN Custom Resource
- * @description cloudformation custom resource to create MediaLive and MediaPackage resources
+ *
  *********************************************************************************************/
- 
+
  const uuid = require('uuid');
  const cfn = require('./lib/cfn');
  const MediaPackage = require('./lib/mediapackage');

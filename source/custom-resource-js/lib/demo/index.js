@@ -10,8 +10,6 @@
  *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- * @function Demo Console Deploy
- * @description S3 module to deploy/delete ademo console to S3
  *********************************************************************************************/
 
 const AWS = require('aws-sdk');

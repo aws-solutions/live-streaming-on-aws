@@ -10,10 +10,6 @@
  *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
  *  for the specific language governing permissions and limitations under the License.
  *
- * @function MediaLive
- * @description AWS Elemental MediaLive module for Node 8.10+ to create/delete
- * MediaLive Inputs and Channels
- *
  *********************************************************************************************/
 
 const AWS = require('aws-sdk');

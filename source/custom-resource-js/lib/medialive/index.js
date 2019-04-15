@@ -252,7 +252,7 @@
              data = await medialive.describeChannel(params).promise();
              state = data.State;
              if (state === 'CREATE_FAILED') {
-                 return Promise.reject("Channel Create Failed");
+                 return Promise.reject('CREATE_FAILED');
              }
          }
          responseData = {

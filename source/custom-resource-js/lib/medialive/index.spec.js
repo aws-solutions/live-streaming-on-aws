@@ -80,6 +80,10 @@ let delete_data = {
   ]
 }
 
+let describe_failed = {
+  State:'CREATE_FAILED',
+}
+
 describe('#MEDIALIVE::', () => {
 
 	afterEach(() => {
@@ -110,6 +114,7 @@ describe('#MEDIALIVE::', () => {
   it('should return "responseData" when create Channel is successful',async () => {
 
     AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
 
     let response = await lambda.createChannel(channel_config)
     expect(response.ChannelId).to.equal('2468');
@@ -124,16 +129,25 @@ describe('#MEDIALIVE::', () => {
     });
   });
 
+  it('should return "ERROR" on MediaLive describe Channel', async () => {
+
+    AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(describe_failed));
+
+    await lambda.createChannel(channel_config).catch(err => {
+      expect(err).to.equal('CREATE_FAILED');
+    });
+  });
+
   it('should return "success" when start channel is successful', async () => {
 
-    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
     AWS.mock('MediaLive', 'startChannel', Promise.resolve(channel_data));
 
     let response = await lambda.startChannel(channel_data)
     expect(response).to.equal('success');
   });
 
-  it('should return "success" when start channel is successful', async () => {
+  it('should return "success" when start channel fails', async () => {
 
     AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
     AWS.mock('MediaLive', 'startChannel', Promise.reject('ERROR'));

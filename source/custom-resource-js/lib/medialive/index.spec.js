@@ -1,3 +1,16 @@
+/***********************************************************************************************
+ *  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ *  Licensed under the Amazon Software License (the "License"). You may not use
+ *  this file except in compliance with the License. A copy of the License is located at
+ *
+ *      http://aws.amazon.com/asl/
+ *
+ *  or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+ *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+ *********************************************************************************************/
 let assert = require('chai').assert;
 let expect = require('chai').expect;
 var path = require('path');
@@ -67,6 +80,10 @@ let delete_data = {
   ]
 }
 
+let describe_failed = {
+  State:'CREATE_FAILED',
+}
+
 describe('#MEDIALIVE::', () => {
 
 	afterEach(() => {
@@ -97,6 +114,7 @@ describe('#MEDIALIVE::', () => {
   it('should return "responseData" when create Channel is successful',async () => {
 
     AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
 
     let response = await lambda.createChannel(channel_config)
     expect(response.ChannelId).to.equal('2468');
@@ -111,16 +129,25 @@ describe('#MEDIALIVE::', () => {
     });
   });
 
+  it('should return "ERROR" on MediaLive describe Channel', async () => {
+
+    AWS.mock('MediaLive', 'createChannel', Promise.resolve(channel_data));
+    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(describe_failed));
+
+    await lambda.createChannel(channel_config).catch(err => {
+      expect(err).to.equal('CREATE_FAILED');
+    });
+  });
+
   it('should return "success" when start channel is successful', async () => {
 
-    AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
     AWS.mock('MediaLive', 'startChannel', Promise.resolve(channel_data));
 
     let response = await lambda.startChannel(channel_data)
     expect(response).to.equal('success');
   });
 
-  it('should return "success" when start channel is successful', async () => {
+  it('should return "success" when start channel fails', async () => {
 
     AWS.mock('MediaLive', 'describeChannel', Promise.resolve(channel_data));
     AWS.mock('MediaLive', 'startChannel', Promise.reject('ERROR'));

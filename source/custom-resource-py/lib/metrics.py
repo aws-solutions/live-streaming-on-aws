@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ##############################################################################
-#  Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
+#  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
 #                                                                            #
 #  Licensed under the Amazon Software License (the "License"). You may not   #
 #  use this file except in compliance with the License. A copy of the        #
@@ -14,7 +14,7 @@
 #  express or implied. See the License for the specific language governing   #
 #  permissions and limitations under the License.                            #
 ##############################################################################
-# Custom resource to send Anonymous Metric back to AWS.
+
 import datetime
 import json
 import urllib.request

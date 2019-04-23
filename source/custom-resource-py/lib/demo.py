@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ##############################################################################
-#  Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
+#  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
 #                                                                            #
 #  Licensed under the Amazon Software License (the "License"). You may not   #
 #  use this file except in compliance with the License. A copy of the        #
@@ -15,8 +15,6 @@
 #  permissions and limitations under the License.                            #
 ##############################################################################
 
-# console-manifest.json contains a list of all the files that make up the demo console.
-# export.js is generated as part of the cloudformation deployment
 import boto3
 import json
 s3 = boto3.client('s3')

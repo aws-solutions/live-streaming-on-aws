@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ##############################################################################
-#  Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
+#  Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.   #
 #                                                                            #
 #  Licensed under the Amazon Software License (the "License"). You may not   #
 #  use this file except in compliance with the License. A copy of the        #
@@ -193,22 +193,28 @@ def create_channel(config):
             'Solution':'SO0013'
         }
     )
-    responseData['ChannelId'] = response['Channel']['Id']
+    # Feature/V103650687 check channel create completes.
+    # Valid states are CREATING, CREATE_FAILED and IDLE
+    channel_id = response['Channel']['Id']
+
+    while True:
+        channel = medialive.describe_channel(
+            ChannelId = channel_id
+        )
+        if channel['State'] == 'IDLE':
+            break
+        elif channel['State'] == 'CREATE_FAILED':
+            raise Exception('Channel Create Failed')
+        else:
+            time.sleep(3)
+
+    responseData['ChannelId'] = channel_id
     print('RESPONSE::{}'.format(responseData))
     return responseData
 
 
 def start_channel(config):
-    # feature/V103650687 check channel create is complete before starting.
     print('Starting Live Channel::{}'.format(config['ChannelId']))
-    while True:
-        channel = medialive.describe_channel(
-            ChannelId = config['ChannelId']
-        )
-        if channel['State'] != 'CREATING':
-            break
-        else:
-            time.sleep(3)
     medialive.start_channel(
         ChannelId = config['ChannelId']
     )

@@ -1,3 +1,2 @@
-#feature/P20903447 boto3 1.9.99 or higher is required for MediaConnect
-boto3>=1.9.99
-botocore>=1.12.99
+## Feature update pythonb 3.8 runtime
+requests

@@ -1,22 +1,68 @@
 #!/bin/bash
-
+#
+# This assumes all of the OS-level configuration has been completed and git repo has already been cloned
+#
 # This script should be run from the repo's deployment directory
 # cd deployment
-# ./build-open-source-dist.sh
+# ./build-open-source-dist.sh solution-name
+#
+# Parameters:
+#  - solution-name: name of the solution for consistency
 
-[ -e open-source ] && rm -r open-source
-echo "== mkdir -p open-source/dist/deployment"
-mkdir -p open-source/dist/deployment
-echo "== cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment"
-cp ./live-streaming-on-aws.yaml ./build-s3-dist.sh open-source/dist/deployment
-echo "== cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png ../CODE_OF_CONDUCT.md ../CONTRIBUTING.md open-source/dist/"
-cp ../LICENSE.txt ../NOTICE.txt ../README.md ./architecture.png ../CODE_OF_CONDUCT.md ../CONTRIBUTING.md open-source/dist/
-echo "== cp -r ../source ./open-source/dist/"
-cp -r ../source ./open-source/dist/
-echo "== ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *"
-cd ./open-source/dist && zip -rq ../live-streaming-on-aws.zip *
-echo "== cd .. && rm -rf dist"
-cd .. && rm -rf dist
-echo "== open-source files:"
-pwd
+# Check to see if input has been provided:
+if [ -z "$1" ]; then
+    echo "Please provide the trademark approved solution name for the open source package."
+    echo "For example: ./build-open-source-dist.sh trademarked-solution-name"
+    exit 1
+fi
+
+# Get reference for all important folders
+source_template_dir="$PWD"
+dist_dir="$source_template_dir/open-source"
+dist_template_dir="$dist_dir/deployment"
+source_dir="$source_template_dir/../source"
+
+echo "------------------------------------------------------------------------------"
+echo "Building open-source folder"
+echo "------------------------------------------------------------------------------"
+[ -e $dist_dir ] && rm -rv $dist_dir
+rm -rf $dist_dir
+mkdir -p $dist_dir
+mkdir -p $dist_template_dir
+
+echo "------------------------------------------------------------------------------"
+echo "Copying Deployment Folder"
+echo "------------------------------------------------------------------------------"
+cp -v $source_template_dir/live-streaming-on-aws.yaml $dist_template_dir
+cp -v $source_template_dir/live-streaming-on-aws-demo.yaml $dist_template_dir
+cp -v $source_template_dir/build-s3-dist.sh $dist_template_dir
+cp -v $source_template_dir/run-unit-tests.sh $dist_template_dir
+
+echo "------------------------------------------------------------------------------"
+echo "Removing Build Files From Source"
+echo "------------------------------------------------------------------------------"
+find $source_dir -iname "node_modules" -type d -exec rm -rv "{}" \; 2> /dev/null
+find $source_dir -type f -name 'package-lock.json' -delete
+
+echo "------------------------------------------------------------------------------"
+echo "Copying Source Folder"
+echo "------------------------------------------------------------------------------"
+cp -rv $source_dir $dist_dir
+cp -v $source_template_dir/architecture.png $dist_dir
+cp -v $source_template_dir/../LICENSE.txt $dist_dir
+cp -v $source_template_dir/../NOTICE.txt $dist_dir
+cp -v $source_template_dir/../README.md $dist_dir
+cp -v $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir
+cp -v $source_template_dir/../CONTRIBUTING.md $dist_dir
+cp -v $source_template_dir/../CHANGELOG.md $dist_dir
+
+echo "------------------------------------------------------------------------------"
+echo "Creating GitHub zip file"
+echo "------------------------------------------------------------------------------"
+cd $dist_dir
+echo "open source files::"
 ls -lh
+zip -q -r9 ../$1.zip *
+#rm -rf *
+mv ../$1.zip .
+echo "Completed building $1.zip"

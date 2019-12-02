@@ -101,6 +101,6 @@
  	}
  	catch (err) {
  		console.log('ERROR:: ',err, err.stack);
- 		cfn.send(event, context,'FAILED');
+ 		await cfn.send(event, context,'FAILED');
  	}
  };

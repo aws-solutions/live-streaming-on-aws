@@ -59,7 +59,7 @@ To solution can be deployed through the CloudFormation template available on the
 
 ### Pre-requirements:
 * [AWS Command Line Interface](https://aws.amazon.com/cli/)
-* Node.js 8.x or Python 3.x
+* Node.js 12.x or Python 3.8 or above.
 
 ### 1. Create an Amazon S3 Bucket.
 The CloudFormation template is configured to pull the Lambda deployment packages from Amazon S3 bucket in the region the template is being launched in. Create a bucket in the desired region with the region name appended to the name of the bucket. eg: for us-east-1 create a bucket named: ```bucket-us-east-1```

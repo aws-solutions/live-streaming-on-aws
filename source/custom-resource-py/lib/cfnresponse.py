@@ -15,7 +15,7 @@
 #  permissions and limitations under the License.                            #
 ##############################################################################
 
-from botocore.vendored import requests
+import requests
 import json
 
 def send(event, context, responseStatus, responseData, physicalResourceId=None, noEcho=False):

@@ -19,10 +19,6 @@ import datetime
 import json
 import urllib.request
 
-# FEATURE/P15424610
-# Update:: passing config(event.ResourceProperties) not event as request type
-# nolonger needed.
-
 def send_metrics(config):
     metrics = {}
     metrics['Solution'] = config['SolutionId']

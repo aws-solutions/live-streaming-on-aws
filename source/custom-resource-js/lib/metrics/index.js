@@ -39,9 +39,9 @@ let  sendMetrics = async (config) => {
     data = await axios(params);
   }
 	catch (err) {
-    throw err;
+    console.log (err);
   }
-  return data.status;
+  return 'success';
 };
 
 

@@ -66,7 +66,7 @@
  					break;
 
  				case ('AnonymousMetric'):
- 					await Metrics.send(config);
+ 					Metrics.send(config);
           break;
 
  				default:

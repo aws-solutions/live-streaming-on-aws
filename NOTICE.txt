@@ -20,6 +20,7 @@ THIRD PARTY COMPONENTS
 This software includes third party software subject to the following copyrights:
 
 AWS SDK under the Apache License Version 2.0
+requests under the Apache License Version 2.0
 
 Stanford Javascript Crypto Library under the BSD license or under the GNU GPL, version 2.0
 Moment.js under the Massachusetts Institute of Technology (MIT) license

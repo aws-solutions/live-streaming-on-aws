@@ -30,7 +30,7 @@ describe('#SEND METRICS', () => {
 		mock.onPost().reply(200, {});
 
 		let response = await lambda.send(_config)
-		expect(response).to.equal(200);
+		expect(response).to.equal('success');
 	});
 
 	it('should return "Network Error" on connection timedout', async () => {

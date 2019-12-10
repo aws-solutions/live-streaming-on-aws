@@ -1,0 +1,10 @@
+node_modules/
+dev/
+dist/
+deploy.sh
+open-source/
+.DS_Store
+test_plan.md
+package-lock.json
+global-s3-assets/
+regional-s3-assets/

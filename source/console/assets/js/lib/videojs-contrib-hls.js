@@ -1,6 +1,6 @@
 /**
  * videojs-contrib-hls
- * @version 5.14.1
+ * @version 5.15.0
  * @copyright 2018 Brightcove, Inc
  * @license Apache-2.0
  */
@@ -558,7 +558,7 @@ var mimeTypesForPlaylist_ = function mimeTypesForPlaylist_(master, media) {
 
 exports.mimeTypesForPlaylist_ = mimeTypesForPlaylist_;
 /**
- * the master playlist controller controller all interactons
+ * the master playlist controller controls all interactons
  * between playlists and segmentloaders. At this time this mainly
  * involves a master playlist and a series of audio playlists
  * if they are available
@@ -578,6 +578,7 @@ var MasterPlaylistController = (function (_videojs$EventTarget) {
     _get(Object.getPrototypeOf(MasterPlaylistController.prototype), 'constructor', this).call(this);
 
     var url = options.url;
+    var handleManifestRedirects = options.handleManifestRedirects;
     var withCredentials = options.withCredentials;
     var mode = options.mode;
     var tech = options.tech;
@@ -593,20 +594,21 @@ var MasterPlaylistController = (function (_videojs$EventTarget) {
 
     Hls = externHls;
 
-    this.withCredentials = withCredentials;
     this.tech_ = tech;
     this.hls_ = tech.hls;
     this.mode_ = mode;
     this.useCueTags_ = useCueTags;
     this.blacklistDuration = blacklistDuration;
     this.enableLowInitialPlaylist = enableLowInitialPlaylist;
+
     if (this.useCueTags_) {
       this.cueTagsTrack_ = this.tech_.addTextTrack('metadata', 'ad-cues');
       this.cueTagsTrack_.inBandMetadataTrackDispatchType = '';
     }
 
     this.requestOptions_ = {
-      withCredentials: this.withCredentials,
+      withCredentials: withCredentials,
+      handleManifestRedirects: handleManifestRedirects,
       timeout: null
     };
 
@@ -655,7 +657,7 @@ var MasterPlaylistController = (function (_videojs$EventTarget) {
     };
 
     // setup playlist loaders
-    this.masterPlaylistLoader_ = new _playlistLoader2['default'](url, this.hls_, this.withCredentials);
+    this.masterPlaylistLoader_ = new _playlistLoader2['default'](url, this.hls_, this.requestOptions_);
     this.setupMasterPlaylistLoaderListeners_();
 
     // setup segment loaders
@@ -2034,7 +2036,7 @@ var initialize = {
     var mode = settings.mode;
     var hls = settings.hls;
     var segmentLoader = settings.segmentLoaders[type];
-    var withCredentials = settings.requestOptions.withCredentials;
+    var requestOptions = settings.requestOptions;
     var mediaGroups = settings.master.mediaGroups;
     var _settings$mediaTypes$type = settings.mediaTypes[type];
     var groups = _settings$mediaTypes$type.groups;
@@ -2057,7 +2059,7 @@ var initialize = {
         var playlistLoader = undefined;
 
         if (properties.resolvedUri) {
-          playlistLoader = new _playlistLoader2['default'](properties.resolvedUri, hls, withCredentials);
+          playlistLoader = new _playlistLoader2['default'](properties.resolvedUri, hls, requestOptions);
         } else {
           // no resolvedUri means the audio is muxed with the video when using this
           // audio track
@@ -2101,7 +2103,7 @@ var initialize = {
     var tech = settings.tech;
     var hls = settings.hls;
     var segmentLoader = settings.segmentLoaders[type];
-    var withCredentials = settings.requestOptions.withCredentials;
+    var requestOptions = settings.requestOptions;
     var mediaGroups = settings.master.mediaGroups;
     var _settings$mediaTypes$type2 = settings.mediaTypes[type];
     var groups = _settings$mediaTypes$type2.groups;
@@ -2129,7 +2131,7 @@ var initialize = {
 
         properties = _videoJs2['default'].mergeOptions({
           id: variantLabel,
-          playlistLoader: new _playlistLoader2['default'](properties.resolvedUri, hls, withCredentials)
+          playlistLoader: new _playlistLoader2['default'](properties.resolvedUri, hls, requestOptions)
         }, properties);
 
         setupListeners[type](type, properties.playlistLoader, settings);
@@ -3328,11 +3330,10 @@ module.exports = exports['default'];
 },{"./ranges":12,"global/window":32}],9:[function(require,module,exports){
 (function (global){
 /**
- * @file playlist-loader.js
+ * @module playlist-loader
  *
- * A state machine that manages the loading, caching, and updating of
+ * @file A state machine that manages the loading, caching, and updating of
  * M3U8 playlists.
- *
  */
 'use strict';
 
@@ -3365,20 +3366,20 @@ var _globalWindow = require('global/window');
 var _globalWindow2 = _interopRequireDefault(_globalWindow);
 
 /**
-  * Returns a new array of segments that is the result of merging
-  * properties from an older list of segments onto an updated
-  * list. No properties on the updated playlist will be overridden.
-  *
-  * @param {Array} original the outdated list of segments
-  * @param {Array} update the updated list of segments
-  * @param {Number=} offset the index of the first update
-  * segment in the original segment list. For non-live playlists,
-  * this should always be zero and does not need to be
-  * specified. For live playlists, it should be the difference
-  * between the media sequence numbers in the original and updated
-  * playlists.
-  * @return a list of merged segment objects
-  */
+ * Returns a new array of segments that is the result of merging
+ * properties from an older list of segments onto an updated
+ * list. No properties on the updated playlist will be overridden.
+ *
+ * @param {Array} original the outdated list of segments
+ * @param {Array} update the updated list of segments
+ * @param {Number=} offset the index of the first update
+ * segment in the original segment list. For non-live playlists,
+ * this should always be zero and does not need to be
+ * specified. For live playlists, it should be the difference
+ * between the media sequence numbers in the original and updated
+ * playlists.
+ * @return a list of merged segment objects
+ */
 var updateSegments = function updateSegments(original, update, offset) {
   var result = update.slice();
 
@@ -3527,25 +3528,31 @@ exports.refreshDelay = refreshDelay;
  * Load a playlist from a remote location
  *
  * @class PlaylistLoader
- * @extends Stream
+ * @extends videojs.EventTarget
  * @param {String} srcUrl the url to start with
- * @param {Boolean} withCredentials the withCredentials xhr option
- * @constructor
+ * @param {Object} hls
+ * @param {Object} [options]
+ * @param {Boolean} [options.withCredentials=false] the withCredentials xhr option
+ * @param {Boolean} [options.handleManifestRedirects=false] whether to follow redirects, when any
+ *        playlist request was redirected
  */
 
 var PlaylistLoader = (function (_EventTarget) {
   _inherits(PlaylistLoader, _EventTarget);
 
-  function PlaylistLoader(srcUrl, hls, withCredentials) {
+  function PlaylistLoader(srcUrl, hls, options) {
     var _this = this;
 
     _classCallCheck(this, PlaylistLoader);
 
     _get(Object.getPrototypeOf(PlaylistLoader.prototype), 'constructor', this).call(this);
 
+    options = options || {};
+
     this.srcUrl = srcUrl;
     this.hls_ = hls;
-    this.withCredentials = withCredentials;
+    this.withCredentials = !!options.withCredentials;
+    this.handleManifestRedirects = !!options.handleManifestRedirects;
 
     if (!this.srcUrl) {
       throw new Error('A non-empty playlist URL is required');
@@ -3734,7 +3741,7 @@ var PlaylistLoader = (function (_EventTarget) {
 
       // there is already an outstanding playlist request
       if (this.request) {
-        if ((0, _resolveUrl2['default'])(this.master.uri, playlist.uri) === this.request.url) {
+        if (playlist.resolvedUri === this.request.url) {
           // requesting to switch to the same playlist multiple times
           // has no effect after the first
           return;
@@ -3750,13 +3757,15 @@ var PlaylistLoader = (function (_EventTarget) {
       }
 
       this.request = this.hls_.xhr({
-        uri: (0, _resolveUrl2['default'])(this.master.uri, playlist.uri),
+        uri: playlist.resolvedUri,
         withCredentials: this.withCredentials
       }, function (error, req) {
         // disposed
         if (!_this3.request) {
           return;
         }
+
+        playlist.resolvedUri = _this3.resolveManifestRedirect(playlist.resolvedUri, req);
 
         if (error) {
           return _this3.playlistRequestError(_this3.request, playlist.uri, startingState);
@@ -3771,6 +3780,27 @@ var PlaylistLoader = (function (_EventTarget) {
           _this3.trigger('mediachange');
         }
       });
+    }
+
+    /**
+     * Checks whether xhr request was redirected and returns correct url depending
+     * on `handleManifestRedirects` option
+     *
+     * @api private
+     *
+     * @param  {String} url - an url being requested
+     * @param  {XMLHttpRequest} req - xhr request result
+     *
+     * @return {String}
+     */
+  }, {
+    key: 'resolveManifestRedirect',
+    value: function resolveManifestRedirect(url, req) {
+      if (this.handleManifestRedirects && req.responseURL && url !== req.responseURL) {
+        return req.responseURL;
+      }
+
+      return url;
     }
 
     /**
@@ -3878,6 +3908,8 @@ var PlaylistLoader = (function (_EventTarget) {
 
         _this5.state = 'HAVE_MASTER';
 
+        _this5.srcUrl = _this5.resolveManifestRedirect(_this5.srcUrl, req);
+
         parser.manifest.uri = _this5.srcUrl;
 
         // loaded a master playlist
@@ -3907,14 +3939,14 @@ var PlaylistLoader = (function (_EventTarget) {
           },
           uri: _globalWindow2['default'].location.href,
           playlists: [{
-            uri: _this5.srcUrl
+            uri: _this5.srcUrl,
+            resolvedUri: _this5.srcUrl,
+            // m3u8-parser does not attach an attributes property to media playlists so make
+            // sure that the property is attached to avoid undefined reference errors
+            attributes: {}
           }]
         };
         _this5.master.playlists[_this5.srcUrl] = _this5.master.playlists[0];
-        _this5.master.playlists[0].resolvedUri = _this5.srcUrl;
-        // m3u8-parser does not attach an attributes property to media playlists so make
-        // sure that the property is attached to avoid undefined reference errors
-        _this5.master.playlists[0].attributes = _this5.master.playlists[0].attributes || {};
         _this5.haveMetadata(req, _this5.srcUrl);
         return _this5.trigger('loadedmetadata');
       });
@@ -17567,7 +17599,7 @@ module.exports = Stream;
 // see https://tools.ietf.org/html/rfc1808
 
 /* jshint ignore:start */
-(function(root) {
+(function(root) { 
 /* jshint ignore:end */
 
   var URL_REGEX = /^((?:[a-zA-Z0-9+\-.]+:)?)(\/\/[^\/\;?#]*)?(.*?)??(;.*?)?(\?.*?)?(#.*?)?$/;
@@ -21193,7 +21225,7 @@ var HlsHandler = (function (_Component) {
       this.options_.enableLowInitialPlaylist = this.options_.enableLowInitialPlaylist && this.options_.bandwidth === INITIAL_BANDWIDTH;
 
       // grab options passed to player.src
-      ['withCredentials', 'bandwidth'].forEach(function (option) {
+      ['withCredentials', 'bandwidth', 'handleManifestRedirects'].forEach(function (option) {
         if (typeof _this2.source_[option] !== 'undefined') {
           _this2.options_[option] = _this2.source_[option];
         }

@@ -84,7 +84,7 @@ curl https://github.com/videojs/videojs-contrib-dash/releases/download/v2.11.0/v
 echo "Removing node_modules and copying console to regional folder "
 
 rm -rf node_modules/
-rm package-lock.json
+rm -f package-lock.json
 cd ..
 cp -rv ./console $build_dist_dir/
 
@@ -94,7 +94,7 @@ echo "--------------------------------------------------------------------------
 cd $source_dir/custom-resource-js/
 rm -rf node_modules/
 npm install --production
-rm package-lock.json
+rm -f package-lock.json
 zip -q -r9 $build_dist_dir/custom-resource-js.zip *
 
 cd $source_dir

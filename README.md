@@ -97,12 +97,12 @@ Use the AWS CLI to sync the lambda code and demo console files to amazon S3:
 
  ```
    cd deployment/
-   aws s3 sync .dist/ s3://bucket-us-east-1/live-streaming-on-aws/1.01/.
+   aws s3 sync ./regional-s3-assets/ s3://bucket-us-east-1/live-streaming-on-aws/1.01/.
  ```
 
  ### 4. Launch the CloudFormation template.
 
-Launch the updated CloudFormation template from ```deployment/dist/``` folder.
+Launch the updated CloudFormation template from ```deployment/global-s3-assets/``` folder.
 
 
 ***

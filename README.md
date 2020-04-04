@@ -77,7 +77,7 @@ This will:
 Example:
 ```
   cd deployment/
-  ./build-s3-dist.sh bucket 1.01
+  ./build-s3-dist.sh bucket live-streaming-on-aws 1.01
 ```
  This will deploy the source code to:
 ```

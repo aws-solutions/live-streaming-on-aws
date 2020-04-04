@@ -65,7 +65,7 @@ echo "--------------------------------------------------------------------------
 cd $source_dir/console
 echo "NPM INSTALL::"
 npm install 
-mkdir ./assets/js/lib
+mkdir -p ./assets/js/lib
 ## Bootstrap
 cp ./node_modules/bootstrap/dist/js/bootstrap.min.js ./assets/js/lib/bootstrap.min.js
 cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./assets/css/bootstrap.min.css

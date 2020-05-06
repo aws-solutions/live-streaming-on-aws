@@ -78,9 +78,9 @@ mv ./node_modules/video.js/dist/video-js.css ./assets/css/
 mv ./node_modules/videojs-contrib-hls/dist/videojs-contrib-hls.js ./assets/js/lib/
 echo "CURL"
 # No NPM repos avalable for:
-curl http://orange-opensource.github.io/hasplayer.js/1.10.0/hasplayer.min.js --output $source_dir/console/assets/js/lib/hasplayer.min.js
-curl https://cdn.dashjs.org/latest/dash.all.min.js --output $source_dir/console/assets/js/lib/dash.all.min.js 
-curl https://github.com/videojs/videojs-contrib-dash/releases/download/v2.11.0/videojs-dash.js --output $source_dir/console/assets/js/lib/videojs-dash.js
+curl --location http://orange-opensource.github.io/hasplayer.js/1.10.0/hasplayer.min.js --output $source_dir/console/assets/js/lib/hasplayer.min.js
+curl --location https://cdn.dashjs.org/latest/dash.all.min.js --output $source_dir/console/assets/js/lib/dash.all.min.js
+curl --location https://github.com/videojs/videojs-contrib-dash/releases/download/v2.11.0/videojs-dash.js --output $source_dir/console/assets/js/lib/videojs-dash.js
 echo "Removing node_modules and copying console to regional folder "
 
 rm -rf node_modules/

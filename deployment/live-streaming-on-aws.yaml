@@ -621,3 +621,12 @@ Outputs:
   DemoConsole:
     Description: Demo Player URL
     Value: !Sub https://${DemoCloudFront.DomainName}/index.html
+
+  Outputs:
+    LogsBucket:
+      Description: Logs bucket
+      Value: !Ref LogsBucket
+
+    DemoBucket:
+      Description: Demo bucket
+      Value: !Ref DemoBucket

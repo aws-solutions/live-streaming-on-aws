@@ -1,6 +1,6 @@
 # Live Streaming on AWS
 
-How to implement Live streaming on AWS  at scale leveraging AWS Elemental MediaLive,  MediaPackage and Amazon CloudFront. This repo contains the source code for the AWS solution [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/).
+How to implement Live streaming on AWS  at scale leveraging AWS Elemental MediaLive,  MediaPackage and Amazon CloudFront. This repo contains the source code for the AWS solution [Live Streaming on AWS](https://aws.amazon.com/solutions/implementations/live-streaming-on-aws/?did=sl_card&trk=sl_card).
 
 ## Architecture Overview
 
@@ -21,96 +21,94 @@ As part of the CloudFormation template a Demo HTML preview player is deployed to
 
 ## Deployment
 The solution is deployed using a CloudFormation template with a lambda backed custom resource, available in both NodeJS and Python.
-For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/)
+For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/solutions/implementations/live-streaming-on-aws/?did=sl_card&trk=sl_card)
 
 ## Encoding Profiles
 To solution Configures AWS Elemental MediaLive with one of three encoding profiles based on the source resolution defined at launch as a CloudFormation parameter. The three options are 1080, 720, 540 and correspond to the following encoding profiles:
 
-**1080p Profile::**<br/>
-1080p@6500kbps, 720p@5000kbps, 720p@3300kbps, 540p@2000kbps, 432p@1200kbps, 360p@800kbps, 270@400kbps, 234p@200kbps.
-
-**720p Profile::**<br/>
-720p@5000kbps, 720p@3300kbps, 540p@2000kbps, 432p@1200kbps, 360p@800kbps, 270@400kbps, 234p@200kbps.
-
-**540p Profile::**<br/>
- 540p@2000kbps, 432p@1200kbps, 360p@800kbps, 270@400kbps, 234p@200kbps.
+* HD-1080p profile: 1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288
+* HD-720p profile: 1280x720, 960x540, 768x432, 640x360, 512x288
+* SD-540p profile:  960x540, 768x432, 640x360, 512x288
 
 The profiles are defined in JSON and and can be found in:
 ```
-  source/custom-resource-js/lib/medialive/encoding-profiles/
-  source/custom-resource-py/encoding-profiles/
+  source/custom-resource/lib/medialive/encoding-profiles/
 ```
 
 ## Source code
 
-**source/custom-resources-js::**<br/>
+**source/custom-resources::**<br/>
 A NodeJS based  Lambda function used as a custom resource for deploying MediaLive and MediaPackage resources through CloudFormation.
 
-**source/custom-resources-py::**<br/>
-A Python based  Lambda function used as a custom resource for deploying MediaLive and MediaPackage resources through CloudFormation.
+## Creating a custom build
+The solution can be deployed through the CloudFormation template available on the solution [home page](https://aws.amazon.com/solutions/implementations/live-streaming-on-aws/). The Following steps are required to customize and deploy your own version of the solution:
 
-**source/console::**<br/>
-A single page application used to demo playback of the live stream. This is deployed to an AWS S3 bucket as part of the CloudFormation deployment.
+1. download or clone this repo, 
+2. update the source code with any changes you require
+3. run the deployment/build-s3-dist.sh script to package the lambda source code and update the s3 bucket mappings in the CloudFormation template (see bellow).
+4. upload lambda deployment package to Amazon S3
+5. deploy the CloudFormation template.
 
 
-## Creating a custom Build
-To solution can be deployed through the CloudFormation template available on the solution home page: [Live Streaming on AWS](https://aws.amazon.com/solutions/live-streaming-on-aws/).
- To make changes to the solution, download or clone this repo, update the source code and then run the deployment/build-s3-dist.sh script to deploy the updated Lambda code to an S3 bucket in your account.
+## Example Custom Deployment.
+The CloudFormation template is configured to pull the source code from Amazon S3 bucket in the same region the template is being launched in. The template includes the following mappings for the source code:
 
-### Pre-requirements:
-* [AWS Command Line Interface](https://aws.amazon.com/cli/)
-* Node.js 12.x or Python 3.8 or above.
-
-### 1. Create an Amazon S3 Bucket.
-The CloudFormation template is configured to pull the Lambda deployment packages from Amazon S3 bucket in the region the template is being launched in. Create a bucket in the desired region with the region name appended to the name of the bucket. eg: for us-east-1 create a bucket named: ```bucket-us-east-1```
-
-### 2. Create the deployment packages:
-Run the build-s3-dist.sh script, passing in 2 variables:
-* CODEBUCKET = the name of the S3 bucket (do NOT include the -region extension)
-* CODEVERSION = this will be the subfolder containing the code.
-
-This will:
-* copy the console files to ./deployment/dist/.
-* copy the CloudFormation template to ./deployment/dist/ and updates the source code mappings.
-* zip and copy the source code to ./deployment/dist/
-
-Example:
-```
-  cd deployment/
-  ./build-s3-dist.sh bucket 1.01
-```
- This will deploy the source code to:
-```
-  s3://bucket-us-east-1/live-streaming-on-aws/1.01/.
-```
-And update the CloudFormation template mappings:
 ```
   SourceCode:
     General:
-      S3Bucket: bucket
-      KeyPrefix: live-streaming-on-aws/1.01
+      S3Bucket: CODE_BUCKET //This is the name of the S3 bucket
+      KeyPrefix: SOLUTION_NAME/CODE_VERSION //This is the path to the source code (eg: live-streaming-on-aws/v2.3.0)
 ```
 
- ### 3. Upload the Code to Amazon S3.
-
-Use the AWS CLI to sync the lambda code and demo console files to amazon S3:
-
- ```
-   cd deployment/
-   aws s3 sync .dist/ s3://bucket-us-east-1/live-streaming-on-aws/1.01/.
- ```
-
- ### 4. Launch the CloudFormation template.
-
-Launch the updated CloudFormation template from ```deployment/dist/``` folder.
+The example bellow assumes the following:
+* The solution is going to be deployed to us-east-1
+* the bucket name is mybucket-us-east-1
+* the solution name is live streaming-on-aws
+* the version is v2.3.0
 
 
-***
+### Prerequisites:
+* [AWS Command Line Interface](https://aws.amazon.com/cli/)
+* Node.js 12.x or later
 
-Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+### 1. Create an Amazon S3 Bucket
+ Create a bucket in us-east-1 region with the region appended to the name:
 
-Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+```
+aws s3 mb s3://mybucket-us-east-1
+```
 
-    http://aws.amazon.com/asl/
+### 2. Create the deployment packages
+Run the build-s3-dist.sh script passing in 3 parameters for CODE_BUCKET, SOLUTION_NAME, CODE_VERSION:
 
-or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and limitations under the License.
+```
+cd deployment/ && chmod +x ./build-s3-dist.sh
+./build-s3-dist.sh mybucket live-streaming-on-aws v2.3.0
+```
+
+**note** 
+The template adds the -region suffix to any referrence to the bucket, this allows the same template to be deployed to multiple regions. For example the cusntom Resource Lambda function has the follwing:
+
+```
+S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "AWS::Region"]]
+```
+
+### 3. Deploy the source code to S3:
+```
+aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v2.3.0/
+```
+
+### 4. Launch the CloudFormation template.
+The buid-s3-dist.sh script creates a copy of the template in deployment/global-assets/ with the Mappins section updated with you s3 details:
+
+  SourceCode:
+    General:
+      S3Bucket: mybucket
+      KeyPrefix: live-streaming-on-aws/v2.3.0
+
+Launch the Template through the AWS Console in us-east-1.
+
+
+## License
+
+* This project is licensed under the terms of the Apache 2.0 license. See `LICENSE`.

@@ -1,4 +1,3 @@
-
 #!/bin/bash
 #
 # This assumes all of the OS-level configuration has been completed and git repo has already been cloned
@@ -60,50 +59,32 @@ sed -i -e $replace $template_dist_dir/live-streaming-on-aws.template
 [ -e $template_dist_dir/live-streaming-on-aws.template-e ] && rm -r $template_dist_dir/live-streaming-on-aws.template-e
 
 echo "------------------------------------------------------------------------------"
+echo "Creating NODE custom-resource deployment package"
+echo "------------------------------------------------------------------------------"
+cd $source_dir/custom-resource/
+rm -rf node_modules/
+npm ci --production
+zip -q -r9 $build_dist_dir/custom-resource.zip *
+
+echo "------------------------------------------------------------------------------"
 echo "Buildinbg console"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/console
-echo "NPM INSTALL::"
-npm install 
-mkdir ./assets/js/lib
-## Bootstrap
-cp ./node_modules/bootstrap/dist/js/bootstrap.min.js ./assets/js/lib/bootstrap.min.js
-cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./assets/css/bootstrap.min.css
-cp ./node_modules/popper.js/dist/popper.min.js ./assets/js/lib/
-## JQuery
-mv ./node_modules/jquery/dist/jquery.min.js ./assets/js/lib/
-##  VideoJS
-mv ./node_modules/video.js/dist/video.js ./assets/js/lib/
-mv ./node_modules/video.js/dist/video-js.css ./assets/css/
-mv ./node_modules/videojs-contrib-hls/dist/videojs-contrib-hls.js ./assets/js/lib/
-echo "CURL"
-# No NPM repos avalable for:
-curl http://orange-opensource.github.io/hasplayer.js/1.10.0/hasplayer.min.js --output $source_dir/console/assets/js/lib/hasplayer.min.js
-curl https://cdn.dashjs.org/latest/dash.all.min.js --output $source_dir/console/assets/js/lib/dash.all.min.js 
-curl https://github.com/videojs/videojs-contrib-dash/releases/download/v2.11.0/videojs-dash.js --output $source_dir/console/assets/js/lib/videojs-dash.js
-echo "Removing node_modules and copying console to regional folder "
-
-rm -rf node_modules/
-rm package-lock.json
-cd ..
-cp -rv ./console $build_dist_dir/
+[ -e build ] && rm -r build
+[ -e node_modules ] && rm -rf node_modules
+npm ci
+touch public/assets/aws-exports.js
+npm run build
+mkdir $build_dist_dir/console
+cp -r ./build/* $build_dist_dir/console/
 
 echo "------------------------------------------------------------------------------"
-echo "Creating NODE custom-resource deployment package"
+echo "Generate console manifest file"
 echo "------------------------------------------------------------------------------"
-cd $source_dir/custom-resource-js/
-rm -rf node_modules/
-npm install --production
-rm package-lock.json
-zip -q -r9 $build_dist_dir/custom-resource-js.zip *
-
-cd $source_dir
-echo "------------------------------------------------------------------------------"
-echo "Creating PYTHON custom-resource deployment package"
-echo "------------------------------------------------------------------------------"
-cd $source_dir/custom-resource-py/
-pip3 install -r ./requirements.txt -t .
-zip -q -r9 $build_dist_dir/custom-resource-py.zip *
+cd $source_dir/console/build
+manifest=(`find * -type f ! -iname ".DS_Store"`) 
+manifest_json=$(IFS=,;printf "%s" "${manifest[*]}")
+echo "[\"$manifest_json\"]" | sed 's/,/","/g' > $build_dist_dir/console-manifest.json
 
 echo "------------------------------------------------------------------------------"
 echo "Build S3 Packaging Complete"

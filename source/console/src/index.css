@@ -1,0 +1,49 @@
+  
+body {
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  /*font-size: 1rem; */
+  font-size: 90%;
+  font-family: "Amazon Ember", "Helvetica", "sans-serif";
+  font-weight: 200;
+  background-color: #f1f1f1;
+  text-align: center;
+}
+
+.main {
+  margin: 2rem auto;
+  padding:1rem;
+  width: 90%;
+  max-width: 860px;
+}
+
+p {
+  margin: 2rem;
+  font-size: large;
+  font-weight: 300;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.perview {
+  margin: 1rem;
+}
+
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  background: #333;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.url {
+  word-wrap: break-word;
+  width:100%
+}

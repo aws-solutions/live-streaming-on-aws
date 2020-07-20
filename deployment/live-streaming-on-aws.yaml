@@ -166,8 +166,8 @@ Metadata:
 Mappings:
   SourceCode:
     General:
-      S3Bucket: solutions-features #CODE_BUCKET
-      KeyPrefix: live-streaming-on-aws/v2.4.0 #SOLUTION_NAME/CODE_VERSION
+      S3Bucket: CODE_BUCKET
+      KeyPrefix: SOLUTION_NAME/CODE_VERSION
   AnonymousData:
     SendAnonymousData:
       Data: Yes
@@ -327,10 +327,10 @@ Resources:
             reason: "Resource level permission is not supported by getRole"
           - id: W11
             reason: "* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html"
-    
+
   CdnSecret:
     Type: AWS::SecretsManager::Secret
-    Properties: 
+    Properties:
       Description: !Sub CDN authorization string value for ${AWS::StackName} Live streaming Deployment
       Name: String
       SecretString: !Sub "{\"MediaPackageCDNIdentifier\":\"${Uuid.UUID}\"}"
@@ -516,8 +516,8 @@ Resources:
             reason: "Used to store access logs for other buckets"
           - id: W51
             reason: "Bucket is private and does not need a bucket policy"
-  
-  # Demo Assets  
+
+  # Demo Assets
   DemoBucket:
     Type: 'AWS::S3::Bucket'
     Properties:

@@ -109,260 +109,83 @@
       "Name": "audio_5l3zhb"
     }
   ],
-  "AvailConfiguration": {
-    "AvailSettings": {
-      "Scte35SpliceInsert": {
-        "WebDeliveryAllowedFlag": "FOLLOW",
-        "NoRegionalBlackoutFlag": "FOLLOW"
-      }
-    }
-  },
   "CaptionDescriptions": [],
   "OutputGroups": [
     {
       "OutputGroupSettings": {
-        "HlsGroupSettings": {
-          "AdMarkers": [
-            "ELEMENTAL_SCTE35"
-          ],
-          "CaptionLanguageSetting": "OMIT",
-          "CaptionLanguageMappings": [],
-          "InputLossAction": "EMIT_OUTPUT",
-          "ManifestCompression": "NONE",
+        "MediaPackageGroupSettings": {
           "Destination": {
             "DestinationRefId": "destination1"
-          },
-          "HlsCdnSettings": {
-            "HlsBasicPutSettings": {
-              "ConnectionRetryInterval": 30,
-              "FilecacheDuration": 300,
-              "NumRetries": 5,
-              "RestartDelay": 5
-            }
-          },
-          "IvInManifest": "INCLUDE",
-          "IvSource": "FOLLOWS_SEGMENT_NUMBER",
-          "ClientCache": "ENABLED",
-          "TsFileMode": "SEGMENTED_FILES",
-          "ManifestDurationFormat": "FLOATING_POINT",
-          "SegmentationMode": "USE_SEGMENT_DURATION",
-          "RedundantManifest": "DISABLED",
-          "OutputSelection": "MANIFESTS_AND_SEGMENTS",
-          "StreamInfResolution": "INCLUDE",
-          "IFrameOnlyPlaylists": "DISABLED",
-          "IndexNSegments": 10,
-          "ProgramDateTime": "EXCLUDE",
-          "ProgramDateTimePeriod": 600,
-          "KeepSegments": 21,
-          "SegmentLength": 4,
-          "TimedMetadataId3Frame": "PRIV",
-          "TimedMetadataId3Period": 10,
-          "HlsId3SegmentTagging": "DISABLED",
-          "CodecSpecification": "RFC_4281",
-          "DirectoryStructure": "SINGLE_DIRECTORY",
-          "SegmentsPerSubdirectory": 10000,
-          "Mode": "LIVE"
+          }
         }
       },
       "Name": "HLS HD",
       "Outputs": [
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_512x288",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_512x288",
-          "VideoDescriptionName": "_512x288",
           "AudioDescriptionNames": [
             "audio_j8tr8"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_512x288",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_512x288"
         },
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_640x360",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_640x360",
-          "VideoDescriptionName": "_640x360",
           "AudioDescriptionNames": [
             "audio_6ht2vm"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_640x360",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_640x360"
         },
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_768x432",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_768x432",
-          "VideoDescriptionName": "_768x432",
           "AudioDescriptionNames": [
             "audio_s90hue"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_764x432",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_768x432"
         },
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_960x540",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_960x540",
-          "VideoDescriptionName": "_960x540",
           "AudioDescriptionNames": [
             "audio_i3rm19"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_960x540",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_960x540"
         },
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_1280x720",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_1280x720",
-          "VideoDescriptionName": "_1280x720",
           "AudioDescriptionNames": [
             "audio_ze3rtr"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_1280x720",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_1280x720"
         },
         {
-          "OutputSettings": {
-            "HlsOutputSettings": {
-              "NameModifier": "_1920x1080",
-              "SegmentModifier": "_$t$_",
-              "HlsSettings": {
-                "StandardHlsSettings": {
-                  "M3u8Settings": {
-                    "AudioFramesPerPes": 4,
-                    "AudioPids": "492-498",
-                    "NielsenId3Behavior": "NO_PASSTHROUGH",
-                    "PcrControl": "PCR_EVERY_PES_PACKET",
-                    "PmtPid": "480",
-                    "ProgramNum": 1,
-                    "Scte35Pid": "500",
-                    "Scte35Behavior": "PASSTHROUGH",
-                    "TimedMetadataPid": "502",
-                    "TimedMetadataBehavior": "NO_PASSTHROUGH",
-                    "VideoPid": "481"
-                  },
-                  "AudioRenditionSets": "program_audio"
-                }
-              },
-              "H265PackagingType": "HVC1"
-            }
-          },
-          "OutputName": "_1920x1080",
-          "VideoDescriptionName": "_1920x1080",
           "AudioDescriptionNames": [
             "audio_5l3zhb"
           ],
-          "CaptionDescriptionNames": []
+          "CaptionDescriptionNames": [],
+          "OutputName": "_1920x1080",
+          "OutputSettings": {
+            "MediaPackageOutputSettings": {}
+          },
+          "VideoDescriptionName": "_1920x1080"
         }
       ]
     }
@@ -387,7 +210,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -396,7 +219,9 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 400000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
           "Profile": "BASELINE",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 6,
@@ -430,7 +255,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -439,8 +264,10 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 800000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
-          "Profile": "BASELINE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
+          "Profile": "MAIN",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 7,
           "Syntax": "DEFAULT",
@@ -473,7 +300,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -482,8 +309,10 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 1200000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
-          "Profile": "BASELINE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
+          "Profile": "MAIN",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 7,
           "Syntax": "DEFAULT",
@@ -516,7 +345,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -525,8 +354,10 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 1800000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
-          "Profile": "BASELINE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
+          "Profile": "MAIN",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 7,
           "Syntax": "DEFAULT",
@@ -559,7 +390,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -568,8 +399,10 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 2700000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
-          "Profile": "BASELINE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
+          "Profile": "MAIN",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 8,
           "Syntax": "DEFAULT",
@@ -602,7 +435,7 @@
           "FramerateDenominator": 1,
           "GopBReference": "ENABLED",
           "GopClosedCadence": 1,
-          "GopNumBFrames": 0,
+          "GopNumBFrames": 3,
           "GopSize": 2,
           "GopSizeUnits": "SECONDS",
           "SubgopLength": "DYNAMIC",
@@ -611,8 +444,10 @@
           "LookAheadRateControl": "HIGH",
           "MaxBitrate": 4100000,
           "NumRefFrames": 5,
-          "ParControl": "INITIALIZE_FROM_SOURCE",
-          "Profile": "BASELINE",
+          "ParControl": "SPECIFIED",
+          "ParDenominator": 1,
+          "ParNumerator": 1,
+          "Profile": "HIGH",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 8,
           "Syntax": "DEFAULT",

@@ -173,20 +173,16 @@ const createChannel = async (config) => {
     try {
         // Define baseline Paameters for cheate channel
         params = {
-            Destinations: [{
-                Id: "destination1",
-                Settings: [{
-                        PasswordParam: config.MediaPackagePriUser,
-                        Url: config.MediaPackagePriUrl,
-                        Username: config.MediaPackagePriUser
-                    },
-                    {
-                        PasswordParam: config.MediaPackageSecUser,
-                        Url: config.MediaPackageSecUrl,
-                        Username: config.MediaPackageSecUser
-                    }
-                ]
-            }],
+            Destinations: [
+                {
+                    Id: "destination1",
+                    MediaPackageSettings: [
+                        {
+                            ChannelId: config.MediaPackageChannelId
+                        }
+                    ]
+                }
+            ],
             InputSpecification: {
                 Codec: config.Codec,
                 Resolution: '',

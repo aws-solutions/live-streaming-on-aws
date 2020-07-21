@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lambda runtime update from Node8.10 to Node12.x, Python3.6 to Python3.8
 - Demo Console deployed by default, previously an optional through cfn parameter but disabling teh console caused the stack to fail.
 
-## [2.4.0] - 2020-07-30
+## [2.4.0] - 2020-08-03
 ### Added
 - Origin headers and Custom Error 404 TTL for CloudFront
 - CDN Autnorizarion for Elemental MediaPackage EndPoints

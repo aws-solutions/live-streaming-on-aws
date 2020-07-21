@@ -25,15 +25,6 @@ Parameters:
       - URL_PULL
       - MEDIACONNECT
 
-  InputCodec:
-    Description: Specify the codec of the source stream for MediaLive (AVC/HEVC/MPEG2)
-    Type: String
-    Default: AVC
-    AllowedValues:
-      - AVC
-      - HEVC
-      - MPEG2
-
   EncodingProfile:
     Description: Select an encoding profile. HD 1080p [1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288] HD 720p [1280x720, 960x540, 768x432, 640x360, 512x288] SD 540p [960x540, 768x432, 640x360, 512x288]  See the implementation guide for details https://docs.aws.amazon.com/solutions/latest/live-streaming/considerations.html
     Type: String
@@ -132,7 +123,6 @@ Metadata:
           default: ENCODING OPTIONS
         Parameters:
           - EncodingProfile
-          - InputCodec
           - ChannelStart
 
     ParameterLabels:
@@ -416,7 +406,7 @@ Resources:
       Resource: MediaLiveChannel
       Name: !Sub ${AWS::StackName}-livestream
       EncodingProfile: !Ref EncodingProfile
-      Codec: !Ref InputCodec
+      Codec: AVC
       Role: !GetAtt MediaLiveRole.Arn
       InputId: !GetAtt MediaLiveInput.Id
       Type: !Ref InputType

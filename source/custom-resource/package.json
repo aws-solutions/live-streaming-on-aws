@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "axios": "*",
-    "moment": "*"
+    "moment": "*",
+    "uuid": "*"
   },
   "devDependencies": {
     "aws-sdk": "*",

@@ -28,11 +28,11 @@ Parameters:
   EncodingProfile:
     Description: Select an encoding profile. HD 1080p [1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288] HD 720p [1280x720, 960x540, 768x432, 640x360, 512x288] SD 540p [960x540, 768x432, 640x360, 512x288]  See the implementation guide for details https://docs.aws.amazon.com/solutions/latest/live-streaming/considerations.html
     Type: String
-    Default: 720
+    Default: HD-720p
     AllowedValues:
-      - 1080
-      - 720
-      - 540
+      - HD-1080p
+      - HD-720p
+      - SD-540p
 
   InputCIDR:
     Description: For RTP and RTMP PUSH input types ONLY, specify the CIDR Block for the MediaLive SecurityGroup. Input security group restricts access to the input and prevents unauthorized third parties from pushing content into a channel that is associated with that input.
@@ -40,49 +40,49 @@ Parameters:
     Default: ""
 
   PriPullURL:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify the primary source URL
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify the primary source URL
     Type: String
     Default: "https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8"
 
   PriPullUser:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify a username for the primary source URL if basic authentication is enabled on the source.
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify a username for the primary source URL if basic authentication is enabled on the source.
     Type: String
     Default: ""
 
   PriPullPass:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify a password for the primary source URL if basic authentication is enabled on the source.
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify a password for the primary source URL if basic authentication is enabled on the source.
     Type: String
     Default: ""
     NoEcho: true
 
   SecPullURL:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.
     Type: String
     Default: "https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8"
 
   SecPullUser:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify a username for the secondary source URL if basic authentication is enabled on the source.
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify a username for the secondary source URL if basic authentication is enabled on the source.
     Type: String
     Default: ""
 
   SecPullPass:
-    Description: For URL PULL and RTMP_PULL input types ONLY, specify a password for the secondary source URL if basic authentication is enabled on the source.
+    Description: For URL_PULL and RTMP_PULL input types ONLY, specify a password for the secondary source URL if basic authentication is enabled on the source.
     Type: String
     Default: ""
     NoEcho: true
 
   PriMediaConnectArn:
-    Description: For MediaConnect Input type ONLY, specify the Arn for MediaConnect as the primary source
+    Description: For MediaConnect Input type ONLY, specify the ARN for MediaConnect as the primary source. This flow has to be in a different availability zone as the secondary source.
     Type: String
     Default: ""
 
   SecMediaConnectArn:
-    Description: For MediaConnect Input type ONLY, specify the Arn for MediaConnect as the secondary source
+    Description: For MediaConnect Input type ONLY, specify the ARN for MediaConnect as the secondary source. This flow has to be in a different availability zone as the primary source.
     Type: String
     Default: ""
 
   ChannelStart:
-    Description: If your source is ready to stream select true, this wil start the MediaLive Channel as part of the deployment. If you select false you will need to manually start the MediaLive Channel when your source is ready.
+    Description: If your source is ready to stream, select true. This will start the MediaLive Channel as part of the deployment. If you select false, you will need to manually start the MediaLive Channel when your source is ready.
     Type: String
     Default: Yes
     AllowedValues:
@@ -267,6 +267,12 @@ Resources:
                   - mediaconnect:ManagedRemoveOutput
                 Resource:
                   - !Join ["", ["arn:aws:mediaconnect:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
+              -
+                Effect: Allow
+                Action:
+                  - mediapackage:DescribeChannel
+                Resource:
+                  - !Join ["", ["arn:aws:mediapackage:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":channels/*"]]
 
   MediaPackageRole:
     Type: AWS::IAM::Role
@@ -313,7 +319,6 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: !Sub CDN authorization string value for ${AWS::StackName} Live streaming Deployment
-      Name: String
       SecretString: !Sub "{\"MediaPackageCDNIdentifier\":\"${Uuid.UUID}\"}"
     Metadata:
       cfn_nag:
@@ -357,16 +362,6 @@ Resources:
       ServiceToken: !GetAtt CustomResource.Arn
       Resource: MediaPackageEndPoint
       EndPoint: DASH
-      ChannelId: !GetAtt MediaPackageChannel.ChannelId
-      SecretsRoleArn: !GetAtt MediaPackageRole.Arn
-      CdnIdentifierSecret: !Ref CdnSecret
-
-  MediaPackageMssEndpoint:
-    Type: Custom::MediaPackageMssEndpoint
-    Properties:
-      ServiceToken: !GetAtt CustomResource.Arn
-      Resource: MediaPackageEndPoint
-      EndPoint: MSS
       ChannelId: !GetAtt MediaPackageChannel.ChannelId
       SecretsRoleArn: !GetAtt MediaPackageRole.Arn
       CdnIdentifierSecret: !Ref CdnSecret
@@ -659,22 +654,26 @@ Outputs:
     Description: Secondary MediaLive input Url
     Value: !GetAtt MediaLiveInput.EndPoint2
 
-  CloudFrontHlsEnpoint:
+  CloudFrontHlsEndpoint:
     Description: HLS CloudFront URL
     Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageHlsEndpoint.Manifest}
 
-  CloudFrontDashEnpoint:
+  CloudFrontDashEndpoint:
     Description: DASH CloudFront URL
     Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageDashEndpoint.Manifest}
 
-  CloudFrontMssEnpoint:
-    Description: MSS CloudFront URL
-    Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageMssEndpoint.Manifest}
-
-  CloudFrontCmafEnpoint:
+  CloudFrontCmafEndpoint:
       Description: CMAF CloudFront URL
       Value: !Sub https://${CloudFront.DomainName}/out/v1${MediaPackageCmafEndpoint.Manifest}
 
   DemoConsole:
     Description: Demo Player URL
     Value: !Sub https://${DemoCloudFront.DomainName}/index.html
+
+  DemoBucket:
+    Description: Demo bucket
+    Value: !Ref DemoBucket 
+
+  LogsBucket:
+    Description: Logs bucket
+    Value: !Ref LogsBucket

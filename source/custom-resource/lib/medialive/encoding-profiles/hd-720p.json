@@ -193,7 +193,7 @@
           "ParControl": "SPECIFIED",
           "ParDenominator": 1,
           "ParNumerator": 1,
-          "Profile": "BASELINE",
+          "Profile": "MAIN",
           "RateControlMode": "QVBR",
           "QvbrQualityLevel": 6,
           "Syntax": "DEFAULT",
@@ -390,5 +390,13 @@
       "ScalingBehavior": "DEFAULT",
       "Width": 1280
     }
-  ]
+  ],
+  "AvailConfiguration": {
+    "AvailSettings": {
+      "Scte35SpliceInsert": {
+        "WebDeliveryAllowedFlag": "FOLLOW",
+        "NoRegionalBlackoutFlag": "FOLLOW"
+      }
+    }
+  }
 }

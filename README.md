@@ -10,7 +10,7 @@ How to implement Live streaming on AWS  at scale leveraging AWS Elemental MediaL
 Is configured to ingest 2 live feeds and transcode the content into multiple adaptive bitrate HLS content.  The solution can be configured to ingest RTP RTMP HLS and MediaConnect streams and will apply 1 of 3 encoding profiles which include bitrates of 1080p through 270p. The encoding profile is set at launch and is based on the source resolution (See Encoding Profiles below).
 
 **AWS Elemental MediaPackage**<br/>
-Ingests the MediaLive Output and package the Live stream into HLS, DASH, MSS and CMAF formats that are delivered through 3 MediaPackage custom endpoints.
+Ingests the MediaLive Output and package the Live stream into HLS, DASH, and CMAF formats that are delivered through 3 MediaPackage custom endpoints.
 
 **Amazon CloudFront**<br/>
 Is configured with the MediaPackage custom endpoints as the Origins for the distribution. CloudFront then enable the live stream content to be delivered globally and at scale.

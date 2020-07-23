@@ -12,9 +12,9 @@
  *********************************************************************************************************************/
 const AWS = require('aws-sdk');
 
- 
+
 const createInput = async (config) => {
-    
+
    const medialive = new AWS.MediaLive({
         region: process.env.AWS_REGION
     });
@@ -205,21 +205,24 @@ const createChannel = async (config) => {
                 SourceEndBehavior: 'LOOP'
             };
         }
-        switch (config.Resolution) {
-            case '1080':
+        switch (config.EncodingProfile) {
+            case 'HD-1080p':
                 params.InputSpecification.Resolution = 'HD';
                 params.InputSpecification.MaximumBitrate = 'MAX_20_MBPS';
                 params.EncoderSettings = encode1080p;
                 break;
-            case '720':
+            case 'HD-720p':
                 params.InputSpecification.Resolution = 'HD';
                 params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
                 params.EncoderSettings = encode720p;
                 break;
-            default:
+            case 'SD-540p':
                 params.InputSpecification.Resolution = 'SD';
                 params.InputSpecification.MaximumBitrate = 'MAX_10_MBPS';
                 params.EncoderSettings = encode540p;
+                break;
+            default:
+                throw new Error(`EncodingProfile is invalid or undefined: ${config.EncodingProfile}`)
         }
         console.log(`Creating Channel with a ${config.EncodingProfile} profile`);
         data = await medialive.createChannel(params).promise();

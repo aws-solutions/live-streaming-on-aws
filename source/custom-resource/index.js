@@ -79,6 +79,10 @@ exports.handler = async (event, context) => {
         if (event.RequestType === 'Delete') {
             switch (resource) {
 
+                case 'MediaLiveInput':
+                    await mediaLive.deleteInput(event.PhysicalResourceId);
+                    break;
+
                 case 'MediaLiveChannel':
                     await mediaLive.deleteChannel(event.PhysicalResourceId);
                     break;

@@ -461,7 +461,7 @@ Resources:
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
       Tags:
-        - Key: MP-Endpoint-ARN
+        - Key: mediapackage:cloudfront_assoc
           Value: !GetAtt MediaPackageChannel.Arn
     Metadata:
       cfn_nag:

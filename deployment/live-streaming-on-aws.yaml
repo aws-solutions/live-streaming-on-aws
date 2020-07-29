@@ -10,7 +10,7 @@
 # on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
-Description: '(SO0013) - Live Streaming on AWS'
+Description: '(SO0013) - Live Streaming on AWS - v2.4.0'
 
 Parameters:
 
@@ -150,8 +150,6 @@ Metadata:
         default: Secondary MediaConnect Arn
       ChannelStart:
         default: Start MediaLive Channel
-      InputType:
-        default: Source Input Type
 
 Mappings:
   SourceCode:

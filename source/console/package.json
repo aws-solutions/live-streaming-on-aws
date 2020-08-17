@@ -8,7 +8,7 @@
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
     "react-player": "^2.1.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "^3.4.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",

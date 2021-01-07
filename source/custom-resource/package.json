@@ -10,7 +10,7 @@
     "test": "mocha lib/**/*.spec.js"
   },
   "dependencies": {
-    "axios": "*",
+    "axios": "^0.21.1",
     "moment": "*",
     "uuid": "*"
   },

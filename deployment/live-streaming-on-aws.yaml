@@ -340,6 +340,13 @@ Resources:
       Environment:
         Variables:
           SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/CODE_VERSION'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W89
+            reason: "W89: We do not need a VPC for this custom resource lambda."
+          - id: W92
+            reason: "W92: Custom resource does not need ReservedConcurrentExecution. "
 
   MediaPackageChannel:
     Type: Custom::MediaPackageChannel

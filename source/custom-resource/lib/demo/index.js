@@ -18,7 +18,9 @@ const AWS = require('aws-sdk');
  */
 const copyAssets = async (config) => {
 
-	const s3 = new AWS.S3();
+	const s3 = new AWS.S3({
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
+    });
 	const {srcBucket,srcPath,manifestFile,destBucket,awsExports} = config;
 
 	try {
@@ -57,7 +59,9 @@ const copyAssets = async (config) => {
 
 const delAssets = async (config) => {
 
-	const s3 = new AWS.S3();
+	const s3 = new AWS.S3({
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
+    });
 
 	try {
 		let params = {

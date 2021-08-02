@@ -337,6 +337,9 @@ Resources:
         S3Key: !Join ["/", [!FindInMap ["SourceCode", "General", "KeyPrefix"], "custom-resource.zip"]]
       Runtime: nodejs12.x
       Timeout: 180
+      Environment:
+        Variables:
+          SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/CODE_VERSION'
 
   MediaPackageChannel:
     Type: Custom::MediaPackageChannel

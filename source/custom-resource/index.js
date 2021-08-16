@@ -19,10 +19,13 @@ const metrics = require('./lib/metrics');
 
 // Remove AWS MediaPackage user and pass from event before logging
 const logEvent = (event) => {
-    delete event.ResourceProperties['PriUser'];
-    delete event.ResourceProperties['PriPass'];
-    delete event.ResourceProperties['SecUser'];
-    delete event.ResourceProperties['SecPass'];
+    // Copy the object to log
+    let loggingObject = Object.assign({}, event);
+
+    delete loggingObject.ResourceProperties.PriUser;
+    delete loggingObject.ResourceProperties.PriPass;
+    delete loggingObject.ResourceProperties.SecUser;
+    delete loggingObject.ResourceProperties.SecPass;
 
     console.log(`event: ${JSON.stringify(event,null,2)}`);
 };

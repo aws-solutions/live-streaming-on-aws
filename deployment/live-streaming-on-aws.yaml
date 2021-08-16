@@ -464,8 +464,28 @@ Resources:
               - Origin
           ViewerProtocolPolicy: allow-all
         CustomErrorResponses:
-          - ErrorCode: '404'
-            ErrorCachingMinTTL: '2'
+          - ErrorCode: 400
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 403
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 404
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 405
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 414
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 416
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 500
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 501
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 502
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 503
+            ErrorCachingMinTTL: 1
+          - ErrorCode: 504
+            ErrorCachingMinTTL: 1
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
       Tags:

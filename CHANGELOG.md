@@ -9,11 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 
 
 ### Changed
-- The AWS MediaLive start channel now defaults to not start when a customer deploys the CloudFormation.  
+- The AWS MediaLive channel defaults to false. So a customer has to enable this option for MediaLive to start. 
 
+### Updated
+- The Amazon CloudFront distribution TTL values were modified to 1 second for all http error codes. 403, 404, 405, 500, 501, 503, and 504.
 
 ### Fixed
 - Readme file updates.
+- Removed Lambda from logging MediaPackage input details. 
 
 ## [2.3.0] - 2019-10-30
 ### Added

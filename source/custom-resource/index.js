@@ -17,23 +17,24 @@ const mediaLive = require('./lib/medialive');
 const demo = require('./lib/demo');
 const metrics = require('./lib/metrics');
 
-// Remove AWS MediaPackage user and pass from event before logging
+
 const logEvent = (event) => {
     // Copy the object to log
     let loggingObject = Object.assign({}, event);
 
+    // Remove AWS MediaPackage user and pass from event before logging
     delete loggingObject.ResourceProperties.PriUser;
     delete loggingObject.ResourceProperties.PriPass;
     delete loggingObject.ResourceProperties.SecUser;
     delete loggingObject.ResourceProperties.SecPass;
 
-    console.log(`event: ${JSON.stringify(event,null,2)}`);
+    console.log(`event: ${JSON.stringify(loggingObject,null,2)}`);
 };
 
 
 exports.handler = async (event, context) => {
 
-    logEvent();
+    // logEvent(event);
 
     const resource = event.ResourceProperties.Resource;
     const config = event.ResourceProperties;

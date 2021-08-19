@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .DS_Store
+.vscode/
 global-s3-assets/
 regional-s3-assets/
 build/

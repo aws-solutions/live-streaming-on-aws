@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.0] - 2020-8-5
 ### Changed
-- The AWS MediaLive channel defaults to false. So a customer has to enable this option for MediaLive to start. 
+- The AWS MediaLive channel start default has been changed to false. So MediaLive will not start automatically and start charging the customer.
 
 ### Updated
 - The Amazon CloudFront distribution TTL values were modified to 1 second for all http error codes. 403, 404, 405, 500, 501, 503, and 504.

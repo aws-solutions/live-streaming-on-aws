@@ -2,9 +2,5 @@
 CONTRIBUTING.md:50
 CODE_OF_CONDUCT.md:4
 source/custom-resources/lib/media-live/channel.js:25
-source/console/assets/css/video-js.css:715
-source/console/assets/css/video-js.css:736
-source/console/assets/js/lib/dash.all.min.js:5
-source/console/assets/js/lib/dash.all.min.js:8
 source/custom-resource/lib/cfn/index.spec.js:30
 deployment/live-streaming-on-aws.yaml:308

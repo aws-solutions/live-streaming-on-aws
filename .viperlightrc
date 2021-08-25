@@ -1,4 +1,4 @@
 {
   "modules": ["contents", "files", "ncu", "nsp"],
-  "failOn": "critical"
+  "failOn": "medium"
 }

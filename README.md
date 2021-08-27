@@ -57,14 +57,14 @@ The CloudFormation template is configured to pull the source code from Amazon S3
   SourceCode:
     General:
       S3Bucket: CODE_BUCKET //This is the name of the S3 bucket
-      KeyPrefix: SOLUTION_NAME/CODE_VERSION //This is the path to the source code (eg: live-streaming-on-aws/v2.3.0)
+      KeyPrefix: SOLUTION_NAME/CODE_VERSION //This is the path to the source code (eg: live-streaming-on-aws/v3.0.0)
 ```
 
 The example bellow assumes the following:
 * The solution is going to be deployed to us-east-1
 * the bucket name is mybucket-us-east-1
 * the solution name is live streaming-on-aws
-* the version is v2.3.0
+* the version is v3.0.0
 
 
 ### Prerequisites:
@@ -83,7 +83,7 @@ Run the build-s3-dist.sh script passing in 3 parameters for CODE_BUCKET, SOLUTIO
 
 ```
 cd deployment/ && chmod +x ./build-s3-dist.sh
-./build-s3-dist.sh mybucket live-streaming-on-aws v2.3.0
+./build-s3-dist.sh mybucket live-streaming-on-aws v3.0.0
 ```
 
 **note** 
@@ -102,7 +102,7 @@ aws s3api head-bucket --bucket mybucket-us-east-1 --expected-bucket-owner YOUR-A
 
 Uploads the files to your S3 bucket. 
 ```
-aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v2.3.0/
+aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v3.0.0/
 ```
 
 ### 4. Launch the CloudFormation template.
@@ -111,7 +111,7 @@ The buid-s3-dist.sh script creates a copy of the template in deployment/global-a
   SourceCode:
     General:
       S3Bucket: mybucket
-      KeyPrefix: live-streaming-on-aws/v2.3.0
+      KeyPrefix: live-streaming-on-aws/v3.0.0
 
 Launch the Template through the AWS Console in us-east-1.
 

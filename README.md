@@ -72,7 +72,7 @@ The example bellow assumes the following:
 * Node.js 12.x or later
 
 ### 1. Create an Amazon S3 Bucket
- Create a bucket in us-east-1 region with the region appended to the name:
+ Create a bucket in us-east-1 region with the region appended to the name. Please consider using randomized bucket names, ensure your buckets are not public, and verify bucket ownership prior to uploading application code or templates.
 
 ```
 aws s3 mb s3://mybucket-us-east-1
@@ -94,6 +94,13 @@ S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "A
 ```
 
 ### 3. Deploy the source code to S3:
+
+Ensure that you are owner of the AWS S3 bucket. 
+```
+aws s3api head-bucket --bucket mybucket-us-east-1 --expected-bucket-owner YOUR-AWS-ACCOUNT-NUMBER
+```
+
+Uploads the files to your S3 bucket. 
 ```
 aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v2.3.0/
 ```

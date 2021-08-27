@@ -17,28 +17,17 @@ const mediaLive = require('./lib/medialive');
 const demo = require('./lib/demo');
 const metrics = require('./lib/metrics');
 
-
-const logEvent = (event) => {
-    // Copy the object to log
-    let loggingObject = Object.assign({}, event);
-
-    // Remove AWS MediaPackage user and pass from event before logging
-    delete loggingObject.ResourceProperties.PriUser;
-    delete loggingObject.ResourceProperties.PriPass;
-    delete loggingObject.ResourceProperties.SecUser;
-    delete loggingObject.ResourceProperties.SecPass;
-
-    console.log(`event: ${JSON.stringify(loggingObject,null,2)}`);
-};
-
-
 exports.handler = async (event, context) => {
-
-    // logEvent(event);
 
     const resource = event.ResourceProperties.Resource;
     const config = event.ResourceProperties;
     let Id, responseData;
+
+    if(resource == "MediaLiveInput"){
+        // Do not log input details which may contain sensative passwords
+    }else{
+        console.log(`event: ${JSON.stringify(event,null,2)}`);
+    }
 
     try {
         if (event.RequestType === 'Create') {

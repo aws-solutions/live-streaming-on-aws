@@ -6,14 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.0] - 2020-8-5
 ### Changed
-- The AWS MediaLive channel start default has been changed to false. So MediaLive will not start automatically and start charging the customer.
+- The AWS MediaLive default CloudFormation parameter for channel start has been changed to false. 
 
 ### Updated
 - The Amazon CloudFront distribution TTL values were modified to 1 second for all http error codes. 403, 404, 405, 500, 501, 503, and 504.
+- Updated packages glob-parent, ssri, y18n, react-dev-utils, elliptic, axios, and others.
 
 ### Fixed
 - Readme file updates.
-- Removed Lambda from logging MediaPackage input details. 
+- Removed Lambda from logging AWS MediaLive input details which could contain passwords. 
 
 ## [2.3.0] - 2019-10-30
 ### Added

@@ -10,16 +10,16 @@
     "test": "mocha lib/**/*.spec.js"
   },
   "dependencies": {
-    "axios": "*",
+    "axios": "^0.21.1",
     "moment": "*",
     "uuid": "*"
   },
   "devDependencies": {
     "aws-sdk": "*",
     "aws-sdk-mock": "*",
-    "mocha": "*",
+    "axios-mock-adapter": "*",
     "chai": "*",
-    "axios-mock-adapter": "*"
+    "mocha": "^8.1.1"
   },
   "repository": {
     "type": "git",

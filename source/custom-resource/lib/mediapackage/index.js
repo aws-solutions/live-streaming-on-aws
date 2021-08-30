@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -15,7 +15,8 @@ const url = require('url');
 
 const createEndPoint = async (config) => {
     const mediapackage = new AWS.MediaPackage({
-        region: process.env.AWS_REGION
+        region: process.env.AWS_REGION,
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
     let responseData;
     try {
@@ -112,10 +113,12 @@ const createEndPoint = async (config) => {
 // FEATURE/P15424610:: Function updated to use Async
 const createChannel = async (config) => {
     const mediapackage = new AWS.MediaPackage({
-        region: process.env.AWS_REGION
+        region: process.env.AWS_REGION,
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
     const ssm = new AWS.SSM({
-        region: process.env.AWS_REGION
+        region: process.env.AWS_REGION,
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
     let responseData;
 
@@ -166,7 +169,8 @@ const createChannel = async (config) => {
 // FEATURE/P15424610:: Function updated to use Async
 const deleteChannel = async (ChannelId) => {
     const mediapackage = new AWS.MediaPackage({
-        region: process.env.AWS_REGION
+        region: process.env.AWS_REGION,
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
     try {
         let params = {

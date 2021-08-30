@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -18,7 +18,9 @@ const AWS = require('aws-sdk');
  */
 const copyAssets = async (config) => {
 
-	const s3 = new AWS.S3();
+	const s3 = new AWS.S3({
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
+    });
 	const {srcBucket,srcPath,manifestFile,destBucket,awsExports} = config;
 
 	try {
@@ -57,7 +59,9 @@ const copyAssets = async (config) => {
 
 const delAssets = async (config) => {
 
-	const s3 = new AWS.S3();
+	const s3 = new AWS.S3({
+        customUserAgent: process.env.SOLUTION_IDENTIFIER
+    });
 
 	try {
 		let params = {

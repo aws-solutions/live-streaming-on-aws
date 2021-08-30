@@ -21,7 +21,7 @@ As part of the CloudFormation template a Demo HTML preview player is deployed to
 
 ## Deployment
 The solution is deployed using a CloudFormation template with a lambda backed custom resource, available in both NodeJS and Python.
-For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/solutions/implementations/live-streaming-on-aws)
+For details on deploying the solution please see the details on the Solution home page:  [Live Streaming on AWS](https://aws.amazon.com/solutions/implementations/live-streaming-on-aws/?did=sl_card&trk=sl_card)
 
 ## Encoding Profiles
 To solution Configures AWS Elemental MediaLive with one of three encoding profiles based on the source resolution defined at launch as a CloudFormation parameter. The three options are 1080, 720, 540 and correspond to the following encoding profiles:
@@ -57,14 +57,14 @@ The CloudFormation template is configured to pull the source code from Amazon S3
   SourceCode:
     General:
       S3Bucket: CODE_BUCKET //This is the name of the S3 bucket
-      KeyPrefix: SOLUTION_NAME/CODE_VERSION //This is the path to the source code (eg: live-streaming-on-aws/v2.3.0)
+      KeyPrefix: SOLUTION_NAME/CODE_VERSION //This is the path to the source code (eg: live-streaming-on-aws/v3.0.0)
 ```
 
 The example bellow assumes the following:
 * The solution is going to be deployed to us-east-1
 * the bucket name is mybucket-us-east-1
 * the solution name is live streaming-on-aws
-* the version is v2.3.0
+* the version is v3.0.0
 
 
 ### Prerequisites:
@@ -72,7 +72,7 @@ The example bellow assumes the following:
 * Node.js 12.x or later
 
 ### 1. Create an Amazon S3 Bucket
- Create a bucket in us-east-1 region with the region appended to the name:
+ Create a bucket in us-east-1 region with the region appended to the name. Please consider using randomized bucket names, ensure your buckets are not public, and verify bucket ownership prior to uploading application code or templates.
 
 ```
 aws s3 mb s3://mybucket-us-east-1
@@ -83,7 +83,7 @@ Run the build-s3-dist.sh script passing in 3 parameters for CODE_BUCKET, SOLUTIO
 
 ```
 cd deployment/ && chmod +x ./build-s3-dist.sh
-./build-s3-dist.sh mybucket live-streaming-on-aws v2.3.0
+./build-s3-dist.sh mybucket live-streaming-on-aws v3.0.0
 ```
 
 **note** 
@@ -94,8 +94,15 @@ S3Bucket: !Join ["-", [!FindInMap ["SourceCode", "General", "S3Bucket"], Ref: "A
 ```
 
 ### 3. Deploy the source code to S3:
+
+Ensure that you are owner of the AWS S3 bucket. 
 ```
-aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v2.3.0/
+aws s3api head-bucket --bucket mybucket-us-east-1 --expected-bucket-owner YOUR-AWS-ACCOUNT-NUMBER
+```
+
+Uploads the files to your S3 bucket. 
+```
+aws s3 sync ./regional-s3-assets/ s3://mybucket-us-east-1/live-streaming-on-aws/v3.0.0/
 ```
 
 ### 4. Launch the CloudFormation template.
@@ -104,7 +111,7 @@ The buid-s3-dist.sh script creates a copy of the template in deployment/global-a
   SourceCode:
     General:
       S3Bucket: mybucket
-      KeyPrefix: live-streaming-on-aws/v2.3.0
+      KeyPrefix: live-streaming-on-aws/v3.0.0
 
 Launch the Template through the AWS Console in us-east-1.
 
@@ -112,3 +119,7 @@ Launch the Template through the AWS Console in us-east-1.
 ## License
 
 * This project is licensed under the terms of the Apache 2.0 license. See `LICENSE`.
+
+This solution collects anonymous operational metrics to help AWS improve the
+quality of features of the solution. For more information, including how to disable
+this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/live-streaming/welcome.html).

@@ -1,5 +1,5 @@
 /*********************************************************************************************************************
- *  Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
  *                                                                                                                    *
  *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
  *  with the License. A copy of the License is located at                                                             *
@@ -17,14 +17,17 @@ const mediaLive = require('./lib/medialive');
 const demo = require('./lib/demo');
 const metrics = require('./lib/metrics');
 
-
 exports.handler = async (event, context) => {
-
-    console.log(`event: ${JSON.stringify(event,null,2)}`);
 
     const resource = event.ResourceProperties.Resource;
     const config = event.ResourceProperties;
     let Id, responseData;
+
+    if(resource == "MediaLiveInput"){
+        // Do not log input details which may contain sensative passwords
+    }else{
+        console.log(`event: ${JSON.stringify(event,null,2)}`);
+    }
 
     try {
         if (event.RequestType === 'Create') {

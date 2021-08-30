@@ -67,7 +67,7 @@ npm ci --production
 zip -q -r9 $build_dist_dir/custom-resource.zip *
 
 echo "------------------------------------------------------------------------------"
-echo "Buildinbg console"
+echo "Building console"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/console
 [ -e build ] && rm -r build

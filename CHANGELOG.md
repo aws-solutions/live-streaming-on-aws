@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.1.0] - 2021-11-12
 ### Changed
-- Added additional permissions for AWS MediaLive Policy. Now has additional CloudWatch, MediaConnect, and MediaStore access. 
+- Added additional permissions for AWS MediaLive IAM Policy. Now has CloudWatch, MediaConnect, and MediaStore access. 
 - Changed case of IAM policy (https://github.com/aws-solutions/live-stream-on-aws/pull/19)
 
 ### Updated

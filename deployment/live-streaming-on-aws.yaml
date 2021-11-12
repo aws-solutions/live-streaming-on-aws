@@ -207,7 +207,8 @@ Resources:
                   - medialive:deleteInputSecurityGroup
                   - medialive:describeChannel
                   - medialive:startChannel
-                  - medialive:tagResource
+                  - medialive:createTags 
+                  - medialive:deleteTags
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
               -

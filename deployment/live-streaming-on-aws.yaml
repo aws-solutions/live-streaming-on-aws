@@ -196,29 +196,29 @@ Resources:
               -
                 Effect: Allow
                 Action:
-                  - medialive:createInputSecurityGroup
-                  - medialive:describeInput
-                  - medialive:createInput
-                  - medialive:deleteInput
-                  - medialive:stopChannel
-                  - medialive:createChannel
-                  - medialive:deleteChannel
-                  - medialive:describeInputSecurityGroup
-                  - medialive:deleteInputSecurityGroup
-                  - medialive:describeChannel
-                  - medialive:startChannel
-                  - medialive:createTags 
-                  - medialive:deleteTags
+                  - medialive:CreateInputSecurityGroup
+                  - medialive:DescribeInput
+                  - medialive:CreateInput
+                  - medialive:DeleteInput
+                  - medialive:StopChannel
+                  - medialive:CreateChannel
+                  - medialive:DeleteChannel
+                  - medialive:DescribeInputSecurityGroup
+                  - medialive:DeleteInputSecurityGroup
+                  - medialive:DescribeChannel
+                  - medialive:StartChannel
+                  - medialive:CreateTags 
+                  - medialive:DeleteTags
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
               -
                 Effect: Allow
                 Action:
-                  - mediapackage:createChannel
-                  - mediapackage:deleteChannel
-                  - mediapackage:listOriginEndpoints
-                  - mediapackage:deleteOriginEndpoint
-                  - mediapackage:createOriginEndpoint
+                  - mediapackage:CreateChannel
+                  - mediapackage:DeleteChannel
+                  - mediapackage:ListOriginEndpoints
+                  - mediapackage:DeleteOriginEndpoint
+                  - mediapackage:CreateOriginEndpoint
 
                 Resource:
                     - !Join ["", ["arn:aws:mediapackage:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
@@ -273,7 +273,7 @@ Resources:
                   - mediapackage:DescribeChannel
                 Resource:
                   - !Join ["", ["arn:aws:mediapackage:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":channels/*"]]
-
+          
   MediaPackageRole:
     Type: AWS::IAM::Role
     Properties:

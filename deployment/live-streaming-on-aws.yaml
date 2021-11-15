@@ -262,14 +262,6 @@ Resources:
               - 
                 Effect: Allow
                 Action:
-                - s3:ListBucket
-                - s3:PutObject
-                - s3:GetObject
-                - s3:DeleteObject
-                Resource: arn:aws:logs:*:*:*
-              - 
-                Effect: Allow
-                Action:
                 - mediastore:ListContainers
                 - mediastore:PutObject
                 - mediastore:GetObject

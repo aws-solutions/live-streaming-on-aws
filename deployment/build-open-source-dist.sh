@@ -65,7 +65,7 @@ echo "--------------------------------------------------------------------------
 echo "Creating GitHub zip file"
 echo "------------------------------------------------------------------------------"
 cd $dist_dir
-zip -q -r9 ../$1.zip * .github
+zip -q -r9 ../$1.zip * .github .gitignore
 rm -rf * 
 rm -rf .github
 mv ../$1.zip .

@@ -67,6 +67,6 @@ echo "--------------------------------------------------------------------------
 cd $dist_dir
 zip -q -r9 ../$1.zip * .github .gitignore
 rm -rf * 
-rm -rf .github
+rm -rf .github .gitignore
 mv ../$1.zip .
 echo "Completed building $1.zip"

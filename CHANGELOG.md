@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2021-11-12
+### Changed
+- Added additional permissions for AWS MediaLive IAM Policy. Now has CloudWatch, MediaConnect, and MediaStore access. 
+- Changed case of IAM policy (https://github.com/aws-solutions/live-stream-on-aws/pull/19)
+
+### Updated
+- Axios update to 0.21.2
+- Tmpl update to 1.0.5
+
+### Fixed
+- Add new Permissions to the CloudFormation template that will allow customers to add tags on EML resources. 
+
 ## [3.0.0] - 2020-8-5
 ### Changed
 - The AWS MediaLive default CloudFormation parameter for channel start has been changed to false. 

@@ -207,7 +207,8 @@ Resources:
                   - medialive:DeleteInputSecurityGroup
                   - medialive:DescribeChannel
                   - medialive:StartChannel
-                  - medialive:TagResource
+                  - medialive:CreateTags 
+                  - medialive:DeleteTags
                 Resource:
                     - !Join ["", ["arn:aws:medialive:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
               -
@@ -258,20 +259,52 @@ Resources:
           PolicyName: !Sub "${AWS::StackName}-mediatranscode-role"
           PolicyDocument:
             Statement:
-              -
+              - 
                 Effect: Allow
                 Action:
-                  - mediaconnect:ManagedDescribeFlow
-                  - mediaconnect:ManagedAddOutput
-                  - mediaconnect:ManagedRemoveOutput
+                - mediastore:ListContainers
+                - mediastore:PutObject
+                - mediastore:GetObject
+                - mediastore:DeleteObject
+                - mediastore:DescribeObject
+                Resource:
+                  - !Join ["", ["arn:aws:mediastore:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
+              - 
+                Effect: Allow
+                Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                - logs:DescribeLogStreams
+                - logs:DescribeLogGroups
+                Resource: arn:aws:logs:*:*:*
+              - 
+                Effect: Allow
+                Action:
+                - mediaconnect:ManagedDescribeFlow
+                - mediaconnect:ManagedAddOutput
+                - mediaconnect:ManagedRemoveOutput
                 Resource:
                   - !Join ["", ["arn:aws:mediaconnect:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
-              -
+              - 
                 Effect: Allow
                 Action:
-                  - mediapackage:DescribeChannel
+                - ec2:describeSubnets
+                - ec2:describeNetworkInterfaces
+                - ec2:createNetworkInterface
+                - ec2:createNetworkInterfacePermission
+                - ec2:deleteNetworkInterface
+                - ec2:deleteNetworkInterfacePermission
+                - ec2:describeSecurityGroups
+                Resource:
+                  - !Join ["", ["arn:aws:ec2:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":*"]]
+              - 
+                Effect: Allow
+                Action:
+                - mediapackage:DescribeChannel
                 Resource:
                   - !Join ["", ["arn:aws:mediapackage:", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":channels/*"]]
+
 
   MediaPackageRole:
     Type: AWS::IAM::Role

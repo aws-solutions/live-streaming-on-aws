@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.1] - 2022-1-24
+## [3.1.2] - 2022-3-24
+### Updated
+- Pathval updated to 1.1.1
+- Follow Redirects updated to 1.14.8
 
+## [3.1.1] - 2022-1-24
 ### Updated
 - Follow Redirects updated to 1.14.7
 - AWS SDK updated to 2.814.0

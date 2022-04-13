@@ -51,7 +51,9 @@ exports.handler = async (event, context) => {
                     break;
 
                 case 'MediaLiveChannelStart':
-                    await mediaLive.startChannel(config);
+                    if (config.ChannelStart === 'Yes') {
+                        await mediaLive.startChannel(config);
+                    }
                     break;
 
                 case 'MediaPackageChannel':

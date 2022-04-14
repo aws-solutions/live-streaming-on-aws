@@ -18,7 +18,12 @@ import * as mediapackage from '@aws-cdk/aws-mediapackage';
 import * as s3 from '@aws-cdk/aws-s3';
 import { Secret } from '@aws-cdk/aws-secretsmanager';
 import { CachePolicy } from '@aws-cdk/aws-cloudfront';
-
+import { Distribution } from '@aws-cdk/aws-cloudfront';
+import * as cloudfront from '@aws-cdk/aws-cloudfront';
+//import { aws_cloudfront_origins as origins } from 'aws-cdk-lib';
+//import { aws_cloudfront as cloudfrontlib } from 'aws-cdk-lib';
+import * as origin from '@aws-cdk/aws-cloudfront-origins';
+import { CfnAccelerator } from 'aws-cdk-lib/aws-globalaccelerator';
 
 export class LiveStreaming extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -394,19 +399,6 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
-     * CloudFront Distribution & log bucket
-     */
-    const cachePolicy = new CachePolicy(this, 'CachePolicy', {
-      headerBehavior: {
-        behavior: 'whitelist',
-        headers: ['Origin']
-      }
-    });
-
-
-
-
-    /**
      * Custom Resource: MediaLive Input
      */
     const mediaLiveInput = new cdk.CustomResource(this, 'MediaLiveInput', {
@@ -477,10 +469,11 @@ export class LiveStreaming extends cdk.Stack {
         Resource: 'MediaPackageEndPoint',
         EndPoint: 'HLS',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
-        //SecretsRoleArn: mediaPackageRole.roleArn,
-        //CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        SecretsRoleArn: mediaPackageRole.roleArn,
+        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
       }
     });
+    mediaPackageHlsEndpoint.node.addDependency(mediaPackagePolicy);
 
     /**
      * Custom Resource: MediaPackage DASH Endpoint
@@ -491,10 +484,11 @@ export class LiveStreaming extends cdk.Stack {
         Resource: 'MediaPackageEndPoint',
         EndPoint: 'DASH',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
-        //SecretsRoleArn: mediaPackageRole.roleArn,
-        //CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        SecretsRoleArn: mediaPackageRole.roleArn,
+        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
       }
     });
+    mediaPackageDashEndpoint.node.addDependency(mediaPackagePolicy);
 
     /**
      * Custom Resource: MediaPackage CMAF Endpoint
@@ -505,19 +499,155 @@ export class LiveStreaming extends cdk.Stack {
         Resource: 'MediaPackageEndPoint',
         EndPoint: 'CMAF',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
-        //SecretsRoleArn: mediaPackageRole.roleArn,
-        //CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        SecretsRoleArn: mediaPackageRole.roleArn,
+        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
       }
     });
+    mediaPackageCmafEndpoint.node.addDependency(mediaPackagePolicy);
+
+
+    /**
+     * S3: Logs bucket for CloudFront
+     */
+     const logsBucket = new s3.Bucket(this, 'LogsBucket', {
+      accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      blockPublicAccess: {
+        blockPublicAcls: true,
+        blockPublicPolicy: true,
+        ignorePublicAcls: true,
+        restrictPublicBuckets: true
+      }
+    });
+    /** get the cfn resource and attach cfn_nag rule */
+    (logsBucket.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [
+          {
+            id: 'W35',
+            reason: 'Used to store access logs for other buckets'
+          },{
+            id: 'W51',
+            reason: 'Bucket is private and does not need a bucket policy'
+          }
+        ]
+      }
+    };
+
+
+    /**
+     * CloudFront Distribution
+     */
+    const cachePolicy = new CachePolicy(this, 'CachePolicy', {
+      cookieBehavior: cloudfront.CacheCookieBehavior.all(),
+      headerBehavior: cloudfront.CacheHeaderBehavior.allowList(
+        'Access-Control-Allow-Origin',
+        'Access-Control-Request-Method',
+        'Access-Control-Request-Header',
+        'Origin'
+      ),
+      queryStringBehavior: cloudfront.CacheQueryStringBehavior.all()
+    });
+
+    /** custom error responses */
+    const errorResponse400: cloudfront.ErrorResponse = {
+      httpStatus: 400,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse403: cloudfront.ErrorResponse = {
+      httpStatus: 403,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse404: cloudfront.ErrorResponse = {
+      httpStatus: 404,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse405: cloudfront.ErrorResponse = {
+      httpStatus: 405,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse414: cloudfront.ErrorResponse = {
+      httpStatus: 414,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse416: cloudfront.ErrorResponse = {
+      httpStatus: 416,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse500: cloudfront.ErrorResponse = {
+      httpStatus: 500,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse501: cloudfront.ErrorResponse = {
+      httpStatus: 501,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse502: cloudfront.ErrorResponse = {
+      httpStatus: 502,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse503: cloudfront.ErrorResponse = {
+      httpStatus: 503,
+      ttl: cdk.Duration.seconds(1)
+    };
+    const errorResponse504: cloudfront.ErrorResponse = {
+      httpStatus: 504,
+      ttl: cdk.Duration.seconds(1)
+    };
+
+    const distribution = new Distribution(this, 'CloudFront', {
+      defaultBehavior: {
+        origin: new origin.HttpOrigin(mediaPackageHlsEndpoint.getAttString('DomainName'), {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+          customHeaders: {
+            'X-MediaPackage-CDNIdentifier':uuid.getAttString('UUID')
+          }
+        }),
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        cachePolicy: cachePolicy,
+        cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS
+      },
+      enabled: true,
+      logBucket: logsBucket,
+      logFilePrefix: 'cloudfront-logs/',
+      errorResponses: [
+        errorResponse400,
+        errorResponse403,
+        errorResponse404,
+        errorResponse405,
+        errorResponse414,
+        errorResponse416,
+        errorResponse500,
+        errorResponse501,
+        errorResponse502,
+        errorResponse503,
+        errorResponse504
+      ]
+    });
+
+    cdk.Tags.of(distribution).add(
+      'mediapackage:cloudfront_assoc',
+      `arn:${cdk.Aws.PARTITION}:mediapackage:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:channels/${mediaPackageChannel.getAttString('ChannelId')}`
+    );
+
+    /** get the cfn resource and attach cfn_nag rule */
+    (distribution.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [
+          {
+            id: 'W70',
+            reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name (CloudFrontDefaultCertificate=true)'
+          }
+        ]
+      }
+    };
+
+    
+
+
 
     /**
      * Demo bucket
-     */
-
-
-
-    /**
-     * Custom Resource: UUID
      */
 
 

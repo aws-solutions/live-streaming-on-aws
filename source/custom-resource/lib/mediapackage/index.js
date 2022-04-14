@@ -61,10 +61,10 @@ const createEndPoint = async (config) => {
             ManifestName: 'index',
             StartoverWindowSeconds: 0,
             TimeDelaySeconds: 0,
-            // Authorization: {
-            //     CdnIdentifierSecret: config.CdnIdentifierSecret,
-            //     SecretsRoleArn: config.SecretsRoleArn
-            // }
+            Authorization: {
+                CdnIdentifierSecret: config.CdnIdentifierSecret,
+                SecretsRoleArn: config.SecretsRoleArn
+            }
         };
         //Add configuration based on the endpoint type defined in config
         switch (config.EndPoint) {

@@ -24,6 +24,8 @@ import * as cloudfront from '@aws-cdk/aws-cloudfront';
 //import { aws_cloudfront as cloudfrontlib } from 'aws-cdk-lib';
 import * as origin from '@aws-cdk/aws-cloudfront-origins';
 import { CfnAccelerator } from 'aws-cdk-lib/aws-globalaccelerator';
+import { readFile, readFileSync } from 'fs';
+import { Role } from 'aws-cdk-lib/aws-iam';
 
 export class LiveStreaming extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -534,7 +536,6 @@ export class LiveStreaming extends cdk.Stack {
       }
     };
 
-
     /**
      * CloudFront Distribution
      */
@@ -624,12 +625,6 @@ export class LiveStreaming extends cdk.Stack {
         errorResponse504
       ]
     });
-
-    cdk.Tags.of(distribution).add(
-      'mediapackage:cloudfront_assoc',
-      `arn:${cdk.Aws.PARTITION}:mediapackage:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:channels/${mediaPackageChannel.getAttString('ChannelId')}`
-    );
-
     /** get the cfn resource and attach cfn_nag rule */
     (distribution.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
       cfn_nag: {
@@ -642,24 +637,232 @@ export class LiveStreaming extends cdk.Stack {
       }
     };
 
+    cdk.Tags.of(distribution).add(
+      'mediapackage:cloudfront_assoc',
+      `arn:${cdk.Aws.PARTITION}:mediapackage:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:channels/${mediaPackageChannel.getAttString('ChannelId')}`
+    );
+
     
 
-
+    
 
     /**
      * Demo bucket
      */
+     const demoBucket = new s3.Bucket(this, 'DemoBucket', {
+      serverAccessLogsBucket: logsBucket,
+      serverAccessLogsPrefix: 'demo_bucket/'
+    });
+    /** get the cfn resource and attach cfn_nag rule */
+    (demoBucket.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [
+          {
+            id: 'W41',
+            reason: 'Encryption not enabled, this bucket hosts a website accessed through CloudFront'
+          }
+        ]
+      }
+    };
+
+    /**
+     * Demo bucket OAI
+     */
+    const demoOAI = new cloudfront.OriginAccessIdentity(this, 'DemoOriginAccessIdentity', {
+      comment: `access-identity-${demoBucket.bucketName}`
+    });
+
+    demoBucket.addToResourcePolicy(new iam.PolicyStatement({
+      resources: [`arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}/*`],
+      actions: ['s3:GetObject'],
+      principals: [new iam.CanonicalUserPrincipal(demoOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
+    }));
+
+    /**
+     * Demo CloudFront distribution
+     */
+    const demoErrorResponse404: cloudfront.ErrorResponse = {
+      httpStatus: 404,
+      responseHttpStatus: 200,
+      responsePagePath: '/index.html'
+    };
+    const demoErrorResponse403: cloudfront.ErrorResponse = {
+      httpStatus: 403,
+      responseHttpStatus: 200,
+      responsePagePath: '/index.html'
+    };
+
+    const demoDistribution = new Distribution(this, 'DemoCloudFront', {
+      comment: 'Website distribution for solution',
+      defaultBehavior: {
+        origin: new origin.S3Origin(demoBucket, {
+          originAccessIdentity: demoOAI
+        }),
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        cachePolicy: cachePolicy,
+        cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+      },
+      enableIpv6: true,
+      defaultRootObject: 'index.html',
+      enabled: true,
+      httpVersion: cloudfront.HttpVersion.HTTP2,
+      logBucket: logsBucket,
+      logFilePrefix: 'cloudfront-demo-logs/',
+      errorResponses: [
+        demoErrorResponse404,
+        demoErrorResponse403
+      ]
+    });
+    /** get the cfn resource and attach cfn_nag rule */
+    (demoDistribution.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [
+          {
+            id: 'W70',
+            reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name (CloudFrontDefaultCertificate=true)'
+          }
+        ]
+      }
+    };
+
+    /**
+     * Demo IAM policy
+     */
+    const demoPolicy = new iam.Policy(this, 'DemoIAMPolicy', {
+      roles: [customResourceLambda.role!],
+      statements: [
+        new iam.PolicyStatement({
+          resources: [
+            `arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}`,
+            `arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}/*`
+          ],
+          actions: [
+            's3:putObject',
+            's3:getObject',
+            's3:deleteObject',
+            's3:listBucket'
+          ]
+        }),
+        new iam.PolicyStatement({
+          resources: [
+            `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
+            `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}/*`
+          ], 
+          actions: ['s3:getObject']
+        })
+      ]
+    });
+    
+
+    /**
+     * Custom Resource: Demo deploy
+     */
+    const demoConsole = new cdk.CustomResource(this, 'DemoConsole', {
+      serviceToken: customResourceLambda.functionArn,
+      properties: {
+        Resource: 'DemoConsole',
+        srcBucket: `%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
+        srcPath: '%%SOLUTION_NAME%%/%%VERSION%%',
+        manifestFile: 'console-manifest.json',
+        destBucket: demoBucket.bucketName,
+        awsExports: `//Configuration file generated by cloudformation
+        const awsExports = {
+          mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#/channels/${mediaLiveChannel.getAttString('ChannelId')}',
+          hls_manifest: 'https://${distribution.domainName}/out/v1${mediaPackageHlsEndpoint.getAttString('Manifest')}',
+          dash_manifest: 'https://${distribution.domainName}/out/v1${mediaPackageDashEndpoint.getAttString('Manifest')}',
+          cmaf_manifest: 'https://${distribution.domainName}/out/v1${mediaPackageCmafEndpoint.getAttString('Manifest')}'
+        }`
+      }
+    });
 
 
     /**
      * AnonymousMetric
      */
+    new cdk.CustomResource(this, 'AnonymousMetric', {
+      serviceToken: customResourceLambda.functionArn,
+      properties: {
+        Resource: 'AnonymousMetric',
+        SolutionId: 'SO0013',
+        UUID: uuid.getAttString('UUID'),
+        Version: '%%VERSION%%',
+        InputType: inputType.valueAsString,
+        EncodingProfile: encodingProfile.valueAsString,
+        Cidr: inputCIDR.valueAsString,
+        ChannelStart: channelStart.valueAsString,
+        SendAnonymousMetric: cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')
+      }
+    });
 
 
     /**
      * Outputs
      */
+    if (cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')) {
+      new cdk.CfnOutput(this, 'AnonymousMetricUUID', {
+        description: 'AnonymousMetric UUID',
+        value: uuid.getAttString('UUID'),
+        exportName: `${cdk.Aws.STACK_NAME}-AnonymousMetricUUID`
+      });
+    }
 
+    new cdk.CfnOutput(this, 'MediaLiveChannelConsole', {
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#!/channels/${mediaLiveChannel.getAttString('ChannelId')}`,
+      description: 'MediaLive Channel',
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannel`
+    });
+
+    new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', {
+      value: mediaLiveInput.getAttString('EndPoint1'),
+      description: 'Primary MediaLive input URL',
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLivePrimaryEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'MediaLiveSecondaryEndpoint', {
+      value: mediaLiveInput.getAttString('EndPoint2'),
+      description: 'Secondary MediaLive input URL',
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLiveSecondaryEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', {
+      description: 'HLS CloudFront URL',
+      value: `https://${distribution.domainName}/out/v1${mediaPackageHlsEndpoint.getAttString('Manifest')}`,
+      exportName: `${cdk.Aws.STACK_NAME}-CloudFrontHlsEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'CloudFrontDashEndpoint', {
+      description: 'DASH CloudFront URL',
+      value: `https://${distribution.domainName}/out/v1${mediaPackageDashEndpoint.getAttString('Manifest')}`,
+      exportName: `${cdk.Aws.STACK_NAME}-CloudFrontDashEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'CloudFrontCmafEndpoint', {
+      description: 'CMAF CloudFront URL',
+      value: `https://${distribution.domainName}/out/v1${mediaPackageCmafEndpoint.getAttString('Manifest')}`,
+      exportName: `${cdk.Aws.STACK_NAME}-CloudFrontCmafEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'DemoPlayer', {
+      description: 'Demo Player URL',
+      value: `https://${demoDistribution.domainName}/index.html`,
+      exportName: `${cdk.Aws.STACK_NAME}-DemoPlayer`
+    });
+
+    new cdk.CfnOutput(this, 'DemoBucketConsole', {
+      description: 'Demo bucket',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoBucket.bucketName}?region=${cdk.Aws.REGION}`,
+      exportName: `${cdk.Aws.STACK_NAME}-DemoBucket`
+    });
+
+
+
+
+    new cdk.CfnOutput(this, 'LogsBucketConsole', {
+      description: 'Logs bucket',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
+      exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
+    });
 
 
 

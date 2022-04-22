@@ -14,18 +14,11 @@
 import * as cdk from '@aws-cdk/core';
 import * as iam from '@aws-cdk/aws-iam';
 import * as lambda from '@aws-cdk/aws-lambda';
-import * as mediapackage from '@aws-cdk/aws-mediapackage';
 import * as s3 from '@aws-cdk/aws-s3';
 import { Secret } from '@aws-cdk/aws-secretsmanager';
-import { CachePolicy } from '@aws-cdk/aws-cloudfront';
-import { Distribution } from '@aws-cdk/aws-cloudfront';
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
-//import { aws_cloudfront_origins as origins } from 'aws-cdk-lib';
-//import { aws_cloudfront as cloudfrontlib } from 'aws-cdk-lib';
 import * as origin from '@aws-cdk/aws-cloudfront-origins';
-import { CfnAccelerator } from 'aws-cdk-lib/aws-globalaccelerator';
-import { readFile, readFileSync } from 'fs';
-import { Role } from 'aws-cdk-lib/aws-iam';
+import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 
 export class LiveStreaming extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -238,7 +231,6 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
-
     mediaLivePolicy.attachToRole(mediaLiveRole);
 
 
@@ -462,9 +454,9 @@ export class LiveStreaming extends cdk.Stack {
       }
     });
 
-    // /**
-    //  * Custom Resource: MediaPackage HLS Endpoint
-    //  */
+    /**
+     * Custom Resource: MediaPackage HLS Endpoint
+     */
     const mediaPackageHlsEndpoint = new cdk.CustomResource(this, 'MediaPackageHlsEndpoint', {
       serviceToken: customResourceLambda.functionArn,
       properties: {
@@ -511,7 +503,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * S3: Logs bucket for CloudFront
      */
-     const logsBucket = new s3.Bucket(this, 'LogsBucket', {
+    const logsBucket = new s3.Bucket(this, 'LogsBucket', {
       accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: {
@@ -528,7 +520,7 @@ export class LiveStreaming extends cdk.Stack {
           {
             id: 'W35',
             reason: 'Used to store access logs for other buckets'
-          },{
+          }, {
             id: 'W51',
             reason: 'Bucket is private and does not need a bucket policy'
           }
@@ -539,7 +531,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * CloudFront Distribution
      */
-    const cachePolicy = new CachePolicy(this, 'CachePolicy', {
+    const cachePolicy = new cloudfront.CachePolicy(this, 'CachePolicy', {
       cookieBehavior: cloudfront.CacheCookieBehavior.all(),
       headerBehavior: cloudfront.CacheHeaderBehavior.allowList(
         'Access-Control-Allow-Origin',
@@ -596,12 +588,12 @@ export class LiveStreaming extends cdk.Stack {
       ttl: cdk.Duration.seconds(1)
     };
 
-    const distribution = new Distribution(this, 'CloudFront', {
+    const distribution = new cloudfront.Distribution(this, 'CloudFront', {
       defaultBehavior: {
         origin: new origin.HttpOrigin(mediaPackageHlsEndpoint.getAttString('DomainName'), {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
           customHeaders: {
-            'X-MediaPackage-CDNIdentifier':uuid.getAttString('UUID')
+            'X-MediaPackage-CDNIdentifier': uuid.getAttString('UUID')
           }
         }),
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
@@ -642,41 +634,7 @@ export class LiveStreaming extends cdk.Stack {
       `arn:${cdk.Aws.PARTITION}:mediapackage:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:channels/${mediaPackageChannel.getAttString('ChannelId')}`
     );
 
-    
 
-    
-
-    /**
-     * Demo bucket
-     */
-     const demoBucket = new s3.Bucket(this, 'DemoBucket', {
-      serverAccessLogsBucket: logsBucket,
-      serverAccessLogsPrefix: 'demo_bucket/'
-    });
-    /** get the cfn resource and attach cfn_nag rule */
-    (demoBucket.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [
-          {
-            id: 'W41',
-            reason: 'Encryption not enabled, this bucket hosts a website accessed through CloudFront'
-          }
-        ]
-      }
-    };
-
-    /**
-     * Demo bucket OAI
-     */
-    const demoOAI = new cloudfront.OriginAccessIdentity(this, 'DemoOriginAccessIdentity', {
-      comment: `access-identity-${demoBucket.bucketName}`
-    });
-
-    demoBucket.addToResourcePolicy(new iam.PolicyStatement({
-      resources: [`arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}/*`],
-      actions: ['s3:GetObject'],
-      principals: [new iam.CanonicalUserPrincipal(demoOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
-    }));
 
     /**
      * Demo CloudFront distribution
@@ -692,39 +650,22 @@ export class LiveStreaming extends cdk.Stack {
       responsePagePath: '/index.html'
     };
 
-    const demoDistribution = new Distribution(this, 'DemoCloudFront', {
-      comment: 'Website distribution for solution',
-      defaultBehavior: {
-        origin: new origin.S3Origin(demoBucket, {
-          originAccessIdentity: demoOAI
-        }),
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-        cachePolicy: cachePolicy,
-        cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
-      },
-      enableIpv6: true,
-      defaultRootObject: 'index.html',
-      enabled: true,
-      httpVersion: cloudfront.HttpVersion.HTTP2,
-      logBucket: logsBucket,
-      logFilePrefix: 'cloudfront-demo-logs/',
-      errorResponses: [
-        demoErrorResponse404,
-        demoErrorResponse403
-      ]
-    });
-    /** get the cfn resource and attach cfn_nag rule */
-    (demoDistribution.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [
-          {
-            id: 'W70',
-            reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name (CloudFrontDefaultCertificate=true)'
-          }
+    const demoDistribution = new CloudFrontToS3(this, 'CloudFrontToS3', {
+      cloudFrontDistributionProps: {
+        defaultBehavior: {
+          allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+          cachePolicy: cachePolicy,
+          cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
+        },
+        errorResponses: [
+          demoErrorResponse404,
+          demoErrorResponse403
         ]
-      }
-    };
+      },
+      insertHttpSecurityHeaders: false
+    });
+
 
     /**
      * Demo IAM policy
@@ -734,8 +675,8 @@ export class LiveStreaming extends cdk.Stack {
       statements: [
         new iam.PolicyStatement({
           resources: [
-            `arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}`,
-            `arn:${cdk.Aws.PARTITION}:s3:::${demoBucket.bucketName}/*`
+            `arn:${cdk.Aws.PARTITION}:s3:::${demoDistribution.s3Bucket?.bucketName}`,
+            `arn:${cdk.Aws.PARTITION}:s3:::${demoDistribution.s3Bucket?.bucketName}/*`
           ],
           actions: [
             's3:putObject',
@@ -748,12 +689,12 @@ export class LiveStreaming extends cdk.Stack {
           resources: [
             `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
             `arn:${cdk.Aws.PARTITION}:s3:::%%BUCKET_NAME%%-${cdk.Aws.REGION}/*`
-          ], 
+          ],
           actions: ['s3:getObject']
         })
       ]
     });
-    
+
 
     /**
      * Custom Resource: Demo deploy
@@ -765,7 +706,7 @@ export class LiveStreaming extends cdk.Stack {
         srcBucket: `%%BUCKET_NAME%%-${cdk.Aws.REGION}`,
         srcPath: '%%SOLUTION_NAME%%/%%VERSION%%',
         manifestFile: 'console-manifest.json',
-        destBucket: demoBucket.bucketName,
+        destBucket: demoDistribution.s3Bucket?.bucketName,
         awsExports: `//Configuration file generated by cloudformation
         const awsExports = {
           mediaLiveConsole: 'https://console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#/channels/${mediaLiveChannel.getAttString('ChannelId')}',
@@ -776,6 +717,7 @@ export class LiveStreaming extends cdk.Stack {
       }
     });
     demoConsole.node.addDependency(demoPolicy);
+    demoConsole.node.addDependency(demoDistribution);
 
 
     /**
@@ -795,6 +737,7 @@ export class LiveStreaming extends cdk.Stack {
         SendAnonymousMetric: cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')
       }
     });
+
 
 
     /**
@@ -846,28 +789,21 @@ export class LiveStreaming extends cdk.Stack {
 
     new cdk.CfnOutput(this, 'DemoPlayer', {
       description: 'Demo Player URL',
-      value: `https://${demoDistribution.domainName}/index.html`,
+      value: `https://${demoDistribution.cloudFrontWebDistribution.domainName}/index.html`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoPlayer`
     });
 
     new cdk.CfnOutput(this, 'DemoBucketConsole', {
       description: 'Demo bucket',
-      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoBucket.bucketName}?region=${cdk.Aws.REGION}`,
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoDistribution.s3Bucket?.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoBucket`
     });
-
-
-
 
     new cdk.CfnOutput(this, 'LogsBucketConsole', {
       description: 'Logs bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
     });
-
-
-
-
 
   }
 }

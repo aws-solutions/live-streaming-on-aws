@@ -775,6 +775,7 @@ export class LiveStreaming extends cdk.Stack {
         }`
       }
     });
+    demoConsole.node.addDependency(demoPolicy);
 
 
     /**

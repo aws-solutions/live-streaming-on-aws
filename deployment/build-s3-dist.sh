@@ -112,6 +112,27 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
     # Copy the zipped artifact from /staging to /regional-s3-assets
     mv $fname.zip $build_dist_dir
 done
+
+echo "------------------------------------------------------------------------------"
+echo "Building console"
+echo "------------------------------------------------------------------------------"
+cd $source_dir/console
+[ -e build ] && rm -r build
+[ -e node_modules ] && rm -rf node_modules
+npm ci
+touch public/assets/aws-exports.js
+npm run build
+mkdir $build_dist_dir/console
+cp -r ./build/* $build_dist_dir/console/
+
+echo "------------------------------------------------------------------------------"
+echo "Generate console manifest file"
+echo "------------------------------------------------------------------------------"
+cd $source_dir/console/build
+manifest=(`find * -type f ! -iname ".DS_Store"`) 
+manifest_json=$(IFS=,;printf "%s" "${manifest[*]}")
+echo "[\"$manifest_json\"]" | sed 's/,/","/g' > $build_dist_dir/console-manifest.json
+
 echo "------------------------------------------------------------------------------"
 echo "[Cleanup]  Remove temporary files"
 echo "------------------------------------------------------------------------------"

@@ -33,9 +33,9 @@ mkdir -p $dist_template_dir
 echo "------------------------------------------------------------------------------"
 echo "Copying Deployment Folder"
 echo "------------------------------------------------------------------------------"
-cp -v $source_template_dir/live-streaming-on-aws.yaml $dist_template_dir
 cp -v $source_template_dir/build-s3-dist.sh $dist_template_dir
 cp -v $source_template_dir/run-unit-tests.sh $dist_template_dir
+cp -vr $source_template_dir/cdk-solution-helper $dist_template_dir
 
 echo "------------------------------------------------------------------------------"
 echo "Copying Source Folder"

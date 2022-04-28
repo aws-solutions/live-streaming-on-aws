@@ -32,7 +32,7 @@ export class LiveStreaming extends cdk.Stack {
        */
     const inputType = new cdk.CfnParameter(this, 'InputType', {
       type: 'String',
-      description: 'Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming-on-aws-with-amazon-s3/appendix-a.html.',
+      description: 'Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming/appendix-a.html.',
       allowedValues: ['RTP_PUSH', 'RTMP_PUSH', 'RTMP_PULL', 'URL_PULL', 'MEDIACONNECT'],
       default: 'URL_PULL'
     });

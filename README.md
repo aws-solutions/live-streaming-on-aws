@@ -53,7 +53,7 @@ The solution can be deployed through the CloudFormation template available on th
 The are 2 options for deploying the solution: using the CDK deployment tools or running the build script to generate a CFN template and the packaged lambda code.
 
 ### Options 1: Deploying through the CDK.
-This options simply flollows the standard CDK deployment process, for easy of use we have included the deployment/build-cdk-deploy.sh BASH script that will run the lambda unit tests, run the cdk unit tests and then run `cdk deploy` in the source/cdk folder. You will need to run `cdk bootstrap` before you run cdk deploy the first time to setup the cdk resource in your AWS account. Details on using the CDK can be found [here].
+This options simply flollows the standard CDK deployment process. You will need to run `cdk bootstrap` before you run cdk deploy the first time to setup the cdk resource in your AWS account. Details on using the CDK can be found [here].
 
 1. Download or clone the repo and make the required changes to the source code.
 2. installl the dependecies for the lambda function and construct.

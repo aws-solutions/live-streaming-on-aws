@@ -631,7 +631,7 @@ export class LiveStreaming extends cdk.Stack {
 
     cdk.Tags.of(distribution).add(
       'mediapackage:cloudfront_assoc',
-      `arn:${cdk.Aws.PARTITION}:mediapackage:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:channels/${mediaPackageChannel.getAttString('ChannelId')}`
+      mediaPackageChannel.getAttString('Arn')
     );
 
 

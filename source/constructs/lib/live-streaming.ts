@@ -375,6 +375,21 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
+    /** get the cfn resource for the policy and attach cfn_nag rule */
+    (mediaPackagePolicy.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [
+          {
+            id: 'F39',
+            reason: 'Resource level permission is not supported by getRole'
+          }, {
+            id: 'W12',
+            reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
+          }
+        ]
+      }
+    };
+
     mediaPackagePolicy.attachToRole(mediaPackageRole);
     /** get the cfn resource for the role and attach cfn_nag rule */
     (mediaPackageRole.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
@@ -384,13 +399,7 @@ export class LiveStreaming extends cdk.Stack {
             id: 'F38',
             reason: 'Resource level permission is not supported by getRole'
           }, {
-            id: 'F39',
-            reason: 'Resource level permission is not supported by getRole'
-          }, {
             id: 'W11',
-            reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
-          }, {
-            id: 'W12',
             reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
           }
         ]

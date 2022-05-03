@@ -384,7 +384,13 @@ export class LiveStreaming extends cdk.Stack {
             id: 'F38',
             reason: 'Resource level permission is not supported by getRole'
           }, {
+            id: 'F39',
+            reason: 'Resource level permission is not supported by getRole'
+          }, {
             id: 'W11',
+            reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
+          }, {
+            id: 'W12',
             reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
           }
         ]

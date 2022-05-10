@@ -422,16 +422,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3ArtifactHash89CEA5A2": Object {
-      "Description": "Artifact hash for asset \\"cbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3\\"",
+    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529ArtifactHash2E4F87ED": Object {
+      "Description": "Artifact hash for asset \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
       "Type": "String",
     },
-    "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3S3Bucket66C882CC": Object {
-      "Description": "S3 bucket for asset \\"cbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3\\"",
+    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3Bucket4F0F230B": Object {
+      "Description": "S3 bucket for asset \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
       "Type": "String",
     },
-    "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3S3VersionKeyEE6596C9": Object {
-      "Description": "S3 key for asset version \\"cbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3\\"",
+    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06": Object {
+      "Description": "S3 key for asset version \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
       "Type": "String",
     },
     "ChannelStart": Object {
@@ -467,7 +467,7 @@ Object {
         "MEDIACONNECT",
       ],
       "Default": "URL_PULL",
-      "Description": "Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming-on-aws-with-amazon-s3/appendix-a.html.",
+      "Description": "Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming/appendix-a.html.",
       "Type": "String",
     },
     "PriMediaConnectArn": Object {
@@ -762,29 +762,9 @@ Object {
           Object {
             "Key": "mediapackage:cloudfront_assoc",
             "Value": Object {
-              "Fn::Join": Array [
-                "",
-                Array [
-                  "arn:",
-                  Object {
-                    "Ref": "AWS::Partition",
-                  },
-                  ":mediapackage:",
-                  Object {
-                    "Ref": "AWS::Region",
-                  },
-                  ":",
-                  Object {
-                    "Ref": "AWS::AccountId",
-                  },
-                  ":channels/",
-                  Object {
-                    "Fn::GetAtt": Array [
-                      "MediaPackageChannel",
-                      "ChannelId",
-                    ],
-                  },
-                ],
+              "Fn::GetAtt": Array [
+                "MediaPackageChannel",
+                "Arn",
               ],
             },
           },
@@ -1208,7 +1188,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3S3Bucket66C882CC",
+            "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3Bucket4F0F230B",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -1221,7 +1201,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3S3VersionKeyEE6596C9",
+                          "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06",
                         },
                       ],
                     },
@@ -1234,7 +1214,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameterscbb30e2d8ef4e101a0639a930b7aebd76ffb70b268155ccf45f98186c2e1b7b3S3VersionKeyEE6596C9",
+                          "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06",
                         },
                       ],
                     },
@@ -2212,6 +2192,20 @@ Object {
       "UpdateReplacePolicy": "Delete",
     },
     "MediaPackagePolicyCBD9468D": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "F39",
+              "reason": "Resource level permission is not supported by getRole",
+            },
+            Object {
+              "id": "W12",
+              "reason": "* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [

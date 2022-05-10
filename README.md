@@ -56,7 +56,7 @@ The are 2 options for deploying the solution: using the CDK deployment tools or 
 This options simply flollows the standard CDK deployment process. You will need to run `cdk bootstrap` before you run cdk deploy the first time to setup the cdk resource in your AWS account. Details on using the CDK can be found [here].
 
 1. Download or clone the repo and make the required changes to the source code.
-2. installl the dependecies for the lambda function and construct.
+2. installl the dependencies for the lambda function and construct.
 3. then run `cdk deploy` (first time use you will need to run `cdk bootstrap` first)
 
 ```
@@ -96,19 +96,19 @@ aws s3api head-bucket --bucket my-bucket-us-east-1 --expected-bucket-owner YOUR-
 Build the distributable:
 ```
 chmod +x ./build-s3-dist.sh
-./build-s3-dist.sh <my-bucket> live-streaming-on-aws-with-amazon-s3 <version>
+./build-s3-dist.sh <my-bucket> live-streaming-on-aws <version>
 ```
 
 > **Notes**: The _build-s3-dist_ script expects the bucket name as one of its parameters. This value should not have the region suffix (remove the -us-east-1)
 
 Deploy the distributable to the Amazon S3 bucket in your account:
 ```
-aws s3 sync ./regional-s3-assets/ s3://my-bucket-us-east-1/live-streaming-on-aws-with-amazon-s3/<version>/ 
-aws s3 sync ./global-s3-assets/ s3://my-bucket-us-east-1/live-streaming-on-aws-with-amazon-s3/<version>/ 
+aws s3 sync ./regional-s3-assets/ s3://my-bucket-us-east-1/live-streaming-on-aws/<version>/ 
+aws s3 sync ./global-s3-assets/ s3://my-bucket-us-east-1/live-streaming-on-aws/<version>/ 
 ```
 
 ### 5. Launch the CloudFormation template.
-* Get the link of the live-streaming-on-aws-with-amazon-s3.template uploaded to your Amazon S3 bucket.
+* Get the link of the live-streaming-on-aws.template uploaded to your Amazon S3 bucket.
 * Deploy the solution.
 
 ## License

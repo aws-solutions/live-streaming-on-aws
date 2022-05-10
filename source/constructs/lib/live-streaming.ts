@@ -358,7 +358,7 @@ export class LiveStreaming extends cdk.Stack {
     const mediaPackagePolicy = new iam.Policy(this, 'MediaPackagePolicy', {
       statements: [
         new iam.PolicyStatement({
-          resources: [`arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`],
+          resources: [cdnSecret.secretArn],
           actions: [
             'secretsmanager:GetSecretValue',
             'secretsmanager:DescribeSecret',
@@ -479,7 +479,7 @@ export class LiveStreaming extends cdk.Stack {
         EndPoint: 'HLS',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
         SecretsRoleArn: mediaPackageRole.roleArn,
-        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        CdnIdentifierSecret: cdnSecret.secretArn
       }
     });
     mediaPackageHlsEndpoint.node.addDependency(mediaPackagePolicy);
@@ -494,7 +494,7 @@ export class LiveStreaming extends cdk.Stack {
         EndPoint: 'DASH',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
         SecretsRoleArn: mediaPackageRole.roleArn,
-        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        CdnIdentifierSecret: cdnSecret.secretArn
       }
     });
     mediaPackageDashEndpoint.node.addDependency(mediaPackagePolicy);
@@ -509,7 +509,7 @@ export class LiveStreaming extends cdk.Stack {
         EndPoint: 'CMAF',
         ChannelId: mediaPackageChannel.getAttString('ChannelId'),
         SecretsRoleArn: mediaPackageRole.roleArn,
-        CdnIdentifierSecret: `arn:${cdk.Aws.PARTITION}:secretsmanager:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:secret:${cdnSecret.secretName}`
+        CdnIdentifierSecret: cdnSecret.secretArn
       }
     });
     mediaPackageCmafEndpoint.node.addDependency(mediaPackagePolicy);
@@ -690,7 +690,7 @@ export class LiveStreaming extends cdk.Stack {
       statements: [
         new iam.PolicyStatement({
           resources: [
-            `arn:${cdk.Aws.PARTITION}:s3:::${demoDistribution.s3Bucket?.bucketName}`,
+            demoDistribution.s3Bucket!.bucketArn,
             `arn:${cdk.Aws.PARTITION}:s3:::${demoDistribution.s3Bucket?.bucketName}/*`
           ],
           actions: [

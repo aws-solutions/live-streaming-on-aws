@@ -422,16 +422,16 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529ArtifactHash2E4F87ED": Object {
-      "Description": "Artifact hash for asset \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
+    "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9ArtifactHash07F2AD40": Object {
+      "Description": "Artifact hash for asset \\"d8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9\\"",
       "Type": "String",
     },
-    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3Bucket4F0F230B": Object {
-      "Description": "S3 bucket for asset \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
+    "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9S3Bucket6B5962EB": Object {
+      "Description": "S3 bucket for asset \\"d8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9\\"",
       "Type": "String",
     },
-    "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06": Object {
-      "Description": "S3 key for asset version \\"1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529\\"",
+    "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9S3VersionKey3BBABC2B": Object {
+      "Description": "S3 key for asset version \\"d8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9\\"",
       "Type": "String",
     },
     "ChannelStart": Object {
@@ -597,6 +597,14 @@ Object {
     },
     "CdnSecret32008E6A": Object {
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-SMG4",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -642,6 +650,26 @@ Object {
     },
     "CloudFrontD198EC06": Object {
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-CFR1",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-CFR2",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-CFR4",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-CFR5",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -774,6 +802,22 @@ Object {
     },
     "CloudFrontToS3CloudFrontDistribution241D9866": Object {
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-CFR1",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-CFR2",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-CFR4",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -870,6 +914,14 @@ Object {
     "CloudFrontToS3CloudfrontLoggingBucket8350BE9B": Object {
       "DeletionPolicy": "Retain",
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-S1",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -1081,6 +1133,14 @@ Object {
     "CloudFrontToS3S3LoggingBucketEF5CD8B2": Object {
       "DeletionPolicy": "Retain",
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-S1",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -1164,7 +1224,6 @@ Object {
     },
     "CustomResource8CDCD7A7": Object {
       "DependsOn": Array [
-        "CustomResourceServiceRoleDefaultPolicy62213138",
         "CustomResourceServiceRoleE774390D",
       ],
       "Metadata": Object {
@@ -1188,7 +1247,7 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3Bucket4F0F230B",
+            "Ref": "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9S3Bucket6B5962EB",
           },
           "S3Key": Object {
             "Fn::Join": Array [
@@ -1201,7 +1260,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06",
+                          "Ref": "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9S3VersionKey3BBABC2B",
                         },
                       ],
                     },
@@ -1214,7 +1273,7 @@ Object {
                       "Fn::Split": Array [
                         "||",
                         Object {
-                          "Ref": "AssetParameters1749b8a625a24eead93b033a8e1b2f039c9b8974152b03407eab31156200b529S3VersionKey2FADBA06",
+                          "Ref": "AssetParametersd8825c4c587e8fee0d3dee53ac4d9ff48e8333923630fa790acff29e3d8655c9S3VersionKey3BBABC2B",
                         },
                       ],
                     },
@@ -1242,7 +1301,20 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "CustomResourceServiceRoleDefaultPolicy62213138": Object {
+    "CustomResourcePolicy79526710": Object {
+      "DependsOn": Array [
+        "CustomResourceServiceRoleE774390D",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "TODO******",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
@@ -1389,7 +1461,7 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "CustomResourceServiceRoleDefaultPolicy62213138",
+        "PolicyName": "CustomResourcePolicy79526710",
         "Roles": Array [
           Object {
             "Ref": "CustomResourceServiceRoleE774390D",
@@ -1399,6 +1471,16 @@ Object {
       "Type": "AWS::IAM::Policy",
     },
     "CustomResourceServiceRoleE774390D": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM4",
+              "reason": "TODO******",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -1538,6 +1620,16 @@ Object {
       "UpdateReplacePolicy": "Delete",
     },
     "DemoIAMPolicy2174894A": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "TODO******",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
@@ -1551,18 +1643,9 @@ Object {
               "Effect": "Allow",
               "Resource": Array [
                 Object {
-                  "Fn::Join": Array [
-                    "",
-                    Array [
-                      "arn:",
-                      Object {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":s3:::",
-                      Object {
-                        "Ref": "CloudFrontToS3S3Bucket9CE6AB04",
-                      },
-                    ],
+                  "Fn::GetAtt": Array [
+                    "CloudFrontToS3S3Bucket9CE6AB04",
+                    "Arn",
                   ],
                 },
                 Object {
@@ -1635,6 +1718,18 @@ Object {
     "LogsBucket9C4D8843": Object {
       "DeletionPolicy": "Retain",
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-S1",
+              "reason": "TODO******",
+            },
+            Object {
+              "id": "AwsSolutions-S10",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -1809,6 +1904,16 @@ Object {
       "UpdateReplacePolicy": "Delete",
     },
     "MediaLivePolicy09DE3C9B": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "TODO******",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "PolicyDocument": Object {
           "Statement": Array [
@@ -2009,37 +2114,7 @@ Object {
       ],
       "Properties": Object {
         "CdnIdentifierSecret": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":secretsmanager:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":secret:",
-              Object {
-                "Fn::Select": Array [
-                  6,
-                  Object {
-                    "Fn::Split": Array [
-                      ":",
-                      Object {
-                        "Ref": "CdnSecret32008E6A",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          ],
+          "Ref": "CdnSecret32008E6A",
         },
         "ChannelId": Object {
           "Fn::GetAtt": Array [
@@ -2072,37 +2147,7 @@ Object {
       ],
       "Properties": Object {
         "CdnIdentifierSecret": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":secretsmanager:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":secret:",
-              Object {
-                "Fn::Select": Array [
-                  6,
-                  Object {
-                    "Fn::Split": Array [
-                      ":",
-                      Object {
-                        "Ref": "CdnSecret32008E6A",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          ],
+          "Ref": "CdnSecret32008E6A",
         },
         "ChannelId": Object {
           "Fn::GetAtt": Array [
@@ -2135,37 +2180,7 @@ Object {
       ],
       "Properties": Object {
         "CdnIdentifierSecret": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":secretsmanager:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":secret:",
-              Object {
-                "Fn::Select": Array [
-                  6,
-                  Object {
-                    "Fn::Split": Array [
-                      ":",
-                      Object {
-                        "Ref": "CdnSecret32008E6A",
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          ],
+          "Ref": "CdnSecret32008E6A",
         },
         "ChannelId": Object {
           "Fn::GetAtt": Array [
@@ -2193,6 +2208,14 @@ Object {
     },
     "MediaPackagePolicyCBD9468D": Object {
       "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "TODO******",
+            },
+          ],
+        },
         "cfn_nag": Object {
           "rules_to_suppress": Array [
             Object {
@@ -2218,37 +2241,7 @@ Object {
               ],
               "Effect": "Allow",
               "Resource": Object {
-                "Fn::Join": Array [
-                  "",
-                  Array [
-                    "arn:",
-                    Object {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":secretsmanager:",
-                    Object {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    Object {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":secret:",
-                    Object {
-                      "Fn::Select": Array [
-                        6,
-                        Object {
-                          "Fn::Split": Array [
-                            ":",
-                            Object {
-                              "Ref": "CdnSecret32008E6A",
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                ],
+                "Ref": "CdnSecret32008E6A",
               },
             },
             Object {

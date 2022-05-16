@@ -15,7 +15,10 @@
  import 'source-map-support/register';
  import * as cdk from '@aws-cdk/core';
  import { LiveStreaming } from '../lib/live-streaming';
+ import { AwsSolutionsChecks } from 'cdk-nag';
  
  const app = new cdk.App();
  new LiveStreaming(app, 'LiveStreaming');
- 
+
+ //cdk nag
+ cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

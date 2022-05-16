@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "jest",
+    "test": "jest --coverage",
     "cdk": "cdk"
   },
   "devDependencies": {
@@ -35,6 +35,7 @@
     "@aws-cdk/aws-mediapackage": "1.125.0",
     "@aws-cdk/core": "1.125.0",
     "@aws-solutions-constructs/aws-cloudfront-s3": "1.125.0",
+    "cdk-nag": "^1.0.0",
     "source-map-support": "0.5.19"
   }
 }

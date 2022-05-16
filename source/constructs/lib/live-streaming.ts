@@ -19,6 +19,7 @@ import { Secret } from '@aws-cdk/aws-secretsmanager';
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as origin from '@aws-cdk/aws-cloudfront-origins';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
+import { NagSuppressions } from 'cdk-nag';
 
 export class LiveStreaming extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -233,6 +234,17 @@ export class LiveStreaming extends cdk.Stack {
     });
     mediaLivePolicy.attachToRole(mediaLiveRole);
 
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      mediaLivePolicy,
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'TODO******'
+        }
+      ]
+    );
+
 
     /**
      * IAM: MediaPackage Role
@@ -253,8 +265,26 @@ export class LiveStreaming extends cdk.Stack {
         SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
       },
       code: lambda.Code.fromAsset('../custom-resource'),
-      timeout: cdk.Duration.seconds(30),
-      initialPolicy: [
+      timeout: cdk.Duration.seconds(30)
+    });
+    /** get the cfn resource for the role and attach cfn_nag rule */
+    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [{
+          id: 'W58',
+          reason: 'Invalid warning: function has access to cloudwatch'
+        }, {
+          id: 'W89',
+          reason: 'This CustomResource does not need to be deployed inside a VPC'
+        }, {
+          id: 'W92',
+          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }]
+      }
+    };
+
+    const customResourcePolicy = new iam.Policy(this, 'CustomResourcePolicy', {
+      statements: [
         new iam.PolicyStatement({
           resources: [`arn:${cdk.Aws.PARTITION}:medialive:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:*`],
           actions: [
@@ -307,21 +337,28 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
-    /** get the cfn resource for the role and attach cfn_nag rule */
-    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [{
-          id: 'W58',
-          reason: 'Invalid warning: function has access to cloudwatch'
-        }, {
-          id: 'W89',
-          reason: 'This CustomResource does not need to be deployed inside a VPC'
-        }, {
-          id: 'W92',
-          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
-        }]
-      }
-    };
+    customResourcePolicy.node.addDependency(customResourceLambda.role!);
+    customResourceLambda.role?.attachInlinePolicy(customResourcePolicy);
+
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      customResourceLambda.role!,
+      [
+        {
+          id: 'AwsSolutions-IAM4',
+          reason: 'TODO******'
+        }
+      ]
+    );
+    NagSuppressions.addResourceSuppressions(
+      customResourcePolicy,
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
 
     /**
@@ -354,6 +391,16 @@ export class LiveStreaming extends cdk.Stack {
         ]
       }
     };
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      cdnSecret,
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
     const mediaPackagePolicy = new iam.Policy(this, 'MediaPackagePolicy', {
       statements: [
@@ -389,6 +436,16 @@ export class LiveStreaming extends cdk.Stack {
         ]
       }
     };
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      mediaPackagePolicy,
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
     mediaPackagePolicy.attachToRole(mediaPackageRole);
     /** get the cfn resource for the role and attach cfn_nag rule */
@@ -542,6 +599,19 @@ export class LiveStreaming extends cdk.Stack {
         ]
       }
     };
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      logsBucket,
+      [
+        {
+          id: 'AwsSolutions-S1', //same as cfn_nag rule W35
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-S10',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
     /**
      * CloudFront Distribution
@@ -643,6 +713,25 @@ export class LiveStreaming extends cdk.Stack {
         ]
       }
     };
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      distribution,
+      [
+        {
+          id: 'AwsSolutions-CFR1',
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-CFR2',
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-CFR4',
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-CFR5', //same as cfn_nag rule W70
+          reason: 'TODO******'
+        }
+      ]
+    );
 
     cdk.Tags.of(distribution).add(
       'mediapackage:cloudfront_assoc',
@@ -680,6 +769,40 @@ export class LiveStreaming extends cdk.Stack {
       },
       insertHttpSecurityHeaders: false
     });
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      demoDistribution.cloudFrontWebDistribution,
+      [
+        {
+          id: 'AwsSolutions-CFR1',
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-CFR2',
+          reason: 'TODO******'
+        }, {
+          id: 'AwsSolutions-CFR4',
+          reason: 'TODO******'
+        }
+      ],
+    );
+    NagSuppressions.addResourceSuppressions(
+      demoDistribution.s3LoggingBucket!,
+      [
+        {
+          id: 'AwsSolutions-S1',
+          reason: 'TODO******'
+        }
+      ]
+    );
+    NagSuppressions.addResourceSuppressions(
+      demoDistribution.cloudFrontLoggingBucket!,
+      [
+        {
+          id: 'AwsSolutions-S1',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
 
     /**
@@ -709,6 +832,16 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      demoPolicy,
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'TODO******'
+        }
+      ]
+    );
 
 
     /**

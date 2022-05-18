@@ -51,6 +51,7 @@ declare -a lambda_packages=(
 
 for lambda_package in "${lambda_packages[@]}"
 do
+  mkdir $source_dir/$lambda_package/coverage
   run_javascript_test $source_dir/$lambda_package $lambda_package
 
   # Check the result of the test and exit if a failure is identified

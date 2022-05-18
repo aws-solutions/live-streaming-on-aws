@@ -46,6 +46,7 @@ coverage_reports_top_path=$source_dir/test/coverage-reports
 # Test the attached Lambda function
 declare -a lambda_packages=(
   "constructs"
+  "custom-resource"
 )
 
 for lambda_package in "${lambda_packages[@]}"

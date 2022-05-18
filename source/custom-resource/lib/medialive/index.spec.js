@@ -33,6 +33,21 @@ const push_config = {
   Type: 'RTP_PUSH',
   Cidr: '0.0.0.0/0'
 };
+const rtmp_push_config = {
+  StreamName: 'test',
+  Type: 'RTMP_PUSH',
+  Cidr: '0.0.0.0/0'
+};
+const mediaconnect_config = {
+  StreamName: 'test',
+  Type: 'MEDIACONNECT',
+  RoleArn: 'arn:aws:iam::12345:role/test',
+  PriMediaConnectArn: 'arn:aws:mediaconnect:us-west-2:12345:flow:1-abcd:Pri',
+  SecMediaConnectArn: 'arn:aws:mediaconnect:us-west-2:12345:flow:1-abcd:Sec'
+};
+const invalid_config = {
+  Type: 'Invalid'
+};
 const input_data = {
   SecurityGroup: {
     Id:'1357'
@@ -103,6 +118,39 @@ describe('#MEDIALIVE::', () => {
       expect(err).to.equal('ERROR');
     });
   });
+  it('should return "responseData" when create RTMP PUSH INPUT is successful', async () => {
+    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
+		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    const response = await lambda.createInput(rtmp_push_config)
+    expect(response.Id).to.equal('2468');
+	});
+  it('should return "ERROR" on MediaLive create RTMP PUSH INPUT', async () => {
+    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
+    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    await lambda.createInput(rtmp_push_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
+  it('should return "responseData" when create MEDIACONNECT INPUT is successful', async () => {
+    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
+		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    const response = await lambda.createInput(mediaconnect_config)
+    expect(response.Id).to.equal('2468');
+	});
+  it('should return "ERROR" on MediaLive create MEDIACONNECT INPUT', async () => {
+    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
+    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    await lambda.createInput(mediaconnect_config).catch(err => {
+      expect(err).to.equal('ERROR');
+    });
+  });
+  it('should return "input type not defined in request" on MediaLive create Invalid INPUT', async () => {
+    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
+    AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    await lambda.createInput(invalid_config).catch(err => {
+      expect(err).to.equal('input type not defined in request');
+    });
+  });
   it('CREATE CHANNEL SUCCESS',async () => {
     AWS.mock('MediaLive', 'createChannel', Promise.resolve(data));
     AWS.mock('MediaLive', 'waitFor', Promise.resolve());
@@ -141,6 +189,14 @@ describe('#MEDIALIVE::', () => {
     await lambda.deleteChannel('1234').catch(err => {
       expect(err).to.equal('ERROR');
     });
+  });
+  it('DELETE INPUT SUCCESS', async () => {
+    AWS.mock('MediaLive', 'describeInput', Promise.resolve(input_data));
+    AWS.mock('MediaLive', 'deleteInput', Promise.resolve());
+    AWS.mock('MediaLive', 'describeInputSecurityGroup', Promise.resolve());
+    AWS.mock('MediaLive', 'deleteInputSecurityGroup', Promise.resolve());
+    const response = await lambda.deleteInput('1357')
+    expect(response).to.equal('success');
   });
 
 });

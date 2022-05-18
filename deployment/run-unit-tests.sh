@@ -29,6 +29,8 @@ run_javascript_test() {
   echo "cd $component_path"
   cd $component_path
 
+  # install jest
+  npm install -g jest
   # run unit tests
   npm test
 

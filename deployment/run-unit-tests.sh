@@ -31,7 +31,7 @@ run_javascript_test() {
 
   # install jest
   npm install -g jest
-  npm install -g ts-jest
+  npm install --save-dev jest
   # run unit tests
   npm test
 

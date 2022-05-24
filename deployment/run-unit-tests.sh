@@ -54,6 +54,7 @@ declare -a lambda_packages=(
 
 for lambda_package in "${lambda_packages[@]}"
 do
+  rm -rf $source_dir/$lambda_package/coverage
   mkdir $source_dir/$lambda_package/coverage
   run_javascript_test $source_dir/$lambda_package $lambda_package
 

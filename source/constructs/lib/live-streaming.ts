@@ -166,7 +166,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Mapping for sending anonymous metrics to AWS Solution Builders API
      */
-    new cdk.CfnMapping(this, 'AnonymousData', {
+    new cdk.CfnMapping(this, 'AnonymousData', { // NOSONAR
       mapping: {
         SendAnonymousData: {
           Data: 'Yes'
@@ -506,7 +506,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Custom Resource: MediaLive Channel Start
      */
-    const mediaLiveChannelStart = new cdk.CustomResource(this, 'MediaLiveChannelStart', {
+    const mediaLiveChannelStart = new cdk.CustomResource(this, 'MediaLiveChannelStart', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
         Resource: 'MediaLiveChannelStart',
@@ -871,7 +871,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * AnonymousMetric
      */
-    new cdk.CustomResource(this, 'AnonymousMetric', {
+    new cdk.CustomResource(this, 'AnonymousMetric', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
         Resource: 'AnonymousMetric',
@@ -892,62 +892,62 @@ export class LiveStreaming extends cdk.Stack {
      * Outputs
      */
     if (cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')) {
-      new cdk.CfnOutput(this, 'AnonymousMetricUUID', {
+      new cdk.CfnOutput(this, 'AnonymousMetricUUID', { // NOSONAR
         description: 'AnonymousMetric UUID',
         value: uuid.getAttString('UUID'),
         exportName: `${cdk.Aws.STACK_NAME}-AnonymousMetricUUID`
       });
     }
 
-    new cdk.CfnOutput(this, 'MediaLiveChannelConsole', {
+    new cdk.CfnOutput(this, 'MediaLiveChannelConsole', { // NOSONAR
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#!/channels/${mediaLiveChannel.getAttString('ChannelId')}`,
       description: 'MediaLive Channel',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannel`
     });
 
-    new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', {
+    new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', { // NOSONAR
       value: mediaLiveInput.getAttString('EndPoint1'),
       description: 'Primary MediaLive input URL',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLivePrimaryEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'MediaLiveSecondaryEndpoint', {
+    new cdk.CfnOutput(this, 'MediaLiveSecondaryEndpoint', { // NOSONAR
       value: mediaLiveInput.getAttString('EndPoint2'),
       description: 'Secondary MediaLive input URL',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveSecondaryEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', {
+    new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', { // NOSONAR
       description: 'HLS CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageHlsEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontHlsEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontDashEndpoint', {
+    new cdk.CfnOutput(this, 'CloudFrontDashEndpoint', { // NOSONAR
       description: 'DASH CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageDashEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontDashEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontCmafEndpoint', {
+    new cdk.CfnOutput(this, 'CloudFrontCmafEndpoint', { // NOSONAR
       description: 'CMAF CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageCmafEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontCmafEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'DemoPlayer', {
+    new cdk.CfnOutput(this, 'DemoPlayer', { // NOSONAR
       description: 'Demo Player URL',
       value: `https://${demoDistribution.cloudFrontWebDistribution.domainName}/index.html`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoPlayer`
     });
 
-    new cdk.CfnOutput(this, 'DemoBucketConsole', {
+    new cdk.CfnOutput(this, 'DemoBucketConsole', { // NOSONAR
       description: 'Demo bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoDistribution.s3Bucket?.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoBucket`
     });
 
-    new cdk.CfnOutput(this, 'LogsBucketConsole', {
+    new cdk.CfnOutput(this, 'LogsBucketConsole', { // NOSONAR
       description: 'Logs bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`

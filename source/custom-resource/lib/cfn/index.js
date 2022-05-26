@@ -39,6 +39,7 @@ const  send = async (event, context, responseStatus, responseData, physicalResou
     data = await axios(params);
   }
   catch (err) {
+    console.err(err);
     throw err;
   }
   return data.status;

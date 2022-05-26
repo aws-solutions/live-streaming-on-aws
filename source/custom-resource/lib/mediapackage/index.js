@@ -104,7 +104,7 @@ const createEndPoint = async (config) => {
             Manifest: Url.pathname.slice(7)
         };
     } catch (err) {
-        console.err(err);
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -161,7 +161,7 @@ const createChannel = async (config) => {
         };
         await ssm.putParameter(secondary).promise();
     } catch (err) {
-        console.err(err);
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -194,7 +194,7 @@ const deleteChannel = async (ChannelId) => {
         };
         await mediapackage.deleteChannel(params).promise();
     } catch (err) {
-        console.err(err);
+        console.error(err);
         throw err;
     }
     return 'success';

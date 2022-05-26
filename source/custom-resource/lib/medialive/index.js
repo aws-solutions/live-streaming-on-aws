@@ -158,7 +158,7 @@ const createInput = async (config) => {
         } //End switch (config.Type)
 
     } catch (err) {
-        console.err(err);
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -238,7 +238,7 @@ const createChannel = async (config) => {
             ChannelId: data.Channel.Id
         };
     } catch (err) {
-        console.err(err);
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -257,7 +257,7 @@ const startChannel = async (config) => {
        };
        await medialive.startChannel(params).promise();
    } catch (err) {
-       console.err(err);
+       console.error(err);
        throw err;
    }
    return 'success';
@@ -301,7 +301,7 @@ const deleteInput = async (InputId) => {
            await medialive.deleteInputSecurityGroup(params).promise();
        }
    } catch (err) {
-       console.err(err);
+       console.error(err);
        throw err;
    }
    return 'success';
@@ -325,7 +325,7 @@ const deleteChannel = async (ChannelId) => {
        await medialive.waitFor('channelDeleted',params).promise();
 
    } catch (err) {
-       console.err(err);
+       console.error(err);
        throw err;
    }
    return 'success';

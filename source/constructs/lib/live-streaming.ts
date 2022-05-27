@@ -240,7 +240,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Resource ARNs are not generated at the time of policy creation'
         }
       ]
     );
@@ -255,8 +255,13 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
-     * Custom Resource: Lambda
+     * IAM: CustomResource lambda role
+     * Lambda: lambda function used to create custom resources
      */
+     const customResourceRole = new iam.Role(this, 'CustomResourceRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
+    });
+
     const customResourceLambda = new lambda.Function(this, 'CustomResource', {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'index.handler',
@@ -265,6 +270,7 @@ export class LiveStreaming extends cdk.Stack {
         SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
       },
       code: lambda.Code.fromAsset('../custom-resource'),
+      role: customResourceRole,
       timeout: cdk.Duration.seconds(30)
     });
     /** get the cfn resource for the role and attach cfn_nag rule */
@@ -338,24 +344,15 @@ export class LiveStreaming extends cdk.Stack {
       ]
     });
     customResourcePolicy.node.addDependency(customResourceLambda.role!);
-    customResourceLambda.role?.attachInlinePolicy(customResourcePolicy);
+    customResourcePolicy.attachToRole(customResourceRole);
 
     //cdk_nag
-    NagSuppressions.addResourceSuppressions(
-      customResourceLambda.role!,
-      [
-        {
-          id: 'AwsSolutions-IAM4',
-          reason: 'TODO******'
-        }
-      ]
-    );
     NagSuppressions.addResourceSuppressions(
       customResourcePolicy,
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Resource ARNs are not generated at the time of policy creation'
         }
       ]
     );
@@ -442,7 +439,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
         }
       ]
     );
@@ -605,10 +602,10 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1', //same as cfn_nag rule W35
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }, {
           id: 'AwsSolutions-S10',
-          reason: 'TODO******'
+          reason: 'Bucket is private and does not need a bucket policy with encryption'
         }
       ]
     );
@@ -719,16 +716,16 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-CFR1',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront Geo restriction'
         }, {
           id: 'AwsSolutions-CFR2',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront integration with AWS WAF'
         }, {
-          id: 'AwsSolutions-CFR4',
-          reason: 'TODO******'
+          id: 'AwsSolutions-CFR4', //same as cfn_nag rule W70
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }, {
           id: 'AwsSolutions-CFR5', //same as cfn_nag rule W70
-          reason: 'TODO******'
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }
       ]
     );
@@ -775,13 +772,13 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-CFR1',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront Geo restriction'
         }, {
           id: 'AwsSolutions-CFR2',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront integration with AWS WAF'
         }, {
           id: 'AwsSolutions-CFR4',
-          reason: 'TODO******'
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }
       ],
     );
@@ -790,7 +787,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1',
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }
       ]
     );
@@ -799,7 +796,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1',
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }
       ]
     );
@@ -838,7 +835,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Lambda role needs access to all contents within the buckets to load files for hosting the web player'
         }
       ]
     );

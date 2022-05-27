@@ -394,7 +394,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-SMG4',
-          reason: 'TODO******'
+          reason: 'MediaPackage requires a static value and is not integrated with CDN for automatic rotation: https://docs.aws.amazon.com/mediapackage/latest/ug/cdn-auth-setup.html#cdn-aut-setup-cdn'
         }
       ]
     );
@@ -605,7 +605,7 @@ export class LiveStreaming extends cdk.Stack {
           reason: 'Used to store access logs for other buckets'
         }, {
           id: 'AwsSolutions-S10',
-          reason: 'Bucket is private and does not need a bucket policy with encryption'
+          reason: 'Bucket is private and is not using HTTP'
         }
       ]
     );

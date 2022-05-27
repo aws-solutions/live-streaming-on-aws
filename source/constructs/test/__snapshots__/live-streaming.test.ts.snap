@@ -601,7 +601,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-SMG4,
-              reason: TODO******,
+              reason: MediaPackage requires a static value and is not integrated with CDN for automatic rotation: https://docs.aws.amazon.com/mediapackage/latest/ug/cdn-auth-setup.html#cdn-aut-setup-cdn,
             },
           ],
         },
@@ -654,19 +654,19 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-CFR1,
-              reason: TODO******,
+              reason: Use case does not warrant CloudFront Geo restriction,
             },
             Object {
               id: AwsSolutions-CFR2,
-              reason: TODO******,
+              reason: Use case does not warrant CloudFront integration with AWS WAF,
             },
             Object {
               id: AwsSolutions-CFR4,
-              reason: TODO******,
+              reason: CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name,
             },
             Object {
               id: AwsSolutions-CFR5,
-              reason: TODO******,
+              reason: CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name,
             },
           ],
         },
@@ -806,15 +806,15 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-CFR1,
-              reason: TODO******,
+              reason: Use case does not warrant CloudFront Geo restriction,
             },
             Object {
               id: AwsSolutions-CFR2,
-              reason: TODO******,
+              reason: Use case does not warrant CloudFront integration with AWS WAF,
             },
             Object {
               id: AwsSolutions-CFR4,
-              reason: TODO******,
+              reason: CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name,
             },
           ],
         },
@@ -918,7 +918,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-S1,
-              reason: TODO******,
+              reason: Used to store access logs for other buckets,
             },
           ],
         },
@@ -1137,7 +1137,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-S1,
-              reason: TODO******,
+              reason: Used to store access logs for other buckets,
             },
           ],
         },
@@ -1224,7 +1224,7 @@ Object {
     },
     CustomResource8CDCD7A7: Object {
       DependsOn: Array [
-        CustomResourceServiceRoleE774390D,
+        CustomResourceRoleAB1EF463,
       ],
       Metadata: Object {
         cfn_nag: Object {
@@ -1292,7 +1292,7 @@ Object {
         Handler: index.handler,
         Role: Object {
           Fn::GetAtt: Array [
-            CustomResourceServiceRoleE774390D,
+            CustomResourceRoleAB1EF463,
             Arn,
           ],
         },
@@ -1303,14 +1303,14 @@ Object {
     },
     CustomResourcePolicy79526710: Object {
       DependsOn: Array [
-        CustomResourceServiceRoleE774390D,
+        CustomResourceRoleAB1EF463,
       ],
       Metadata: Object {
         cdk_nag: Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-IAM5,
-              reason: TODO******,
+              reason: Resource ARNs are not generated at the time of policy creation,
             },
           ],
         },
@@ -1464,23 +1464,13 @@ Object {
         PolicyName: CustomResourcePolicy79526710,
         Roles: Array [
           Object {
-            Ref: CustomResourceServiceRoleE774390D,
+            Ref: CustomResourceRoleAB1EF463,
           },
         ],
       },
       Type: AWS::IAM::Policy,
     },
-    CustomResourceServiceRoleE774390D: Object {
-      Metadata: Object {
-        cdk_nag: Object {
-          rules_to_suppress: Array [
-            Object {
-              id: AwsSolutions-IAM4,
-              reason: TODO******,
-            },
-          ],
-        },
-      },
+    CustomResourceRoleAB1EF463: Object {
       Properties: Object {
         AssumeRolePolicyDocument: Object {
           Statement: Array [
@@ -1494,20 +1484,6 @@ Object {
           ],
           Version: 2012-10-17,
         },
-        ManagedPolicyArns: Array [
-          Object {
-            Fn::Join: Array [
-              ,
-              Array [
-                arn:,
-                Object {
-                  Ref: AWS::Partition,
-                },
-                :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole,
-              ],
-            ],
-          },
-        ],
       },
       Type: AWS::IAM::Role,
     },
@@ -1625,7 +1601,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-IAM5,
-              reason: TODO******,
+              reason: Lambda role needs access to all contents within the buckets to load files for hosting the web player,
             },
           ],
         },
@@ -1709,7 +1685,7 @@ Object {
         PolicyName: DemoIAMPolicy2174894A,
         Roles: Array [
           Object {
-            Ref: CustomResourceServiceRoleE774390D,
+            Ref: CustomResourceRoleAB1EF463,
           },
         ],
       },
@@ -1722,11 +1698,11 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-S1,
-              reason: TODO******,
+              reason: Used to store access logs for other buckets,
             },
             Object {
               id: AwsSolutions-S10,
-              reason: TODO******,
+              reason: Bucket is private and is not using HTTP,
             },
           ],
         },
@@ -1909,7 +1885,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-IAM5,
-              reason: TODO******,
+              reason: Resource ARNs are not generated at the time of policy creation,
             },
           ],
         },
@@ -2212,7 +2188,7 @@ Object {
           rules_to_suppress: Array [
             Object {
               id: AwsSolutions-IAM5,
-              reason: TODO******,
+              reason: * is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html,
             },
           ],
         },

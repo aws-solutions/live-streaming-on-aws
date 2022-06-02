@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2022-7-28
+
+### New
+```
+# Added cdk infastructure in source/constructs directory
+# Defined resources for cdk stack in source/constructs/lib/live-streaming.ts
+# Added links to MediaLive and S3 consoles to CloudFormation Outputs
+# Added SonarQube properties file: sonar-project.properties
+# Added snapshot test to source/constructs/test directory
+# Added cdk nag rule suppressions
+```
+
+### Changed
+```
+# Removed CloudFormation template live-streaming-on-aws.yaml
+# Use CachePolicy instead of ForwardedValues(deprecated) for cloudfront distribution
+# Use @aws-solutions-constructs/aws-cloudfront-s3 construct to deploy demo resources
+# Updated deployment/run-unit-tests.sh to generate unit test coverage reports
+# Updated deployment/build-s3-dist.sh to output cdk nag errors
+# Updated source/custom-resource/lib/medialive/index.spec.js to increase unit test coverage
+# Generate secret string for Cdn Secret resource using cdk instead of hard coding
+```
+
+### Fixed
+
+### Contributors
+
 ## [3.1.1] - 2022-1-24
 
 ### Updated

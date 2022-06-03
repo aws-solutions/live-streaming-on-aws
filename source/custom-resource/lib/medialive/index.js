@@ -161,6 +161,13 @@ const createInput = async (config) => {
         console.error(err);
         throw err;
     }
+
+    const tags = {
+        ResourceArn: data.Input.Arn,
+        Tags: { 'SolutionId': 'SO0013'}
+    };
+    medialive.createTags(tags).promise();
+
     return responseData;
 };
 
@@ -200,7 +207,7 @@ const createChannel = async (config) => {
             }],
             EncoderSettings: {},
             Tags: {
-              Solution:'SO0013'
+              SolutionId:'SO0013'
             }
         };
 

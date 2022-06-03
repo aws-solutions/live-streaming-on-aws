@@ -316,7 +316,9 @@ export class LiveStreaming extends cdk.Stack {
             'mediapackage:DeleteChannel',
             'mediapackage:ListOriginEndpoints',
             'mediapackage:DeleteOriginEndpoint',
-            'mediapackage:CreateOriginEndpoint'
+            'mediapackage:CreateOriginEndpoint',
+            'mediapackage:TagResource',
+            'mediapackage:UntagResource'
           ]
         }),
         new iam.PolicyStatement({
@@ -949,6 +951,15 @@ export class LiveStreaming extends cdk.Stack {
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
     });
+
+
+    /**
+     * Tag all resources with Solution Id
+     */
+    cdk.Tags.of(this).add(
+      'SolutionId',
+      'SO0013'
+    );
 
   }
 }

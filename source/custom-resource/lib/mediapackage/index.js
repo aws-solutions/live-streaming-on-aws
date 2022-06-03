@@ -64,6 +64,9 @@ const createEndPoint = async (config) => {
             Authorization: {
                 CdnIdentifierSecret: config.CdnIdentifierSecret,
                 SecretsRoleArn: config.SecretsRoleArn
+            },
+            Tags: {
+                SolutionId: 'SO0013'
             }
         };
         //Add configuration based on the endpoint type defined in config
@@ -127,7 +130,10 @@ const createChannel = async (config) => {
 
         let params = {
             Id: config.ChannelId,
-            Description: 'Live Streaming on AWS Solution'
+            Description: 'Live Streaming on AWS Solution',
+            Tags: {
+                SolutionId: 'SO0013'
+            }
         };
         let data = await mediapackage.createChannel(params).promise();
 

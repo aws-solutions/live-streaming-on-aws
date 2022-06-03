@@ -255,39 +255,12 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
-     * IAM: CustomResource lambda role
+     * IAM: CustomResource lambda role & policy
      * Lambda: lambda function used to create custom resources
      */
      const customResourceRole = new iam.Role(this, 'CustomResourceRole', {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
     });
-
-    const customResourceLambda = new lambda.Function(this, 'CustomResource', {
-      runtime: lambda.Runtime.NODEJS_12_X,
-      handler: 'index.handler',
-      description: 'Used to deploy custom resources and send AnonymousData',
-      environment: {
-        SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
-      },
-      code: lambda.Code.fromAsset('../custom-resource'),
-      role: customResourceRole,
-      timeout: cdk.Duration.seconds(30)
-    });
-    /** get the cfn resource for the role and attach cfn_nag rule */
-    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [{
-          id: 'W58',
-          reason: 'Invalid warning: function has access to cloudwatch'
-        }, {
-          id: 'W89',
-          reason: 'This CustomResource does not need to be deployed inside a VPC'
-        }, {
-          id: 'W92',
-          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
-        }]
-      }
-    };
 
     const customResourcePolicy = new iam.Policy(this, 'CustomResourcePolicy', {
       statements: [
@@ -345,7 +318,6 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
-    customResourcePolicy.node.addDependency(customResourceLambda.role!);
     customResourcePolicy.attachToRole(customResourceRole);
 
     //cdk_nag
@@ -358,6 +330,37 @@ export class LiveStreaming extends cdk.Stack {
         }
       ]
     );
+
+    const customResourceLambda = new lambda.Function(this, 'CustomResource', {
+      runtime: lambda.Runtime.NODEJS_12_X,
+      handler: 'index.handler',
+      description: 'Used to deploy custom resources and send AnonymousData',
+      environment: {
+        SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
+      },
+      code: lambda.Code.fromAsset('../custom-resource'),
+      role: customResourceRole,
+      timeout: cdk.Duration.seconds(30)
+    });
+    customResourceLambda.node.addDependency(customResourceRole);
+    customResourceLambda.node.addDependency(customResourcePolicy);
+    /** get the cfn resource for the role and attach cfn_nag rule */
+    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [{
+          id: 'W58',
+          reason: 'Invalid warning: function has access to cloudwatch'
+        }, {
+          id: 'W89',
+          reason: 'This CustomResource does not need to be deployed inside a VPC'
+        }, {
+          id: 'W92',
+          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }]
+      }
+    };
+
+    
 
 
     /**
@@ -904,6 +907,12 @@ export class LiveStreaming extends cdk.Stack {
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannel`
     });
 
+    new cdk.CfnOutput(this, 'MediaLiveMetrics', { // NOSONAR
+      description: 'MediaLive Metrics',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#!/channels/${mediaLiveChannel.getAttString('ChannelId')}/health`,
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLiveMetrics`
+    });
+
     new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', { // NOSONAR
       value: mediaLiveInput.getAttString('EndPoint1'),
       description: 'Primary MediaLive input URL',
@@ -914,6 +923,12 @@ export class LiveStreaming extends cdk.Stack {
       value: mediaLiveInput.getAttString('EndPoint2'),
       description: 'Secondary MediaLive input URL',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveSecondaryEndpoint`
+    });
+
+    new cdk.CfnOutput(this, 'MediaPackageMetrics', { // NOSONAR
+      description: 'MediaPackage Metrics',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/mediapackage/home?region=${cdk.Aws.REGION}#/channels/${mediaPackageChannel.getAttString('ChannelId')}?tabId=metrics`,
+      exportName: `${cdk.Aws.STACK_NAME}-MediaPackageMetrics`
     });
 
     new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', { // NOSONAR

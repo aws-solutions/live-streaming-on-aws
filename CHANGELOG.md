@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # Added cdk infastructure in source/constructs directory
 # Defined resources for cdk stack in source/constructs/lib/live-streaming.ts
 # Added links to MediaLive and S3 consoles to CloudFormation Outputs
+# Added links to metric dashboards for MediaLive and MediaPackage to CloudFormation Outputs
 # Added SonarQube properties file: sonar-project.properties
 # Added snapshot test to source/constructs/test directory
 # Added cdk nag rule suppressions
+# Added SolutionId tag to resources
 ```
 
 ### Changed

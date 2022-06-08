@@ -376,6 +376,45 @@ Object {
         ],
       },
     },
+    MediaLiveMetrics: Object {
+      Description: MediaLive Metrics,
+      Export: Object {
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::StackName,
+              },
+              -MediaLiveMetrics,
+            ],
+          ],
+        },
+      },
+      Value: Object {
+        Fn::Join: Array [
+          ,
+          Array [
+            https://,
+            Object {
+              Ref: AWS::Region,
+            },
+            .console.aws.amazon.com/medialive/home?region=,
+            Object {
+              Ref: AWS::Region,
+            },
+            #!/channels/,
+            Object {
+              Fn::GetAtt: Array [
+                MediaLiveChannel,
+                ChannelId,
+              ],
+            },
+            /health,
+          ],
+        ],
+      },
+    },
     MediaLivePrimaryEndpoint: Object {
       Description: Primary MediaLive input URL,
       Export: Object {
@@ -417,6 +456,45 @@ Object {
         Fn::GetAtt: Array [
           MediaLiveInput,
           EndPoint2,
+        ],
+      },
+    },
+    MediaPackageMetrics: Object {
+      Description: MediaPackage Metrics,
+      Export: Object {
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::StackName,
+              },
+              -MediaPackageMetrics,
+            ],
+          ],
+        },
+      },
+      Value: Object {
+        Fn::Join: Array [
+          ,
+          Array [
+            https://,
+            Object {
+              Ref: AWS::Region,
+            },
+            .console.aws.amazon.com/mediapackage/home?region=,
+            Object {
+              Ref: AWS::Region,
+            },
+            #/channels/,
+            Object {
+              Fn::GetAtt: Array [
+                MediaPackageChannel,
+                ChannelId,
+              ],
+            },
+            ?tabId=metrics,
+          ],
         ],
       },
     },
@@ -645,6 +723,12 @@ Object {
             ],
           },
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::SecretsManager::Secret,
     },
@@ -796,6 +880,10 @@ Object {
               ],
             },
           },
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
         ],
       },
       Type: AWS::CloudFront::Distribution,
@@ -900,6 +988,12 @@ Object {
             },
           ],
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::CloudFront::Distribution,
     },
@@ -948,6 +1042,12 @@ Object {
           IgnorePublicAcls: true,
           RestrictPublicBuckets: true,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
         VersioningConfiguration: Object {
           Status: Enabled,
         },
@@ -1039,6 +1139,12 @@ Object {
           IgnorePublicAcls: true,
           RestrictPublicBuckets: true,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
         VersioningConfiguration: Object {
           Status: Enabled,
         },
@@ -1167,6 +1273,12 @@ Object {
           IgnorePublicAcls: true,
           RestrictPublicBuckets: true,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
         VersioningConfiguration: Object {
           Status: Enabled,
         },
@@ -1224,6 +1336,7 @@ Object {
     },
     CustomResource8CDCD7A7: Object {
       DependsOn: Array [
+        CustomResourcePolicy79526710,
         CustomResourceRoleAB1EF463,
       ],
       Metadata: Object {
@@ -1297,14 +1410,17 @@ Object {
           ],
         },
         Runtime: nodejs12.x,
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
         Timeout: 30,
       },
       Type: AWS::Lambda::Function,
     },
     CustomResourcePolicy79526710: Object {
-      DependsOn: Array [
-        CustomResourceRoleAB1EF463,
-      ],
       Metadata: Object {
         cdk_nag: Object {
           rules_to_suppress: Array [
@@ -1363,6 +1479,8 @@ Object {
                 mediapackage:ListOriginEndpoints,
                 mediapackage:DeleteOriginEndpoint,
                 mediapackage:CreateOriginEndpoint,
+                mediapackage:TagResource,
+                mediapackage:UntagResource,
               ],
               Effect: Allow,
               Resource: Object {
@@ -1484,6 +1602,12 @@ Object {
           ],
           Version: 2012-10-17,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::IAM::Role,
     },
@@ -1736,6 +1860,12 @@ Object {
           IgnorePublicAcls: true,
           RestrictPublicBuckets: true,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::S3::Bucket,
       UpdateReplacePolicy: Retain,
@@ -2055,6 +2185,12 @@ Object {
           ],
           Version: 2012-10-17,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::IAM::Role,
     },
@@ -2268,6 +2404,12 @@ Object {
           ],
           Version: 2012-10-17,
         },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
       },
       Type: AWS::IAM::Role,
     },

@@ -64,7 +64,7 @@ echo "--------------------------------------------------------------------------
 echo "[Synth] CDK Project"
 echo "------------------------------------------------------------------------------"
 # Make sure user has the newest CDK version
-npm uninstall -g aws-cdk && npm install -g aws-cdk
+npm uninstall -g aws-cdk && npm install -g aws-cdk@1
 
 cd $source_dir/constructs
 npm install

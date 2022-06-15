@@ -39,6 +39,7 @@ const send = async (config) => {
         //Send Metrics & retun status code.
         data = await axios(params);
     } catch (err) {
+        console.error(err);
         throw err;
     }
     return data.status;

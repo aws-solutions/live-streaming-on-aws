@@ -51,6 +51,7 @@ const copyAssets = async (config) => {
 		}).promise();
 
 	} catch (err) {
+		console.error(err);
 		throw err;
 	}
 	return 'success';
@@ -82,6 +83,7 @@ const delAssets = async (config) => {
 		};
 		await s3.deleteObjects(params).promise();
 	} catch (err) {
+		console.error(err);
 		throw err;
 	}
 	return 'success';

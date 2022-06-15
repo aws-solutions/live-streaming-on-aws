@@ -166,7 +166,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Mapping for sending anonymous metrics to AWS Solution Builders API
      */
-    new cdk.CfnMapping(this, 'AnonymousData', {
+    new cdk.CfnMapping(this, 'AnonymousData', { // NOSONAR
       mapping: {
         SendAnonymousData: {
           Data: 'Yes'
@@ -240,7 +240,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Resource ARNs are not generated at the time of policy creation'
         }
       ]
     );
@@ -255,33 +255,12 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
-     * Custom Resource: Lambda
+     * IAM: CustomResource lambda role & policy
+     * Lambda: lambda function used to create custom resources
      */
-    const customResourceLambda = new lambda.Function(this, 'CustomResource', {
-      runtime: lambda.Runtime.NODEJS_12_X,
-      handler: 'index.handler',
-      description: 'Used to deploy custom resources and send AnonymousData',
-      environment: {
-        SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
-      },
-      code: lambda.Code.fromAsset('../custom-resource'),
-      timeout: cdk.Duration.seconds(30)
+     const customResourceRole = new iam.Role(this, 'CustomResourceRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
     });
-    /** get the cfn resource for the role and attach cfn_nag rule */
-    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [{
-          id: 'W58',
-          reason: 'Invalid warning: function has access to cloudwatch'
-        }, {
-          id: 'W89',
-          reason: 'This CustomResource does not need to be deployed inside a VPC'
-        }, {
-          id: 'W92',
-          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
-        }]
-      }
-    };
 
     const customResourcePolicy = new iam.Policy(this, 'CustomResourcePolicy', {
       statements: [
@@ -310,7 +289,9 @@ export class LiveStreaming extends cdk.Stack {
             'mediapackage:DeleteChannel',
             'mediapackage:ListOriginEndpoints',
             'mediapackage:DeleteOriginEndpoint',
-            'mediapackage:CreateOriginEndpoint'
+            'mediapackage:CreateOriginEndpoint',
+            'mediapackage:TagResource',
+            'mediapackage:UntagResource'
           ]
         }),
         new iam.PolicyStatement({
@@ -337,28 +318,49 @@ export class LiveStreaming extends cdk.Stack {
         })
       ]
     });
-    customResourcePolicy.node.addDependency(customResourceLambda.role!);
-    customResourceLambda.role?.attachInlinePolicy(customResourcePolicy);
+    customResourcePolicy.attachToRole(customResourceRole);
 
     //cdk_nag
-    NagSuppressions.addResourceSuppressions(
-      customResourceLambda.role!,
-      [
-        {
-          id: 'AwsSolutions-IAM4',
-          reason: 'TODO******'
-        }
-      ]
-    );
     NagSuppressions.addResourceSuppressions(
       customResourcePolicy,
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Resource ARNs are not generated at the time of policy creation'
         }
       ]
     );
+
+    const customResourceLambda = new lambda.Function(this, 'CustomResource', {
+      runtime: lambda.Runtime.NODEJS_12_X,
+      handler: 'index.handler',
+      description: 'Used to deploy custom resources and send AnonymousData',
+      environment: {
+        SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
+      },
+      code: lambda.Code.fromAsset('../custom-resource'),
+      role: customResourceRole,
+      timeout: cdk.Duration.seconds(30)
+    });
+    customResourceLambda.node.addDependency(customResourceRole);
+    customResourceLambda.node.addDependency(customResourcePolicy);
+    /** get the cfn resource for the role and attach cfn_nag rule */
+    (customResourceLambda.node.findChild('Resource') as lambda.CfnFunction).cfnOptions.metadata = {
+      cfn_nag: {
+        rules_to_suppress: [{
+          id: 'W58',
+          reason: 'Invalid warning: function has access to cloudwatch'
+        }, {
+          id: 'W89',
+          reason: 'This CustomResource does not need to be deployed inside a VPC'
+        }, {
+          id: 'W92',
+          reason: 'This CustomResource does not need to define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }]
+      }
+    };
+
+    
 
 
     /**
@@ -397,7 +399,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-SMG4',
-          reason: 'TODO******'
+          reason: 'MediaPackage requires a static value and is not integrated with CDN for automatic rotation: https://docs.aws.amazon.com/mediapackage/latest/ug/cdn-auth-setup.html#cdn-aut-setup-cdn'
         }
       ]
     );
@@ -442,7 +444,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: '* is required for MediaPackage CDN Authorization: https://docs.aws.amazon.com/mediapackage/latest/ug/setting-up-create-trust-rel-policy-cdn.html'
         }
       ]
     );
@@ -506,7 +508,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Custom Resource: MediaLive Channel Start
      */
-    const mediaLiveChannelStart = new cdk.CustomResource(this, 'MediaLiveChannelStart', {
+    const mediaLiveChannelStart = new cdk.CustomResource(this, 'MediaLiveChannelStart', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
         Resource: 'MediaLiveChannelStart',
@@ -605,10 +607,10 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1', //same as cfn_nag rule W35
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }, {
           id: 'AwsSolutions-S10',
-          reason: 'TODO******'
+          reason: 'Bucket is private and is not using HTTP'
         }
       ]
     );
@@ -719,16 +721,16 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-CFR1',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront Geo restriction'
         }, {
           id: 'AwsSolutions-CFR2',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront integration with AWS WAF'
         }, {
-          id: 'AwsSolutions-CFR4',
-          reason: 'TODO******'
+          id: 'AwsSolutions-CFR4', //same as cfn_nag rule W70
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }, {
           id: 'AwsSolutions-CFR5', //same as cfn_nag rule W70
-          reason: 'TODO******'
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }
       ]
     );
@@ -775,13 +777,13 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-CFR1',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront Geo restriction'
         }, {
           id: 'AwsSolutions-CFR2',
-          reason: 'TODO******'
+          reason: 'Use case does not warrant CloudFront integration with AWS WAF'
         }, {
           id: 'AwsSolutions-CFR4',
-          reason: 'TODO******'
+          reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }
       ],
     );
@@ -790,7 +792,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1',
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }
       ]
     );
@@ -799,7 +801,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-S1',
-          reason: 'TODO******'
+          reason: 'Used to store access logs for other buckets'
         }
       ]
     );
@@ -838,7 +840,7 @@ export class LiveStreaming extends cdk.Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'TODO******'
+          reason: 'Lambda role needs access to all contents within the buckets to load files for hosting the web player'
         }
       ]
     );
@@ -871,7 +873,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * AnonymousMetric
      */
-    new cdk.CustomResource(this, 'AnonymousMetric', {
+    new cdk.CustomResource(this, 'AnonymousMetric', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
         Resource: 'AnonymousMetric',
@@ -892,66 +894,87 @@ export class LiveStreaming extends cdk.Stack {
      * Outputs
      */
     if (cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')) {
-      new cdk.CfnOutput(this, 'AnonymousMetricUUID', {
+      new cdk.CfnOutput(this, 'AnonymousMetricUUID', { // NOSONAR
         description: 'AnonymousMetric UUID',
         value: uuid.getAttString('UUID'),
         exportName: `${cdk.Aws.STACK_NAME}-AnonymousMetricUUID`
       });
     }
 
-    new cdk.CfnOutput(this, 'MediaLiveChannelConsole', {
+    new cdk.CfnOutput(this, 'MediaLiveChannelConsole', { // NOSONAR
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#!/channels/${mediaLiveChannel.getAttString('ChannelId')}`,
       description: 'MediaLive Channel',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannel`
     });
 
-    new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', {
+    new cdk.CfnOutput(this, 'MediaLiveMetrics', { // NOSONAR
+      description: 'MediaLive Metrics',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/medialive/home?region=${cdk.Aws.REGION}#!/channels/${mediaLiveChannel.getAttString('ChannelId')}/health`,
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLiveMetrics`
+    });
+
+    new cdk.CfnOutput(this, 'MediaLivePrimaryEndpoint', { // NOSONAR
       value: mediaLiveInput.getAttString('EndPoint1'),
       description: 'Primary MediaLive input URL',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLivePrimaryEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'MediaLiveSecondaryEndpoint', {
+    new cdk.CfnOutput(this, 'MediaLiveSecondaryEndpoint', { // NOSONAR
       value: mediaLiveInput.getAttString('EndPoint2'),
       description: 'Secondary MediaLive input URL',
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveSecondaryEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', {
+    new cdk.CfnOutput(this, 'MediaPackageMetrics', { // NOSONAR
+      description: 'MediaPackage Metrics',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/mediapackage/home?region=${cdk.Aws.REGION}#/channels/${mediaPackageChannel.getAttString('ChannelId')}?tabId=metrics`,
+      exportName: `${cdk.Aws.STACK_NAME}-MediaPackageMetrics`
+    });
+
+    new cdk.CfnOutput(this, 'CloudFrontHlsEndpoint', { // NOSONAR
       description: 'HLS CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageHlsEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontHlsEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontDashEndpoint', {
+    new cdk.CfnOutput(this, 'CloudFrontDashEndpoint', { // NOSONAR
       description: 'DASH CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageDashEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontDashEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'CloudFrontCmafEndpoint', {
+    new cdk.CfnOutput(this, 'CloudFrontCmafEndpoint', { // NOSONAR
       description: 'CMAF CloudFront URL',
       value: `https://${distribution.domainName}/out/v1${mediaPackageCmafEndpoint.getAttString('Manifest')}`,
       exportName: `${cdk.Aws.STACK_NAME}-CloudFrontCmafEndpoint`
     });
 
-    new cdk.CfnOutput(this, 'DemoPlayer', {
+    new cdk.CfnOutput(this, 'DemoPlayer', { // NOSONAR
       description: 'Demo Player URL',
       value: `https://${demoDistribution.cloudFrontWebDistribution.domainName}/index.html`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoPlayer`
     });
 
-    new cdk.CfnOutput(this, 'DemoBucketConsole', {
+    new cdk.CfnOutput(this, 'DemoBucketConsole', { // NOSONAR
       description: 'Demo bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoDistribution.s3Bucket?.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoBucket`
     });
 
-    new cdk.CfnOutput(this, 'LogsBucketConsole', {
+    new cdk.CfnOutput(this, 'LogsBucketConsole', { // NOSONAR
       description: 'Logs bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
     });
+
+
+    /**
+     * Tag all resources with Solution Id
+     */
+    cdk.Tags.of(this).add(
+      'SolutionId',
+      'SO0013'
+    );
 
   }
 }

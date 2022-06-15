@@ -64,6 +64,9 @@ const createEndPoint = async (config) => {
             Authorization: {
                 CdnIdentifierSecret: config.CdnIdentifierSecret,
                 SecretsRoleArn: config.SecretsRoleArn
+            },
+            Tags: {
+                SolutionId: 'SO0013'
             }
         };
         //Add configuration based on the endpoint type defined in config
@@ -104,6 +107,7 @@ const createEndPoint = async (config) => {
             Manifest: Url.pathname.slice(7)
         };
     } catch (err) {
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -126,7 +130,10 @@ const createChannel = async (config) => {
 
         let params = {
             Id: config.ChannelId,
-            Description: 'Live Streaming on AWS Solution'
+            Description: 'Live Streaming on AWS Solution',
+            Tags: {
+                SolutionId: 'SO0013'
+            }
         };
         let data = await mediapackage.createChannel(params).promise();
 
@@ -160,6 +167,7 @@ const createChannel = async (config) => {
         };
         await ssm.putParameter(secondary).promise();
     } catch (err) {
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -192,6 +200,7 @@ const deleteChannel = async (ChannelId) => {
         };
         await mediapackage.deleteChannel(params).promise();
     } catch (err) {
+        console.error(err);
         throw err;
     }
     return 'success';

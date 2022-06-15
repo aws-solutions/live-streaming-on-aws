@@ -18,7 +18,7 @@
  import { AwsSolutionsChecks } from 'cdk-nag';
  
  const app = new cdk.App();
- new LiveStreaming(app, 'LiveStreaming');
+ new LiveStreaming(app, 'LiveStreaming'); // NOSONAR
 
  //cdk nag
  cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

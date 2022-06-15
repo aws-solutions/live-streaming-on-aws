@@ -48,9 +48,7 @@ Object {
           },
           Parameters: Array [
             PriMediaConnectArn,
-            Object {
-              Ref: SecMediaConnectArn,
-            },
+            SecMediaConnectArn,
           ],
         },
         Object {
@@ -71,7 +69,7 @@ Object {
           default: Encoding Profile,
         },
         InputCIDR: Object {
-          default: Input Security Group CIDR Block (REQUIRED),
+          default: Input CIDR Block,
         },
         InputType: Object {
           default: Source Input Type,
@@ -80,13 +78,13 @@ Object {
           default: Primary MediaConnect Arn,
         },
         PriPullPass: Object {
-          default: Primary Source Password (REQUIRED),
+          default: Primary Source Password,
         },
         PriPullUrl: Object {
-          default: Primary Source URL (REQUIRED),
+          default: Primary Source URL,
         },
         PriPullUser: Object {
-          default: Primary Source Username (OPTIONAL),
+          default: Primary Source Username,
         },
         SecMediaConnectArn: Object {
           default: Secondary MediaConnect Arn,
@@ -518,7 +516,7 @@ Object {
         No,
       ],
       Default: No,
-      Description: If your source is ready to stream select true, this wil start the MediaLive Channel as part of the deployment. If you select false you will need to manually start the MediaLive Channel when your source is ready.,
+      Description: If your source is ready to stream, select true. This will start the MediaLive Channel as part of the deployment. If you select false, you will need to manually start the MediaLive Channel when your source is ready.,
       Type: String,
     },
     EncodingProfile: Object {
@@ -545,7 +543,7 @@ Object {
         MEDIACONNECT,
       ],
       Default: URL_PULL,
-      Description: Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming/appendix-a.html.,
+      Description: Specify the input type for MediaLive. Detailed instructions for each input type can be found here https://docs.aws.amazon.com/solutions/latest/live-streaming-on-aws/appendix-a.html,
       Type: String,
     },
     PriMediaConnectArn: Object {
@@ -555,18 +553,18 @@ Object {
     },
     PriPullPass: Object {
       Default: ,
-      Description: For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the primary source stream enter the password,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify a password for the primary source URL if basic authentication is enabled on the source.,
       NoEcho: true,
       Type: String,
     },
     PriPullUrl: Object {
       Default: https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8,
-      Description: For URL and RTMP PULL input types ONLY, specify the primary source URL, this should be a HTTP or HTTPS link to the stream manifest file.,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify the primary source URL.,
       Type: String,
     },
     PriPullUser: Object {
       Default: ,
-      Description: For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the primary source stream enter the username,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify a username for the primary source URL if basic authentication is enabled on the source.,
       Type: String,
     },
     SecMediaConnectArn: Object {
@@ -576,18 +574,18 @@ Object {
     },
     SecPullPass: Object {
       Default: ,
-      Description: For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the secondary source stream enter the password,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify a password for the secondary source URL if basic authentication is enabled on the source.,
       NoEcho: true,
       Type: String,
     },
     SecPullUrl: Object {
-      Default: https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8,
-      Description: For URL and RTMP PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.,
+      Default: https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.,
       Type: String,
     },
     SecPullUser: Object {
       Default: ,
-      Description: For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the secondary source stream enter the username,
+      Description: For URL_PULL and RTMP_PULL input types ONLY, specify a username for the secondary source URL if basic authentication is enabled on the source.,
       Type: String,
     },
   },

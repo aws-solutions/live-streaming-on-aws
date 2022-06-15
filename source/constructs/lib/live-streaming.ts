@@ -33,7 +33,7 @@ export class LiveStreaming extends cdk.Stack {
        */
     const inputType = new cdk.CfnParameter(this, 'InputType', {
       type: 'String',
-      description: 'Specify the input type for MediaLive (default parameters are for the demo video).  For details on setting up each input type, see https://docs.aws.amazon.com/solutions/latest/live-streaming/appendix-a.html.',
+      description: 'Specify the input type for MediaLive. Detailed instructions for each input type can be found here https://docs.aws.amazon.com/solutions/latest/live-streaming-on-aws/appendix-a.html',
       allowedValues: ['RTP_PUSH', 'RTMP_PUSH', 'RTMP_PULL', 'URL_PULL', 'MEDIACONNECT'],
       default: 'URL_PULL'
     });
@@ -50,33 +50,33 @@ export class LiveStreaming extends cdk.Stack {
     });
     const priPullUrl = new cdk.CfnParameter(this, 'PriPullUrl', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, specify the primary source URL, this should be a HTTP or HTTPS link to the stream manifest file.',
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify the primary source URL.',
       default: 'https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8'
     });
     const priPullUser = new cdk.CfnParameter(this, 'PriPullUser', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the primary source stream enter the username',
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify a username for the primary source URL if basic authentication is enabled on the source.',
       default: ''
     });
     const priPullPass = new cdk.CfnParameter(this, 'PriPullPass', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the primary source stream enter the password',
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify a password for the primary source URL if basic authentication is enabled on the source.',
       default: '',
       noEcho: true
     });
     const secPullUrl = new cdk.CfnParameter(this, 'SecPullUrl', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.',
-      default: 'https://d15an60oaeed9r.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8'
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify the secondary source URL, this should be a HTTP or HTTPS link to the stream manifest file.',
+      default: 'https://d3h5srgm8b0t83.cloudfront.net/live_stream_v2/sports_reel_with_markers.m3u8'
     });
     const secPullUser = new cdk.CfnParameter(this, 'SecPullUser', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the secondary source stream enter the username',
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify a username for the secondary source URL if basic authentication is enabled on the source.',
       default: ''
     });
     const secPullPass = new cdk.CfnParameter(this, 'SecPullPass', {
       type: 'String',
-      description: 'For URL and RTMP PULL input types ONLY, if basic authentication is enabled on the secondary source stream enter the password',
+      description: 'For URL_PULL and RTMP_PULL input types ONLY, specify a password for the secondary source URL if basic authentication is enabled on the source.',
       default: '',
       noEcho: true
     });
@@ -92,7 +92,7 @@ export class LiveStreaming extends cdk.Stack {
     });
     const channelStart = new cdk.CfnParameter(this, 'ChannelStart', {
       type: 'String',
-      description: 'If your source is ready to stream select true, this wil start the MediaLive Channel as part of the deployment. If you select false you will need to manually start the MediaLive Channel when your source is ready.',
+      description: 'If your source is ready to stream, select true. This will start the MediaLive Channel as part of the deployment. If you select false, you will need to manually start the MediaLive Channel when your source is ready.',
       default: 'No',
       allowedValues: ['Yes', 'No']
     });
@@ -116,7 +116,7 @@ export class LiveStreaming extends cdk.Stack {
           },
           {
             Label: { default: 'MEDIACONNECT CONFIGURATION' },
-            Parameters: [priMediaConnectArn.logicalId, secMediaConnectArn]
+            Parameters: [priMediaConnectArn.logicalId, secMediaConnectArn.logicalId]
           },
           {
             Label: { default: 'ENCODING OPTIONS' },
@@ -131,16 +131,16 @@ export class LiveStreaming extends cdk.Stack {
             default: 'Encoding Profile'
           },
           InputCIDR: {
-            default: 'Input Security Group CIDR Block (REQUIRED)'
+            default: 'Input CIDR Block'
           },
           PriPullUrl: {
-            default: 'Primary Source URL (REQUIRED)'
+            default: 'Primary Source URL'
           },
           PriPullUser: {
-            default: 'Primary Source Username (OPTIONAL)'
+            default: 'Primary Source Username'
           },
           PriPullPass: {
-            default: 'Primary Source Password (REQUIRED)'
+            default: 'Primary Source Password'
           },
           SecPullUrl: {
             default: 'Secondary Source URL'

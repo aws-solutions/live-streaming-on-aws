@@ -29,9 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # Generate secret string for Cdn Secret resource using cdk instead of hard coding
 ```
 
-### Fixed
-
 ### Contributors
+* @sandimciin
+* @eggoynes
 
 ## [3.1.1] - 2022-1-24
 

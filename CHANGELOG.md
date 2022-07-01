@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### New
 ```
-# Added cdk infastructure in source/constructs directory
+# Added cdk infrastructure in source/constructs directory
 # Defined resources for cdk stack in source/constructs/lib/live-streaming.ts
 # Added links to MediaLive and S3 consoles to CloudFormation Outputs
 # Added links to metric dashboards for MediaLive and MediaPackage to CloudFormation Outputs
@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # Updated deployment/build-s3-dist.sh to output cdk nag errors
 # Updated source/custom-resource/lib/medialive/index.spec.js to increase unit test coverage
 # Generate secret string for Cdn Secret resource using cdk instead of hard coding
+# Upgrade path from old versions require a delete and re-deploy since moving to CDK
 ```
 
 ### Contributors

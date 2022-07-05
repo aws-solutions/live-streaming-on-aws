@@ -74,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2020-07-30
 ### Added
 - Origin headers and Custom Error 404 TTL for CloudFront
-- CDN Autnorizarion for Elemental MediaPackage EndPoints
+- CDN Authorization for Elemental MediaPackage EndPoints
 ### Updated
 - MediaLive Encoding now supports QVBR and 4 second segment sizes
 - MediaLive with a new set of outputs 1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288

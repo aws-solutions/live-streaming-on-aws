@@ -1,0 +1,7 @@
+{
+  "name": "cdk-solution-helper",
+  "version": "0.1.0",
+  "dependencies": {
+    "json-to-pretty-yaml": "^1.2.2"
+  }
+}

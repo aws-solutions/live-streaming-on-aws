@@ -4,6 +4,7 @@ build/
 dev/
 global-s3-assets/
 regional-s3-assets/
+open-source/
 .pnp
 .pnp.js
 .DS_Store

@@ -158,8 +158,16 @@ const createInput = async (config) => {
         } //End switch (config.Type)
 
     } catch (err) {
+        console.error(err);
         throw err;
     }
+
+    const tags = {
+        ResourceArn: data.Input.Arn,
+        Tags: { 'SolutionId': 'SO0013'}
+    };
+    medialive.createTags(tags).promise();
+
     return responseData;
 };
 
@@ -199,7 +207,7 @@ const createChannel = async (config) => {
             }],
             EncoderSettings: {},
             Tags: {
-              Solution:'SO0013'
+              SolutionId:'SO0013'
             }
         };
 
@@ -237,6 +245,7 @@ const createChannel = async (config) => {
             ChannelId: data.Channel.Id
         };
     } catch (err) {
+        console.error(err);
         throw err;
     }
     return responseData;
@@ -255,6 +264,7 @@ const startChannel = async (config) => {
        };
        await medialive.startChannel(params).promise();
    } catch (err) {
+       console.error(err);
        throw err;
    }
    return 'success';
@@ -298,6 +308,7 @@ const deleteInput = async (InputId) => {
            await medialive.deleteInputSecurityGroup(params).promise();
        }
    } catch (err) {
+       console.error(err);
        throw err;
    }
    return 'success';
@@ -321,6 +332,7 @@ const deleteChannel = async (ChannelId) => {
        await medialive.waitFor('channelDeleted',params).promise();
 
    } catch (err) {
+       console.error(err);
        throw err;
    }
    return 'success';

@@ -51,7 +51,9 @@ exports.handler = async (event, context) => {
                     break;
 
                 case 'MediaLiveChannelStart':
-                    await mediaLive.startChannel(config);
+                    if (config.ChannelStart === 'Yes') {
+                        await mediaLive.startChannel(config);
+                    }
                     break;
 
                 case 'MediaPackageChannel':
@@ -68,7 +70,9 @@ exports.handler = async (event, context) => {
                     break;
 
                 case ('AnonymousMetric'):
-                    await metrics.send(config);
+                    if (config.SendAnonymousMetric) {
+                        await metrics.send(config);
+                    }
                     break;
 
                 default:

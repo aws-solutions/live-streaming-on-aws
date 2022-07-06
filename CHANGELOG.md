@@ -4,12 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.1.2] - 2022-3-24
-### Updated
-- Pathval updated to 1.1.1
-- Follow Redirects updated to 1.14.8
+## [4.0.0] - 2022-7-28
+
+### New
+```
+# Added cdk infrastructure in source/constructs directory
+# Defined resources for cdk stack in source/constructs/lib/live-streaming.ts
+# Added links to MediaLive and S3 consoles to CloudFormation Outputs
+# Added links to metric dashboards for MediaLive and MediaPackage to CloudFormation Outputs
+# Added SonarQube properties file: sonar-project.properties
+# Added snapshot test to source/constructs/test directory
+# Added cdk nag rule suppressions
+# Added SolutionId tag to resources
+```
+
+### Changed
+```
+# Removed CloudFormation template live-streaming-on-aws.yaml
+# Use CachePolicy instead of ForwardedValues(deprecated) for cloudfront distribution
+# Use @aws-solutions-constructs/aws-cloudfront-s3 construct to deploy demo resources
+# Updated deployment/run-unit-tests.sh to generate unit test coverage reports
+# Updated deployment/build-s3-dist.sh to output cdk nag errors
+# Updated source/custom-resource/lib/medialive/index.spec.js to increase unit test coverage
+# Generate secret string for Cdn Secret resource using cdk instead of hard coding
+# Upgrade path from old versions require a delete and re-deploy since moving to CDK
+```
+
+### Contributors
+* @sandimciin
+* @eggoynes
 
 ## [3.1.1] - 2022-1-24
+
 ### Updated
 - Follow Redirects updated to 1.14.7
 - AWS SDK updated to 2.814.0
@@ -48,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2020-07-30
 ### Added
 - Origin headers and Custom Error 404 TTL for CloudFront
-- CDN Autnorizarion for Elemental MediaPackage EndPoints
+- CDN Authorization for Elemental MediaPackage EndPoints
 ### Updated
 - MediaLive Encoding now supports QVBR and 4 second segment sizes
 - MediaLive with a new set of outputs 1920x1080, 1280x720, 960x540, 768x432, 640x360, 512x288

@@ -770,6 +770,15 @@ export class LiveStreaming extends cdk.Stack {
           demoErrorResponse403
         ]
       },
+      bucketProps: {
+        versioned: false
+      },
+      loggingBucketProps: {
+        versioned: false
+      },
+      cloudFrontLoggingBucketProps: {
+        versioned: false
+      },
       insertHttpSecurityHeaders: false
     });
     //cdk_nag

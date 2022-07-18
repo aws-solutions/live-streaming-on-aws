@@ -124,6 +124,40 @@ Object {
         ],
       },
     },
+    AppRegistryConsole: Object {
+      Description: AppRegistry,
+      Export: Object {
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::StackName,
+              },
+              -AppRegistry,
+            ],
+          ],
+        },
+      },
+      Value: Object {
+        Fn::Join: Array [
+          ,
+          Array [
+            https://,
+            Object {
+              Ref: AWS::Region,
+            },
+            .console.aws.amazon.com/servicecatalog/home?#applications/,
+            Object {
+              Fn::GetAtt: Array [
+                AppRegistryApp5349BE86,
+                Id,
+              ],
+            },
+          ],
+        ],
+      },
+    },
     CloudFrontCmafEndpoint: Object {
       Description: CMAF CloudFront URL,
       Export: Object {
@@ -631,6 +665,31 @@ Object {
       Type: AWS::CloudFormation::CustomResource,
       UpdateReplacePolicy: Delete,
     },
+    AppRegistryApp5349BE86: Object {
+      Properties: Object {
+        Description: (SO0013) Live Streaming on AWS Solution %%VERSION%%,
+        Name: LiveStreamingOnAws,
+        Tags: Object {
+          SolutionId: SO0013,
+        },
+      },
+      Type: AWS::ServiceCatalogAppRegistry::Application,
+    },
+    AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8: Object {
+      Properties: Object {
+        Application: Object {
+          Fn::GetAtt: Array [
+            AppRegistryApp5349BE86,
+            Id,
+          ],
+        },
+        Resource: Object {
+          Ref: AWS::StackId,
+        },
+        ResourceType: CFN_STACK,
+      },
+      Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
+    },
     CachePolicy26D8A535: Object {
       Properties: Object {
         CachePolicyConfig: Object {
@@ -1046,9 +1105,6 @@ Object {
             Value: SO0013,
           },
         ],
-        VersioningConfiguration: Object {
-          Status: Enabled,
-        },
       },
       Type: AWS::S3::Bucket,
       UpdateReplacePolicy: Retain,
@@ -1113,19 +1169,6 @@ Object {
             },
           ],
         },
-        LifecycleConfiguration: Object {
-          Rules: Array [
-            Object {
-              NoncurrentVersionTransitions: Array [
-                Object {
-                  StorageClass: GLACIER,
-                  TransitionInDays: 90,
-                },
-              ],
-              Status: Enabled,
-            },
-          ],
-        },
         LoggingConfiguration: Object {
           DestinationBucketName: Object {
             Ref: CloudFrontToS3S3LoggingBucketEF5CD8B2,
@@ -1143,9 +1186,6 @@ Object {
             Value: SO0013,
           },
         ],
-        VersioningConfiguration: Object {
-          Status: Enabled,
-        },
       },
       Type: AWS::S3::Bucket,
       UpdateReplacePolicy: Retain,
@@ -1277,9 +1317,6 @@ Object {
             Value: SO0013,
           },
         ],
-        VersioningConfiguration: Object {
-          Status: Enabled,
-        },
       },
       Type: AWS::S3::Bucket,
       UpdateReplacePolicy: Retain,

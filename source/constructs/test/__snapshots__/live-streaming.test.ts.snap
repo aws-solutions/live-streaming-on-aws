@@ -408,6 +408,28 @@ Object {
         ],
       },
     },
+    MediaLiveChannelId: Object {
+      Description: MediaLive Channel Id,
+      Export: Object {
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::StackName,
+              },
+              -MediaLiveChannelId,
+            ],
+          ],
+        },
+      },
+      Value: Object {
+        Fn::GetAtt: Array [
+          MediaLiveChannel,
+          ChannelId,
+        ],
+      },
+    },
     MediaLiveMetrics: Object {
       Description: MediaLive Metrics,
       Export: Object {

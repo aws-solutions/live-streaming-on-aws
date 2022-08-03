@@ -18,6 +18,7 @@ import * as s3 from '@aws-cdk/aws-s3';
 import { Secret } from '@aws-cdk/aws-secretsmanager';
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as origin from '@aws-cdk/aws-cloudfront-origins';
+import * as appreg from '@aws-cdk/aws-servicecatalogappregistry';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 import { NagSuppressions } from 'cdk-nag';
 
@@ -769,6 +770,15 @@ export class LiveStreaming extends cdk.Stack {
           demoErrorResponse403
         ]
       },
+      bucketProps: {
+        versioned: false
+      },
+      loggingBucketProps: {
+        versioned: false
+      },
+      cloudFrontLoggingBucketProps: {
+        versioned: false
+      },
       insertHttpSecurityHeaders: false
     });
     //cdk_nag
@@ -871,6 +881,16 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
+     * AppRegistry
+     */
+    const appRegistry = new appreg.Application(this, 'AppRegistryApp', {
+      applicationName: 'LiveStreamingOnAws',
+      description: '(SO0013) Live Streaming on AWS Solution %%VERSION%%'
+    });
+    appRegistry.associateStack(this);
+
+
+    /**
      * AnonymousMetric
      */
     new cdk.CustomResource(this, 'AnonymousMetric', { // NOSONAR
@@ -965,6 +985,17 @@ export class LiveStreaming extends cdk.Stack {
       description: 'Logs bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
+    });
+
+    new cdk.CfnOutput(this, 'AppRegistryConsole', { // NOSONAR
+      description: 'AppRegistry',
+      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/servicecatalog/home?#applications/${appRegistry.applicationId}`,
+      exportName: `${cdk.Aws.STACK_NAME}-AppRegistry`
+    });
+    new cdk.CfnOutput(this, 'MediaLiveChannelId', {
+      description: 'MediaLive Channel Id',
+      value: `${mediaLiveChannel.getAttString('ChannelId')}`,
+      exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannelId`
     });
 
 

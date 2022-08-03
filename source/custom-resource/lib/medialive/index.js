@@ -38,7 +38,8 @@ const createInput = async (config) => {
                 params = {
                     InputSecurityGroups: [data.SecurityGroup.Id],
                     Name: config.StreamName,
-                    Type: config.Type
+                    Type: config.Type,
+                    Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
                 data = await medialive.createInput(params).promise();
@@ -68,7 +69,8 @@ const createInput = async (config) => {
                         {
                             StreamName: config.StreamName + '/secondary'
                         }
-                    ]
+                    ],
+                    Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
                 data = await medialive.createInput(params).promise();
@@ -92,7 +94,8 @@ const createInput = async (config) => {
                         {
                             Url: config.SecUrl
                         }
-                    ]
+                    ],
+                    Tags: {'SolutionId': 'SO0109'}
                 };
                 //If authentication is required, update params & store U/P in Parameter Store
                 if (config.PriUser !== null && config.PriUser !== '') {
@@ -141,7 +144,8 @@ const createInput = async (config) => {
                         {
                             FlowArn: config.SecMediaConnectArn
                         }
-                    ]
+                    ],
+                    Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
                 data = await medialive.createInput(params).promise();
@@ -161,12 +165,6 @@ const createInput = async (config) => {
         console.error(err);
         throw err;
     }
-
-    const tags = {
-        ResourceArn: data.Input.Arn,
-        Tags: { 'SolutionId': 'SO0013'}
-    };
-    medialive.createTags(tags).promise();
 
     return responseData;
 };

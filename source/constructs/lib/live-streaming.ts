@@ -992,7 +992,7 @@ export class LiveStreaming extends cdk.Stack {
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/servicecatalog/home?#applications/${appRegistry.applicationId}`,
       exportName: `${cdk.Aws.STACK_NAME}-AppRegistry`
     });
-    new cdk.CfnOutput(this, 'MediaLiveChannelId', {
+    new cdk.CfnOutput(this, 'MediaLiveChannelId', { // NOSONAR
       description: 'MediaLive Channel Id',
       value: `${mediaLiveChannel.getAttString('ChannelId')}`,
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannelId`

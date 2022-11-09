@@ -688,16 +688,58 @@ Object {
       UpdateReplacePolicy: Delete,
     },
     AppRegistryApp5349BE86: Object {
+      DependsOn: Array [
+        AppRegistryAttributeGroup7AF07446,
+      ],
       Properties: Object {
-        Description: (SO0013) Live Streaming on AWS Solution %%VERSION%%,
-        Name: LiveStreamingOnAws,
+        Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              live-streaming-on-aws-,
+              Object {
+                Ref: AWS::StackName,
+              },
+            ],
+          ],
+        },
         Tags: Object {
+          ApplicationType: AWS-Solutions,
+          SolutionDomain: CloudFoundations,
           SolutionId: SO0013,
+          SolutionName: Live Streaming on AWS,
+          SolutionVersion: %%VERSION%%,
+          appRegistryApplicationName: live-streaming-on-aws-stack,
+          solutionId: SO0013,
         },
       },
       Type: AWS::ServiceCatalogAppRegistry::Application,
     },
+    AppRegistryAppAttributeGroupAssociation73c027e3f10e9676CFD5: Object {
+      DependsOn: Array [
+        AppRegistryAttributeGroup7AF07446,
+      ],
+      Properties: Object {
+        Application: Object {
+          Fn::GetAtt: Array [
+            AppRegistryApp5349BE86,
+            Id,
+          ],
+        },
+        AttributeGroup: Object {
+          Fn::GetAtt: Array [
+            AppRegistryAttributeGroup7AF07446,
+            Id,
+          ],
+        },
+      },
+      Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation,
+    },
     AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8: Object {
+      DependsOn: Array [
+        AppRegistryAttributeGroup7AF07446,
+      ],
       Properties: Object {
         Application: Object {
           Fn::GetAtt: Array [
@@ -712,6 +754,54 @@ Object {
       },
       Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
     },
+    AppRegistryAttributeGroup7AF07446: Object {
+      Properties: Object {
+        Attributes: Object {
+          ApplicationType: AWS-Solutions,
+          SolutionID: SO0013,
+          SolutionName: Live Streaming on AWS,
+          SolutionVersion: %%VERSION%%,
+        },
+        Description: Attribute group for solution information.,
+        Name: Object {
+          Ref: AWS::StackName,
+        },
+        Tags: Object {
+          SolutionId: SO0013,
+        },
+      },
+      Type: AWS::ServiceCatalogAppRegistry::AttributeGroup,
+    },
+    ApplicationInsightsApp: Object {
+      DependsOn: Array [
+        AppRegistryAppAttributeGroupAssociation73c027e3f10e9676CFD5,
+        AppRegistryApp5349BE86,
+        AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8,
+      ],
+      Properties: Object {
+        AutoConfigurationEnabled: true,
+        CWEMonitorEnabled: true,
+        OpsCenterEnabled: true,
+        ResourceGroupName: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              AWS_AppRegistry_Application-live-streaming-on-aws-,
+              Object {
+                Ref: AWS::StackName,
+              },
+            ],
+          ],
+        },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
+      },
+      Type: AWS::ApplicationInsights::Application,
+    },
     CachePolicy26D8A535: Object {
       Properties: Object {
         CachePolicyConfig: Object {
@@ -722,9 +812,9 @@ Object {
             Fn::Join: Array [
               ,
               Array [
-                LiveStreamingCachePolicy36FCA70B-,
+                CachePolicy-,
                 Object {
-                  Ref: AWS::Region,
+                  Ref: AWS::StackName,
                 },
               ],
             ],

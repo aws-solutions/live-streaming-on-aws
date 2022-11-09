@@ -19,6 +19,7 @@ import { Secret } from '@aws-cdk/aws-secretsmanager';
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as origin from '@aws-cdk/aws-cloudfront-origins';
 import * as appreg from '@aws-cdk/aws-servicecatalogappregistry';
+import * as applicationinsights from '@aws-cdk/aws-applicationinsights';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 import { NagSuppressions } from 'cdk-nag';
 
@@ -619,7 +620,11 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * CloudFront Distribution
      */
-    const cachePolicy = new cloudfront.CachePolicy(this, 'CachePolicy', {
+    // Need Unique name for each Cache Policy. 
+    const cachePolicyName = `CachePolicy-${cdk.Aws.STACK_NAME}`;
+
+    const cachePolicy = new cloudfront.CachePolicy(this, `CachePolicy`, {
+      cachePolicyName: cachePolicyName,
       cookieBehavior: cloudfront.CacheCookieBehavior.all(),
       headerBehavior: cloudfront.CacheHeaderBehavior.allowList(
         'Access-Control-Allow-Origin',
@@ -883,12 +888,42 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * AppRegistry
      */
-    const appRegistry = new appreg.Application(this, 'AppRegistryApp', {
-      applicationName: 'LiveStreamingOnAws',
-      description: '(SO0013) Live Streaming on AWS Solution %%VERSION%%'
-    });
-    appRegistry.associateStack(this);
-
+     const solutionId = 'SO0013';
+     const solutionName = 'Live Streaming on AWS';
+     const applicationName = `live-streaming-on-aws-${cdk.Aws.STACK_NAME}`;
+     const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeGroup', {
+         attributeGroupName: cdk.Aws.STACK_NAME,
+         description: "Attribute group for solution information.",
+         attributes: {
+             ApplicationType: 'AWS-Solutions',
+             SolutionVersion: '%%VERSION%%',
+             SolutionID: solutionId,
+             SolutionName: solutionName
+         }
+     });
+     const appRegistry = new appreg.Application(this, 'AppRegistryApp', {
+         applicationName: applicationName,
+         description: `Service Catalog application to track and manage all your resources. The SolutionId is ${solutionId} and SolutionVersion is %%VERSION%%.`
+     });
+     appRegistry.associateStack(this);
+     cdk.Tags.of(appRegistry).add('solutionId', solutionId);
+     cdk.Tags.of(appRegistry).add('SolutionName', solutionName);
+     cdk.Tags.of(appRegistry).add('SolutionDomain', 'CloudFoundations');
+     cdk.Tags.of(appRegistry).add('SolutionVersion', '%%VERSION%%');
+     cdk.Tags.of(appRegistry).add('appRegistryApplicationName', 'live-streaming-on-aws-stack');
+     cdk.Tags.of(appRegistry).add('ApplicationType', 'AWS-Solutions');
+ 
+     appRegistry.node.addDependency(attributeGroup);
+     appRegistry.associateAttributeGroup(attributeGroup);
+ 
+     const appInsights = new applicationinsights.CfnApplication(this, 'ApplicationInsightsApp', {
+         resourceGroupName: `AWS_AppRegistry_Application-${applicationName}`,
+         autoConfigurationEnabled: true,
+         cweMonitorEnabled: true,
+         opsCenterEnabled: true
+     });
+     appInsights.node.addDependency(appRegistry);
+ 
 
     /**
      * AnonymousMetric
@@ -992,7 +1027,7 @@ export class LiveStreaming extends cdk.Stack {
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/servicecatalog/home?#applications/${appRegistry.applicationId}`,
       exportName: `${cdk.Aws.STACK_NAME}-AppRegistry`
     });
-    new cdk.CfnOutput(this, 'MediaLiveChannelId', {
+    new cdk.CfnOutput(this, 'MediaLiveChannelId', { // NOSONAR
       description: 'MediaLive Channel Id',
       value: `${mediaLiveChannel.getAttString('ChannelId')}`,
       exportName: `${cdk.Aws.STACK_NAME}-MediaLiveChannelId`

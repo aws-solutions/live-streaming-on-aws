@@ -20,6 +20,7 @@ THIRD PARTY COMPONENTS
 This software includes third party software subject to the following copyrights:
 
 AWS SDK under the Apache License Version 2.0
+AWS CDK under the Apache License Version 2.0
 requests under the Apache License Version 2.0
 Stanford Javascript Crypto Library under the BSD license or under the GNU GPL, version 2.0
 uuid.js under the Massachusetts Institute of Technology (MIT) license
@@ -34,5 +35,24 @@ react-bootstrap under the Massachusetts Institute of Technology (MIT) license
 react-dom under the Massachusetts Institute of Technology (MIT) license
 react-scripts under the Massachusetts Institute of Technology (MIT) license
 react-player under the Massachusetts Institute of Technology (MIT) license
+json-to-pretty-yaml under the Apache License Version 2.0                                                                      
+@aws-cdk/aws-cloudwatch under the Apache License Version 2.0
+@aws-cdk/aws-lambda under the Apache License Version 2.0
+@aws-cdk/aws-medialive under the Apache License Version 2.0
+@aws-cdk/aws-s3 under the Apache License Version 2.0
+@aws-cdk/aws-servicecatalogappregistry under the Apache License Version 2.0
+@aws-cdk/aws-applicationinsights under the Apache License Version 2.0
+@aws-cdk/core under the Apache License Version 2.0
+@aws-solutions-constructs/aws-cloudfront-s3 under the Apache License Version 2.0
+cdk-nag under the Apache License Version 2.0
+source-map-support under the Massachusetts Institute of Technology (MIT) license
+@aws-cdk/assert under the Apache License Version 2.0
+@types/jest under the Massachusetts Institute of Technology (MIT) license
+@types/node under the Massachusetts Institute of Technology (MIT) license
+aws-cdk under the Apache License Version 2.0
+jest under the Massachusetts Institute of Technology (MIT) license
+ts-jest under the Massachusetts Institute of Technology (MIT) license
+ts-node under the Massachusetts Institute of Technology (MIT) license
+typescript under the Apache License Version 2.0
 
 The licenses for these third party components are included in LICENSE.txt

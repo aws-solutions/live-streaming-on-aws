@@ -1,0 +1,6 @@
+^dist/
+CONTRIBUTING.md:50
+CODE_OF_CONDUCT.md:4
+source/custom-resources/lib/media-live/channel.js:25
+source/custom-resource/lib/cfn/index.spec.js:30
+deployment/live-streaming-on-aws.yaml:308

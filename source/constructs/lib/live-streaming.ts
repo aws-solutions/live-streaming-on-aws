@@ -621,7 +621,7 @@ export class LiveStreaming extends cdk.Stack {
      * CloudFront Distribution
      */
     // Need Unique name for each Cache Policy. 
-    const cachePolicyName = `CachePolicy-${cdk.Aws.STACK_NAME}`;
+    const cachePolicyName = `CachePolicy-${cdk.Aws.STACK_NAME}-${cdk.Aws.REGION}`;
 
     const cachePolicy = new cloudfront.CachePolicy(this, `CachePolicy`, {
       cachePolicyName: cachePolicyName,

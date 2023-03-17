@@ -892,7 +892,7 @@ export class LiveStreaming extends cdk.Stack {
      const solutionName = 'Live Streaming on AWS';
      const applicationName = `live-streaming-on-aws-${cdk.Aws.STACK_NAME}`;
      const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeGroup', {
-         attributeGroupName: cdk.Aws.STACK_NAME,
+         attributeGroupName: `${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
          description: "Attribute group for solution information.",
          attributes: {
              ApplicationType: 'AWS-Solutions',

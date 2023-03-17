@@ -816,6 +816,10 @@ Object {
                 Object {
                   Ref: AWS::StackName,
                 },
+                -,
+                Object {
+                  Ref: AWS::Region,
+                },
               ],
             ],
           },

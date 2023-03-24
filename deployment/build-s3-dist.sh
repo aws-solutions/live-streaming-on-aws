@@ -113,7 +113,7 @@ for d in `find . -mindepth 1 -maxdepth 1 -type d`; do
     cd $fname
     rm -rf node_modules/
     rm -rf coverage/
-    npm ci --production
+    npm install
     zip -rq ../$fname.zip *
     cd ..
 

@@ -11,20 +11,21 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as s3 from '@aws-cdk/aws-s3';
-import { Secret } from '@aws-cdk/aws-secretsmanager';
-import * as cloudfront from '@aws-cdk/aws-cloudfront';
-import * as origin from '@aws-cdk/aws-cloudfront-origins';
-import * as appreg from '@aws-cdk/aws-servicecatalogappregistry';
-import * as applicationinsights from '@aws-cdk/aws-applicationinsights';
+import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origin from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as appreg from '@aws-cdk/aws-servicecatalogappregistry-alpha';
+import * as applicationinsights from 'aws-cdk-lib/aws-applicationinsights';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs'; // newly-added module
 
 export class LiveStreaming extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     /**
      * CloudFormation Template Descrption
@@ -334,7 +335,7 @@ export class LiveStreaming extends cdk.Stack {
     );
 
     const customResourceLambda = new lambda.Function(this, 'CustomResource', {
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
       description: 'Used to deploy custom resources and send AnonymousData',
       environment: {

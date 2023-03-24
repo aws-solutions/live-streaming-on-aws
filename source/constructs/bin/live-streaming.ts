@@ -13,7 +13,7 @@
  *********************************************************************************************************************/
 
  import 'source-map-support/register';
- import * as cdk from '@aws-cdk/core';
+ import * as cdk from 'aws-cdk-lib';
  import { LiveStreaming } from '../lib/live-streaming';
  import { AwsSolutionsChecks } from 'cdk-nag';
  

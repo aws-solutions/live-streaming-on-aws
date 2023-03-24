@@ -12,7 +12,7 @@
  *********************************************************************************************************************/
 
 import '@aws-cdk/assert/jest';
-import { Stack } from '@aws-cdk/core';
+import { Stack } from 'aws-cdk-lib';
 import { SynthUtils } from '@aws-cdk/assert';
 import * as LiveStreaming from '../lib/live-streaming';
 

@@ -64,11 +64,11 @@ echo "--------------------------------------------------------------------------
 echo "[Synth] CDK Project"
 echo "------------------------------------------------------------------------------"
 # Make sure user has the newest CDK version
-npm uninstall -g aws-cdk && npm install -g aws-cdk@1
+# npm install -g aws-cdk
 
 cd $source_dir/constructs
 npm install
-cdk synth --output=$staging_dist_dir
+npx cdk synth --output=$staging_dist_dir
 if [ $? -ne 0 ]
 then
     echo "******************************************************************************"
@@ -127,7 +127,7 @@ echo "--------------------------------------------------------------------------
 cd $source_dir/console
 [ -e build ] && rm -r build
 [ -e node_modules ] && rm -rf node_modules
-npm ci
+npm install
 touch public/assets/aws-exports.js
 npm run build
 mkdir $build_dist_dir/console

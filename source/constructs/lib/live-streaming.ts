@@ -19,7 +19,6 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origin from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as appreg from '@aws-cdk/aws-servicecatalogappregistry-alpha';
-import * as applicationinsights from 'aws-cdk-lib/aws-applicationinsights';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs'; // newly-added module
@@ -916,14 +915,6 @@ export class LiveStreaming extends cdk.Stack {
  
      appRegistry.node.addDependency(attributeGroup);
      appRegistry.associateAttributeGroup(attributeGroup);
- 
-     const appInsights = new applicationinsights.CfnApplication(this, 'ApplicationInsightsApp', {
-         resourceGroupName: `AWS_AppRegistry_Application-${applicationName}`,
-         autoConfigurationEnabled: true,
-         cweMonitorEnabled: true,
-         opsCenterEnabled: true
-     });
-     appInsights.node.addDependency(appRegistry);
  
 
     /**

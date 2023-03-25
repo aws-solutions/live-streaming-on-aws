@@ -11,20 +11,20 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 
-import * as cdk from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as s3 from '@aws-cdk/aws-s3';
-import { Secret } from '@aws-cdk/aws-secretsmanager';
-import * as cloudfront from '@aws-cdk/aws-cloudfront';
-import * as origin from '@aws-cdk/aws-cloudfront-origins';
-import * as appreg from '@aws-cdk/aws-servicecatalogappregistry';
-import * as applicationinsights from '@aws-cdk/aws-applicationinsights';
+import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origin from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as appreg from '@aws-cdk/aws-servicecatalogappregistry-alpha';
 import { CloudFrontToS3 } from '@aws-solutions-constructs/aws-cloudfront-s3';
 import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs'; // newly-added module
 
 export class LiveStreaming extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
     /**
      * CloudFormation Template Descrption
@@ -334,7 +334,7 @@ export class LiveStreaming extends cdk.Stack {
     );
 
     const customResourceLambda = new lambda.Function(this, 'CustomResource', {
-      runtime: lambda.Runtime.NODEJS_12_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
       description: 'Used to deploy custom resources and send AnonymousData',
       environment: {
@@ -621,7 +621,7 @@ export class LiveStreaming extends cdk.Stack {
      * CloudFront Distribution
      */
     // Need Unique name for each Cache Policy. 
-    const cachePolicyName = `CachePolicy-${cdk.Aws.STACK_NAME}`;
+    const cachePolicyName = `CachePolicy-${cdk.Aws.STACK_NAME}-${cdk.Aws.REGION}`;
 
     const cachePolicy = new cloudfront.CachePolicy(this, `CachePolicy`, {
       cachePolicyName: cachePolicyName,
@@ -892,7 +892,7 @@ export class LiveStreaming extends cdk.Stack {
      const solutionName = 'Live Streaming on AWS';
      const applicationName = `live-streaming-on-aws-${cdk.Aws.STACK_NAME}`;
      const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeGroup', {
-         attributeGroupName: cdk.Aws.STACK_NAME,
+         attributeGroupName: `${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
          description: "Attribute group for solution information.",
          attributes: {
              ApplicationType: 'AWS-Solutions',
@@ -915,14 +915,6 @@ export class LiveStreaming extends cdk.Stack {
  
      appRegistry.node.addDependency(attributeGroup);
      appRegistry.associateAttributeGroup(attributeGroup);
- 
-     const appInsights = new applicationinsights.CfnApplication(this, 'ApplicationInsightsApp', {
-         resourceGroupName: `AWS_AppRegistry_Application-${applicationName}`,
-         autoConfigurationEnabled: true,
-         cweMonitorEnabled: true,
-         opsCenterEnabled: true
-     });
-     appInsights.node.addDependency(appRegistry);
  
 
     /**

@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added region name to CachePolicy to allow unique name for multiple stacks with the same stack name in different regions. 
 - Removed application insights
 
+### Contributors
+* @eggoynes
 ## [4.1.0] - 2022-11-9
 
 ### New

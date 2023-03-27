@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2023-4-15
+
+### New
+- Converted project from CDK 1 to CDK 2 project. 
+
+### Changed
+- Upgraded multiple nodejs packages to improve security. 
+- Upgraded Lambda runtimes to node 18 from node 12. 
+- Added region name to CachePolicy to allow unique name for multiple stacks with the same stack name in different regions. 
+- Removed application insights
+
 ## [4.1.0] - 2022-11-9
 
 ### New

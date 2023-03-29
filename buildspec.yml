@@ -33,3 +33,5 @@ artifacts:
       - buildspec.yml
       - .gitignore
       - sonar-project.properties
+      - NOTICE.txt
+

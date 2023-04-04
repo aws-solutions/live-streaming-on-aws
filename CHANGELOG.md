@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded Lambda runtimes to node 18 from node 12. 
 - Added region name to CachePolicy to allow unique name for multiple stacks with the same stack name in different regions. 
 - Removed application insights
+- MediaPackage IAM role more secure with scoped down privlages. 
 
 ### Contributors
 * @eggoynes

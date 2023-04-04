@@ -168,9 +168,9 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Mapping for sending anonymous metrics to AWS Solution Builders API
      */
-    new cdk.CfnMapping(this, 'AnonymousData', { // NOSONAR
+    new cdk.CfnMapping(this, 'AnonymizedData', { // NOSONAR
       mapping: {
-        SendAnonymousData: {
+        SendAnonymizedData: {
           Data: 'Yes'
         }
       }
@@ -336,7 +336,7 @@ export class LiveStreaming extends cdk.Stack {
     const customResourceLambda = new lambda.Function(this, 'CustomResource', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
-      description: 'Used to deploy custom resources and send AnonymousData',
+      description: 'Used to deploy custom resources and send AnonymizedData',
       environment: {
         SOLUTION_IDENTIFIER: 'AwsSolution/SO0013/%%VERSION%%'
       },
@@ -931,7 +931,7 @@ export class LiveStreaming extends cdk.Stack {
         EncodingProfile: encodingProfile.valueAsString,
         Cidr: inputCIDR.valueAsString,
         ChannelStart: channelStart.valueAsString,
-        SendAnonymousMetric: cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')
+        SendAnonymousMetric: cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')
       }
     });
 
@@ -940,7 +940,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Outputs
      */
-    if (cdk.Fn.findInMap('AnonymousData', 'SendAnonymousData', 'Data')) {
+    if (cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')) {
       new cdk.CfnOutput(this, 'AnonymousMetricUUID', { // NOSONAR
         description: 'AnonymousMetric UUID',
         value: uuid.getAttString('UUID'),

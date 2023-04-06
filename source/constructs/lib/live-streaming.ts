@@ -580,6 +580,9 @@ export class LiveStreaming extends cdk.Stack {
      * S3: Logs bucket for CloudFront
      */
     const logsBucket = new s3.Bucket(this, 'LogsBucket', {
+      enforceSSL: true,
+      versioned: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
       accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: {

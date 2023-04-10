@@ -580,6 +580,9 @@ export class LiveStreaming extends cdk.Stack {
      * S3: Logs bucket for CloudFront
      */
     const logsBucket = new s3.Bucket(this, 'LogsBucket', {
+      enforceSSL: true,
+      versioned: true,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
       accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: {
@@ -891,8 +894,8 @@ export class LiveStreaming extends cdk.Stack {
      const solutionId = 'SO0013';
      const solutionName = 'Live Streaming on AWS';
      const applicationName = `live-streaming-on-aws-${cdk.Aws.STACK_NAME}`;
-     const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeGroup', {
-         attributeGroupName: `${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
+     const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeId', {
+         attributeGroupName: `A30-${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
          description: "Attribute group for solution information.",
          attributes: {
              ApplicationType: 'AWS-Solutions',

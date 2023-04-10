@@ -554,18 +554,6 @@ Object {
     },
   },
   Parameters: Object {
-    AssetParameters[HASH REMOVED]: Object {
-      Description: Artifact hash for asset [HASH REMOVED],
-      Type: String,
-    },
-    AssetParameters[HASH REMOVED]: Object {
-      Description: S3 bucket for asset [HASH REMOVED],
-      Type: String,
-    },
-    AssetParameters[HASH REMOVED]: Object {
-      Description: S3 key for asset [HASH REMOVED],
-      Type: String,
-    },
     ChannelStart: Object {
       AllowedValues: Array [
         Yes,
@@ -764,7 +752,18 @@ Object {
         },
         Description: Attribute group for solution information.,
         Name: Object {
-          Ref: AWS::StackName,
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::Region,
+              },
+              -,
+              Object {
+                Ref: AWS::StackName,
+              },
+            ],
+          ],
         },
         Tags: Object {
           SolutionId: SO0013,
@@ -816,6 +815,10 @@ Object {
                 Object {
                   Ref: AWS::StackName,
                 },
+                -,
+                Object {
+                  Ref: AWS::Region,
+                },
               ],
             ],
           },
@@ -843,6 +846,7 @@ Object {
       Type: AWS::CloudFront::CachePolicy,
     },
     CdnSecret32008E6A: Object {
+      DeletionPolicy: Delete,
       Metadata: Object {
         cdk_nag: Object {
           rules_to_suppress: Array [
@@ -900,6 +904,7 @@ Object {
         ],
       },
       Type: AWS::SecretsManager::Secret,
+      UpdateReplacePolicy: Delete,
     },
     CloudFrontD198EC06: Object {
       Metadata: Object {
@@ -1229,7 +1234,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1240,6 +1245,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3CloudfrontLoggingBucket8350BE9B,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1254,14 +1265,7 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3CloudfrontLoggingBucket8350BE9B,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
             },
           ],
           Version: 2012-10-17,
@@ -1320,7 +1324,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1331,6 +1335,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3S3Bucket9CE6AB04,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1345,14 +1355,7 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3S3Bucket9CE6AB04,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
             },
             Object {
               Action: s3:GetObject,
@@ -1441,7 +1444,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1452,6 +1455,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3S3LoggingBucketEF5CD8B2,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1466,14 +1475,7 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3S3LoggingBucketEF5CD8B2,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
             },
           ],
           Version: 2012-10-17,
@@ -1507,41 +1509,9 @@ Object {
       Properties: Object {
         Code: Object {
           S3Bucket: Object {
-            Ref: AssetParameters[HASH REMOVED],
+            Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: Object {
-            Fn::Join: Array [
-              ,
-              Array [
-                Object {
-                  Fn::Select: Array [
-                    0,
-                    Object {
-                      Fn::Split: Array [
-                        ||,
-                        Object {
-                          Ref: AssetParameters[HASH REMOVED],
-                        },
-                      ],
-                    },
-                  ],
-                },
-                Object {
-                  Fn::Select: Array [
-                    1,
-                    Object {
-                      Fn::Split: Array [
-                        ||,
-                        Object {
-                          Ref: AssetParameters[HASH REMOVED],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            ],
-          },
+          S3Key: 73d45459ae7abbe57b24ae45648c26887c578dbcc2c8001b8932715b29560f21.zip,
         },
         Description: Used to deploy custom resources and send AnonymousData,
         Environment: Object {
@@ -1556,7 +1526,7 @@ Object {
             Arn,
           ],
         },
-        Runtime: nodejs12.x,
+        Runtime: nodejs18.x,
         Tags: Array [
           Object {
             Key: SolutionId,

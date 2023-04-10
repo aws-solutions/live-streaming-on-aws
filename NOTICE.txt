@@ -35,18 +35,10 @@ react-bootstrap under the Massachusetts Institute of Technology (MIT) license
 react-dom under the Massachusetts Institute of Technology (MIT) license
 react-scripts under the Massachusetts Institute of Technology (MIT) license
 react-player under the Massachusetts Institute of Technology (MIT) license
-json-to-pretty-yaml under the Apache License Version 2.0                                                                      
-@aws-cdk/aws-cloudwatch under the Apache License Version 2.0
-@aws-cdk/aws-lambda under the Apache License Version 2.0
-@aws-cdk/aws-medialive under the Apache License Version 2.0
-@aws-cdk/aws-s3 under the Apache License Version 2.0
-@aws-cdk/aws-servicecatalogappregistry under the Apache License Version 2.0
-@aws-cdk/aws-applicationinsights under the Apache License Version 2.0
-@aws-cdk/core under the Apache License Version 2.0
+json-to-pretty-yaml under the Apache License Version 2.0
 @aws-solutions-constructs/aws-cloudfront-s3 under the Apache License Version 2.0
 cdk-nag under the Apache License Version 2.0
 source-map-support under the Massachusetts Institute of Technology (MIT) license
-@aws-cdk/assert under the Apache License Version 2.0
 @types/jest under the Massachusetts Institute of Technology (MIT) license
 @types/node under the Massachusetts Institute of Technology (MIT) license
 aws-cdk under the Apache License Version 2.0

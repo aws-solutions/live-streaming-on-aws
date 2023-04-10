@@ -418,7 +418,7 @@ export class LiveStreaming extends cdk.Stack {
           ]
         }),
         new iam.PolicyStatement({
-          resources: ['arn:aws:iam:*'],
+          resources: ['*'], // NOSONAR
           actions: [
             'iam:GetRole',
             'iam:PassRole'

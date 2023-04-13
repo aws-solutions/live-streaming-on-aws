@@ -690,6 +690,9 @@ export class LiveStreaming extends cdk.Stack {
           id: 'AwsSolutions-CFR2',
           reason: 'Use case does not warrant CloudFront integration with AWS WAF'
         }, {
+            id: 'AwsSolutions-CFR3', //same as cfn_nag rule W70
+            reason: 'S3 update causing deploy fail when bucket makes any sort of ACL. With this error cannot have ACLs set with ObjectOwnerships BucketOwnerEnforced setting'
+        },{
           id: 'AwsSolutions-CFR4', //same as cfn_nag rule W70
           reason: 'CloudFront automatically sets the security policy to TLSv1 when the distribution uses the CloudFront domain name'
         }, {

@@ -4,8 +4,8 @@ exports[`LiveStreaming Stack Test 1`] = `
 Object {
   Description: (SO0013) Live Streaming on AWS Solution %%VERSION%%,
   Mappings: Object {
-    AnonymousData: Object {
-      SendAnonymousData: Object {
+    AnonymizedData: Object {
+      SendAnonymizedData: Object {
         Data: Yes,
       },
     },
@@ -335,41 +335,6 @@ Object {
         ],
       },
     },
-    LogsBucketConsole: Object {
-      Description: Logs bucket,
-      Export: Object {
-        Name: Object {
-          Fn::Join: Array [
-            ,
-            Array [
-              Object {
-                Ref: AWS::StackName,
-              },
-              -LogsBucket,
-            ],
-          ],
-        },
-      },
-      Value: Object {
-        Fn::Join: Array [
-          ,
-          Array [
-            https://,
-            Object {
-              Ref: AWS::Region,
-            },
-            .console.aws.amazon.com/s3/buckets/,
-            Object {
-              Ref: LogsBucket9C4D8843,
-            },
-            ?region=,
-            Object {
-              Ref: AWS::Region,
-            },
-          ],
-        ],
-      },
-    },
     MediaLiveChannelConsole: Object {
       Description: MediaLive Channel,
       Export: Object {
@@ -652,8 +617,8 @@ Object {
         Resource: AnonymousMetric,
         SendAnonymousMetric: Object {
           Fn::FindInMap: Array [
-            AnonymousData,
-            SendAnonymousData,
+            AnonymizedData,
+            SendAnonymizedData,
             Data,
           ],
         },
@@ -677,7 +642,7 @@ Object {
     },
     AppRegistryApp5349BE86: Object {
       DependsOn: Array [
-        AppRegistryAttributeGroup7AF07446,
+        AppRegistryAttributeIdDF43F316,
       ],
       Properties: Object {
         Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
@@ -704,9 +669,9 @@ Object {
       },
       Type: AWS::ServiceCatalogAppRegistry::Application,
     },
-    AppRegistryAppAttributeGroupAssociation73c027e3f10e9676CFD5: Object {
+    AppRegistryAppAttributeGroupAssociatione6a1c2e3176a77F7002D: Object {
       DependsOn: Array [
-        AppRegistryAttributeGroup7AF07446,
+        AppRegistryAttributeIdDF43F316,
       ],
       Properties: Object {
         Application: Object {
@@ -717,7 +682,7 @@ Object {
         },
         AttributeGroup: Object {
           Fn::GetAtt: Array [
-            AppRegistryAttributeGroup7AF07446,
+            AppRegistryAttributeIdDF43F316,
             Id,
           ],
         },
@@ -726,7 +691,7 @@ Object {
     },
     AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8: Object {
       DependsOn: Array [
-        AppRegistryAttributeGroup7AF07446,
+        AppRegistryAttributeIdDF43F316,
       ],
       Properties: Object {
         Application: Object {
@@ -742,7 +707,7 @@ Object {
       },
       Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
     },
-    AppRegistryAttributeGroup7AF07446: Object {
+    AppRegistryAttributeIdDF43F316: Object {
       Properties: Object {
         Attributes: Object {
           ApplicationType: AWS-Solutions,
@@ -755,6 +720,7 @@ Object {
           Fn::Join: Array [
             ,
             Array [
+              A30-,
               Object {
                 Ref: AWS::Region,
               },
@@ -770,36 +736,6 @@ Object {
         },
       },
       Type: AWS::ServiceCatalogAppRegistry::AttributeGroup,
-    },
-    ApplicationInsightsApp: Object {
-      DependsOn: Array [
-        AppRegistryAppAttributeGroupAssociation73c027e3f10e9676CFD5,
-        AppRegistryApp5349BE86,
-        AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8,
-      ],
-      Properties: Object {
-        AutoConfigurationEnabled: true,
-        CWEMonitorEnabled: true,
-        OpsCenterEnabled: true,
-        ResourceGroupName: Object {
-          Fn::Join: Array [
-            ,
-            Array [
-              AWS_AppRegistry_Application-live-streaming-on-aws-,
-              Object {
-                Ref: AWS::StackName,
-              },
-            ],
-          ],
-        },
-        Tags: Array [
-          Object {
-            Key: SolutionId,
-            Value: SO0013,
-          },
-        ],
-      },
-      Type: AWS::ApplicationInsights::Application,
     },
     CachePolicy26D8A535: Object {
       Properties: Object {
@@ -1006,15 +942,6 @@ Object {
           Enabled: true,
           HttpVersion: http2,
           IPV6Enabled: true,
-          Logging: Object {
-            Bucket: Object {
-              Fn::GetAtt: Array [
-                LogsBucket9C4D8843,
-                RegionalDomainName,
-              ],
-            },
-            Prefix: cloudfront-logs/,
-          },
           Origins: Array [
             Object {
               CustomOriginConfig: Object {
@@ -1511,9 +1438,9 @@ Object {
           S3Bucket: Object {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: 73d45459ae7abbe57b24ae45648c26887c578dbcc2c8001b8932715b29560f21.zip,
+          S3Key: 700e39bdce00113c2e39b58cb30fec1590a50aa9faf6201ab10f1f7444451b8d.zip,
         },
-        Description: Used to deploy custom resources and send AnonymousData,
+        Description: Used to deploy custom resources and send AnonymizedData,
         Environment: Object {
           Variables: Object {
             SOLUTION_IDENTIFIER: AwsSolution/SO0013/%%VERSION%%,
@@ -1931,61 +1858,6 @@ Object {
         ],
       },
       Type: AWS::IAM::Policy,
-    },
-    LogsBucket9C4D8843: Object {
-      DeletionPolicy: Retain,
-      Metadata: Object {
-        cdk_nag: Object {
-          rules_to_suppress: Array [
-            Object {
-              id: AwsSolutions-S1,
-              reason: Used to store access logs for other buckets,
-            },
-            Object {
-              id: AwsSolutions-S10,
-              reason: Bucket is private and is not using HTTP,
-            },
-          ],
-        },
-        cfn_nag: Object {
-          rules_to_suppress: Array [
-            Object {
-              id: W35,
-              reason: Used to store access logs for other buckets,
-            },
-            Object {
-              id: W51,
-              reason: Bucket is private and does not need a bucket policy,
-            },
-          ],
-        },
-      },
-      Properties: Object {
-        AccessControl: LogDeliveryWrite,
-        BucketEncryption: Object {
-          ServerSideEncryptionConfiguration: Array [
-            Object {
-              ServerSideEncryptionByDefault: Object {
-                SSEAlgorithm: AES256,
-              },
-            },
-          ],
-        },
-        PublicAccessBlockConfiguration: Object {
-          BlockPublicAcls: true,
-          BlockPublicPolicy: true,
-          IgnorePublicAcls: true,
-          RestrictPublicBuckets: true,
-        },
-        Tags: Array [
-          Object {
-            Key: SolutionId,
-            Value: SO0013,
-          },
-        ],
-      },
-      Type: AWS::S3::Bucket,
-      UpdateReplacePolicy: Retain,
     },
     MediaLiveChannel: Object {
       DeletionPolicy: Delete,

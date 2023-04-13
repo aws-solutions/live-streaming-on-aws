@@ -577,50 +577,6 @@ export class LiveStreaming extends cdk.Stack {
 
 
     /**
-     * S3: Logs bucket for CloudFront
-     */
-    const logsBucket = new s3.Bucket(this, 'LogsBucket', {
-      enforceSSL: true,
-      versioned: true,
-      removalPolicy: cdk.RemovalPolicy.RETAIN,
-      accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      blockPublicAccess: {
-        blockPublicAcls: true,
-        blockPublicPolicy: true,
-        ignorePublicAcls: true,
-        restrictPublicBuckets: true
-      }
-    });
-    /** get the cfn resource and attach cfn_nag rule */
-    (logsBucket.node.defaultChild as cdk.CfnResource).cfnOptions.metadata = {
-      cfn_nag: {
-        rules_to_suppress: [
-          {
-            id: 'W35',
-            reason: 'Used to store access logs for other buckets'
-          }, {
-            id: 'W51',
-            reason: 'Bucket is private and does not need a bucket policy'
-          }
-        ]
-      }
-    };
-    //cdk_nag
-    NagSuppressions.addResourceSuppressions(
-      logsBucket,
-      [
-        {
-          id: 'AwsSolutions-S1', //same as cfn_nag rule W35
-          reason: 'Used to store access logs for other buckets'
-        }, {
-          id: 'AwsSolutions-S10',
-          reason: 'Bucket is private and is not using HTTP'
-        }
-      ]
-    );
-
-    /**
      * CloudFront Distribution
      */
     // Need Unique name for each Cache Policy. 
@@ -697,7 +653,6 @@ export class LiveStreaming extends cdk.Stack {
         cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS
       },
       enabled: true,
-      logBucket: logsBucket,
       logFilePrefix: 'cloudfront-logs/',
       errorResponses: [
         errorResponse400,
@@ -1009,12 +964,6 @@ export class LiveStreaming extends cdk.Stack {
       description: 'Demo bucket',
       value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${demoDistribution.s3Bucket?.bucketName}?region=${cdk.Aws.REGION}`,
       exportName: `${cdk.Aws.STACK_NAME}-DemoBucket`
-    });
-
-    new cdk.CfnOutput(this, 'LogsBucketConsole', { // NOSONAR
-      description: 'Logs bucket',
-      value: `https://${cdk.Aws.REGION}.console.aws.amazon.com/s3/buckets/${logsBucket.bucketName}?region=${cdk.Aws.REGION}`,
-      exportName: `${cdk.Aws.STACK_NAME}-LogsBucket`
     });
 
     new cdk.CfnOutput(this, 'AppRegistryConsole', { // NOSONAR

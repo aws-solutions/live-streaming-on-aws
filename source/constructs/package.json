@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "@aws-cdk/aws-servicecatalogappregistry-alpha": "2.35.0-alpha.0",
-    "@aws-solutions-constructs/aws-cloudfront-s3": "2.35.0",
-    "aws-cdk-lib": "2.68.0",
+    "@aws-solutions-constructs/aws-cloudfront-s3": "2.38.0",
+    "aws-cdk-lib": "2.74.0",
     "cdk-nag": "^2.21.52",
     "constructs": "10.1.283",
     "source-map-support": "0.5.19"

@@ -583,8 +583,8 @@ export class LiveStreaming extends cdk.Stack {
       enforceSSL: true,
       versioned: true,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
-      accessControl: s3.BucketAccessControl.LOG_DELIVERY_WRITE,
       encryption: s3.BucketEncryption.S3_MANAGED,
+      objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
       blockPublicAccess: {
         blockPublicAcls: true,
         blockPublicPolicy: true,

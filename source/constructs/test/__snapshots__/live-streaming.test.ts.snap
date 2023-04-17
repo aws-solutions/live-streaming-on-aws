@@ -335,6 +335,41 @@ Object {
         ],
       },
     },
+    LogsBucketConsole: Object {
+      Description: Logs bucket,
+      Export: Object {
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              Object {
+                Ref: AWS::StackName,
+              },
+              -LogsBucket,
+            ],
+          ],
+        },
+      },
+      Value: Object {
+        Fn::Join: Array [
+          ,
+          Array [
+            https://,
+            Object {
+              Ref: AWS::Region,
+            },
+            .console.aws.amazon.com/s3/buckets/,
+            Object {
+              Ref: LogsBucket9C4D8843,
+            },
+            ?region=,
+            Object {
+              Ref: AWS::Region,
+            },
+          ],
+        ],
+      },
+    },
     MediaLiveChannelConsole: Object {
       Description: MediaLive Channel,
       Export: Object {
@@ -942,6 +977,15 @@ Object {
           Enabled: true,
           HttpVersion: http2,
           IPV6Enabled: true,
+          Logging: Object {
+            Bucket: Object {
+              Fn::GetAtt: Array [
+                LogsBucket9C4D8843,
+                RegionalDomainName,
+              ],
+            },
+            Prefix: cloudfront-logs/,
+          },
           Origins: Array [
             Object {
               CustomOriginConfig: Object {
@@ -1134,6 +1178,13 @@ Object {
               ServerSideEncryptionByDefault: Object {
                 SSEAlgorithm: AES256,
               },
+            },
+          ],
+        },
+        OwnershipControls: Object {
+          Rules: Array [
+            Object {
+              ObjectOwnership: ObjectWriter,
             },
           ],
         },
@@ -1337,7 +1388,6 @@ Object {
         },
       },
       Properties: Object {
-        AccessControl: LogDeliveryWrite,
         BucketEncryption: Object {
           ServerSideEncryptionConfiguration: Array [
             Object {
@@ -1404,6 +1454,42 @@ Object {
                 },
               ],
             },
+            Object {
+              Action: s3:PutObject,
+              Condition: Object {
+                ArnLike: Object {
+                  aws:SourceArn: Object {
+                    Fn::GetAtt: Array [
+                      CloudFrontToS3S3Bucket9CE6AB04,
+                      Arn,
+                    ],
+                  },
+                },
+                StringEquals: Object {
+                  aws:SourceAccount: Object {
+                    Ref: AWS::AccountId,
+                  },
+                },
+              },
+              Effect: Allow,
+              Principal: Object {
+                Service: logging.s3.amazonaws.com,
+              },
+              Resource: Object {
+                Fn::Join: Array [
+                  ,
+                  Array [
+                    Object {
+                      Fn::GetAtt: Array [
+                        CloudFrontToS3S3LoggingBucketEF5CD8B2,
+                        Arn,
+                      ],
+                    },
+                    /*,
+                  ],
+                ],
+              },
+            },
           ],
           Version: 2012-10-17,
         },
@@ -1438,7 +1524,7 @@ Object {
           S3Bucket: Object {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: 700e39bdce00113c2e39b58cb30fec1590a50aa9faf6201ab10f1f7444451b8d.zip,
+          S3Key: 09e61b0d6b987f1e34c37dca7fac2021462b7b3bd89ecf3fcdc0eccdae4d6b4a.zip,
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: Object {
@@ -1858,6 +1944,117 @@ Object {
         ],
       },
       Type: AWS::IAM::Policy,
+    },
+    LogsBucket9C4D8843: Object {
+      DeletionPolicy: Retain,
+      Metadata: Object {
+        cdk_nag: Object {
+          rules_to_suppress: Array [
+            Object {
+              id: AwsSolutions-S1,
+              reason: Used to store access logs for other buckets,
+            },
+            Object {
+              id: AwsSolutions-S10,
+              reason: Bucket is private and is not using HTTP,
+            },
+          ],
+        },
+        cfn_nag: Object {
+          rules_to_suppress: Array [
+            Object {
+              id: W35,
+              reason: Used to store access logs for other buckets,
+            },
+            Object {
+              id: W51,
+              reason: Bucket is private and does not need a bucket policy,
+            },
+          ],
+        },
+      },
+      Properties: Object {
+        BucketEncryption: Object {
+          ServerSideEncryptionConfiguration: Array [
+            Object {
+              ServerSideEncryptionByDefault: Object {
+                SSEAlgorithm: AES256,
+              },
+            },
+          ],
+        },
+        OwnershipControls: Object {
+          Rules: Array [
+            Object {
+              ObjectOwnership: ObjectWriter,
+            },
+          ],
+        },
+        PublicAccessBlockConfiguration: Object {
+          BlockPublicAcls: true,
+          BlockPublicPolicy: true,
+          IgnorePublicAcls: true,
+          RestrictPublicBuckets: true,
+        },
+        Tags: Array [
+          Object {
+            Key: SolutionId,
+            Value: SO0013,
+          },
+        ],
+        VersioningConfiguration: Object {
+          Status: Enabled,
+        },
+      },
+      Type: AWS::S3::Bucket,
+      UpdateReplacePolicy: Retain,
+    },
+    LogsBucketPolicyD70D9252: Object {
+      Properties: Object {
+        Bucket: Object {
+          Ref: LogsBucket9C4D8843,
+        },
+        PolicyDocument: Object {
+          Statement: Array [
+            Object {
+              Action: s3:*,
+              Condition: Object {
+                Bool: Object {
+                  aws:SecureTransport: false,
+                },
+              },
+              Effect: Deny,
+              Principal: Object {
+                AWS: *,
+              },
+              Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    LogsBucket9C4D8843,
+                    Arn,
+                  ],
+                },
+                Object {
+                  Fn::Join: Array [
+                    ,
+                    Array [
+                      Object {
+                        Fn::GetAtt: Array [
+                          LogsBucket9C4D8843,
+                          Arn,
+                        ],
+                      },
+                      /*,
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          Version: 2012-10-17,
+        },
+      },
+      Type: AWS::S3::BucketPolicy,
     },
     MediaLiveChannel: Object {
       DeletionPolicy: Delete,

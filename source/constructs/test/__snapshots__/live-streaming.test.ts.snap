@@ -4,8 +4,8 @@ exports[`LiveStreaming Stack Test 1`] = `
 Object {
   Description: (SO0013) Live Streaming on AWS Solution %%VERSION%%,
   Mappings: Object {
-    AnonymousData: Object {
-      SendAnonymousData: Object {
+    AnonymizedData: Object {
+      SendAnonymizedData: Object {
         Data: Yes,
       },
     },
@@ -554,18 +554,6 @@ Object {
     },
   },
   Parameters: Object {
-    AssetParameters[HASH REMOVED]: Object {
-      Description: Artifact hash for asset [HASH REMOVED],
-      Type: String,
-    },
-    AssetParameters[HASH REMOVED]: Object {
-      Description: S3 bucket for asset [HASH REMOVED],
-      Type: String,
-    },
-    AssetParameters[HASH REMOVED]: Object {
-      Description: S3 key for asset [HASH REMOVED],
-      Type: String,
-    },
     ChannelStart: Object {
       AllowedValues: Array [
         Yes,
@@ -664,8 +652,8 @@ Object {
         Resource: AnonymousMetric,
         SendAnonymousMetric: Object {
           Fn::FindInMap: Array [
-            AnonymousData,
-            SendAnonymousData,
+            AnonymizedData,
+            SendAnonymizedData,
             Data,
           ],
         },
@@ -688,16 +676,58 @@ Object {
       UpdateReplacePolicy: Delete,
     },
     AppRegistryApp5349BE86: Object {
+      DependsOn: Array [
+        AppRegistryAttributeIdDF43F316,
+      ],
       Properties: Object {
-        Description: (SO0013) Live Streaming on AWS Solution %%VERSION%%,
-        Name: LiveStreamingOnAws,
+        Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              live-streaming-on-aws-,
+              Object {
+                Ref: AWS::StackName,
+              },
+            ],
+          ],
+        },
         Tags: Object {
+          ApplicationType: AWS-Solutions,
+          SolutionDomain: CloudFoundations,
           SolutionId: SO0013,
+          SolutionName: Live Streaming on AWS,
+          SolutionVersion: %%VERSION%%,
+          appRegistryApplicationName: live-streaming-on-aws-stack,
+          solutionId: SO0013,
         },
       },
       Type: AWS::ServiceCatalogAppRegistry::Application,
     },
+    AppRegistryAppAttributeGroupAssociatione6a1c2e3176a77F7002D: Object {
+      DependsOn: Array [
+        AppRegistryAttributeIdDF43F316,
+      ],
+      Properties: Object {
+        Application: Object {
+          Fn::GetAtt: Array [
+            AppRegistryApp5349BE86,
+            Id,
+          ],
+        },
+        AttributeGroup: Object {
+          Fn::GetAtt: Array [
+            AppRegistryAttributeIdDF43F316,
+            Id,
+          ],
+        },
+      },
+      Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation,
+    },
     AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8: Object {
+      DependsOn: Array [
+        AppRegistryAttributeIdDF43F316,
+      ],
       Properties: Object {
         Application: Object {
           Fn::GetAtt: Array [
@@ -712,6 +742,36 @@ Object {
       },
       Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
     },
+    AppRegistryAttributeIdDF43F316: Object {
+      Properties: Object {
+        Attributes: Object {
+          ApplicationType: AWS-Solutions,
+          SolutionID: SO0013,
+          SolutionName: Live Streaming on AWS,
+          SolutionVersion: %%VERSION%%,
+        },
+        Description: Attribute group for solution information.,
+        Name: Object {
+          Fn::Join: Array [
+            ,
+            Array [
+              A30-,
+              Object {
+                Ref: AWS::Region,
+              },
+              -,
+              Object {
+                Ref: AWS::StackName,
+              },
+            ],
+          ],
+        },
+        Tags: Object {
+          SolutionId: SO0013,
+        },
+      },
+      Type: AWS::ServiceCatalogAppRegistry::AttributeGroup,
+    },
     CachePolicy26D8A535: Object {
       Properties: Object {
         CachePolicyConfig: Object {
@@ -722,7 +782,11 @@ Object {
             Fn::Join: Array [
               ,
               Array [
-                LiveStreamingCachePolicy36FCA70B-,
+                CachePolicy-,
+                Object {
+                  Ref: AWS::StackName,
+                },
+                -,
                 Object {
                   Ref: AWS::Region,
                 },
@@ -753,6 +817,7 @@ Object {
       Type: AWS::CloudFront::CachePolicy,
     },
     CdnSecret32008E6A: Object {
+      DeletionPolicy: Delete,
       Metadata: Object {
         cdk_nag: Object {
           rules_to_suppress: Array [
@@ -810,6 +875,7 @@ Object {
         ],
       },
       Type: AWS::SecretsManager::Secret,
+      UpdateReplacePolicy: Delete,
     },
     CloudFrontD198EC06: Object {
       Metadata: Object {
@@ -1115,6 +1181,13 @@ Object {
             },
           ],
         },
+        OwnershipControls: Object {
+          Rules: Array [
+            Object {
+              ObjectOwnership: ObjectWriter,
+            },
+          ],
+        },
         PublicAccessBlockConfiguration: Object {
           BlockPublicAcls: true,
           BlockPublicPolicy: true,
@@ -1139,7 +1212,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1150,6 +1223,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3CloudfrontLoggingBucket8350BE9B,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1164,14 +1243,7 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3CloudfrontLoggingBucket8350BE9B,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
             },
           ],
           Version: 2012-10-17,
@@ -1230,7 +1302,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1241,6 +1313,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3S3Bucket9CE6AB04,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1255,14 +1333,7 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3S3Bucket9CE6AB04,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
             },
             Object {
               Action: s3:GetObject,
@@ -1317,7 +1388,6 @@ Object {
         },
       },
       Properties: Object {
-        AccessControl: LogDeliveryWrite,
         BucketEncryption: Object {
           ServerSideEncryptionConfiguration: Array [
             Object {
@@ -1351,7 +1421,7 @@ Object {
         PolicyDocument: Object {
           Statement: Array [
             Object {
-              Action: *,
+              Action: s3:*,
               Condition: Object {
                 Bool: Object {
                   aws:SecureTransport: false,
@@ -1362,6 +1432,12 @@ Object {
                 AWS: *,
               },
               Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    CloudFrontToS3S3LoggingBucketEF5CD8B2,
+                    Arn,
+                  ],
+                },
                 Object {
                   Fn::Join: Array [
                     ,
@@ -1376,14 +1452,43 @@ Object {
                     ],
                   ],
                 },
-                Object {
-                  Fn::GetAtt: Array [
-                    CloudFrontToS3S3LoggingBucketEF5CD8B2,
-                    Arn,
-                  ],
-                },
               ],
-              Sid: HttpsOnly,
+            },
+            Object {
+              Action: s3:PutObject,
+              Condition: Object {
+                ArnLike: Object {
+                  aws:SourceArn: Object {
+                    Fn::GetAtt: Array [
+                      CloudFrontToS3S3Bucket9CE6AB04,
+                      Arn,
+                    ],
+                  },
+                },
+                StringEquals: Object {
+                  aws:SourceAccount: Object {
+                    Ref: AWS::AccountId,
+                  },
+                },
+              },
+              Effect: Allow,
+              Principal: Object {
+                Service: logging.s3.amazonaws.com,
+              },
+              Resource: Object {
+                Fn::Join: Array [
+                  ,
+                  Array [
+                    Object {
+                      Fn::GetAtt: Array [
+                        CloudFrontToS3S3LoggingBucketEF5CD8B2,
+                        Arn,
+                      ],
+                    },
+                    /*,
+                  ],
+                ],
+              },
             },
           ],
           Version: 2012-10-17,
@@ -1417,43 +1522,11 @@ Object {
       Properties: Object {
         Code: Object {
           S3Bucket: Object {
-            Ref: AssetParameters[HASH REMOVED],
+            Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: Object {
-            Fn::Join: Array [
-              ,
-              Array [
-                Object {
-                  Fn::Select: Array [
-                    0,
-                    Object {
-                      Fn::Split: Array [
-                        ||,
-                        Object {
-                          Ref: AssetParameters[HASH REMOVED],
-                        },
-                      ],
-                    },
-                  ],
-                },
-                Object {
-                  Fn::Select: Array [
-                    1,
-                    Object {
-                      Fn::Split: Array [
-                        ||,
-                        Object {
-                          Ref: AssetParameters[HASH REMOVED],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            ],
-          },
+          S3Key: 09e61b0d6b987f1e34c37dca7fac2021462b7b3bd89ecf3fcdc0eccdae4d6b4a.zip,
         },
-        Description: Used to deploy custom resources and send AnonymousData,
+        Description: Used to deploy custom resources and send AnonymizedData,
         Environment: Object {
           Variables: Object {
             SOLUTION_IDENTIFIER: AwsSolution/SO0013/%%VERSION%%,
@@ -1466,7 +1539,7 @@ Object {
             Arn,
           ],
         },
-        Runtime: nodejs12.x,
+        Runtime: nodejs18.x,
         Tags: Array [
           Object {
             Key: SolutionId,
@@ -1901,13 +1974,19 @@ Object {
         },
       },
       Properties: Object {
-        AccessControl: LogDeliveryWrite,
         BucketEncryption: Object {
           ServerSideEncryptionConfiguration: Array [
             Object {
               ServerSideEncryptionByDefault: Object {
                 SSEAlgorithm: AES256,
               },
+            },
+          ],
+        },
+        OwnershipControls: Object {
+          Rules: Array [
+            Object {
+              ObjectOwnership: ObjectWriter,
             },
           ],
         },
@@ -1923,9 +2002,59 @@ Object {
             Value: SO0013,
           },
         ],
+        VersioningConfiguration: Object {
+          Status: Enabled,
+        },
       },
       Type: AWS::S3::Bucket,
       UpdateReplacePolicy: Retain,
+    },
+    LogsBucketPolicyD70D9252: Object {
+      Properties: Object {
+        Bucket: Object {
+          Ref: LogsBucket9C4D8843,
+        },
+        PolicyDocument: Object {
+          Statement: Array [
+            Object {
+              Action: s3:*,
+              Condition: Object {
+                Bool: Object {
+                  aws:SecureTransport: false,
+                },
+              },
+              Effect: Deny,
+              Principal: Object {
+                AWS: *,
+              },
+              Resource: Array [
+                Object {
+                  Fn::GetAtt: Array [
+                    LogsBucket9C4D8843,
+                    Arn,
+                  ],
+                },
+                Object {
+                  Fn::Join: Array [
+                    ,
+                    Array [
+                      Object {
+                        Fn::GetAtt: Array [
+                          LogsBucket9C4D8843,
+                          Arn,
+                        ],
+                      },
+                      /*,
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          Version: 2012-10-17,
+        },
+      },
+      Type: AWS::S3::BucketPolicy,
     },
     MediaLiveChannel: Object {
       DeletionPolicy: Delete,

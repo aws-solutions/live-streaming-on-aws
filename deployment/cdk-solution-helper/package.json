@@ -1,6 +1,12 @@
 {
   "name": "cdk-solution-helper",
   "version": "0.1.0",
+  "description": "Cleans-up synthesized templates from the AWS Cloud Development Kit (CDK) and prepares them for use with the AWS Solutions publishing pipeline.",
+  "license": "Apache-2.0",
+  "author": {
+      "name": "Amazon Web Services",
+      "url": "https://aws.amazon.com/solutions"
+  },
   "dependencies": {
     "json-to-pretty-yaml": "^1.2.2"
   }

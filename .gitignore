@@ -17,3 +17,4 @@ yarn-debug.log*
 yarn-error.log*
 yarm-lock.json
 deployment/staging
+source/test/*

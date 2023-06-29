@@ -1,5 +1,3 @@
 {
-    "failOn": "medium",
-    "all": true
-  }
-  
+  "all": true
+}

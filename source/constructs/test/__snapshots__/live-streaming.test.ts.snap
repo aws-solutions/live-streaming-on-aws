@@ -676,9 +676,6 @@ Object {
       UpdateReplacePolicy: Delete,
     },
     AppRegistryApp5349BE86: Object {
-      DependsOn: Array [
-        AppRegistryAttributeIdDF43F316,
-      ],
       Properties: Object {
         Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
         Name: Object {
@@ -687,27 +684,45 @@ Object {
             Array [
               live-streaming-on-aws-,
               Object {
+                Ref: AWS::Region,
+              },
+              -,
+              Object {
+                Ref: AWS::AccountId,
+              },
+              -,
+              Object {
                 Ref: AWS::StackName,
               },
             ],
           ],
         },
         Tags: Object {
-          ApplicationType: AWS-Solutions,
-          SolutionDomain: CloudFoundations,
           SolutionId: SO0013,
-          SolutionName: Live Streaming on AWS,
-          SolutionVersion: %%VERSION%%,
-          appRegistryApplicationName: live-streaming-on-aws-stack,
-          solutionId: SO0013,
+          Solutions:ApplicationType: AWS-Solutions,
+          Solutions:SolutionID: SO0013,
+          Solutions:SolutionName: Live Streaming on AWS,
+          Solutions:SolutionVersion: %%VERSION%%,
         },
       },
       Type: AWS::ServiceCatalogAppRegistry::Application,
     },
-    AppRegistryAppAttributeGroupAssociatione6a1c2e3176a77F7002D: Object {
-      DependsOn: Array [
-        AppRegistryAttributeIdDF43F316,
-      ],
+    AppRegistryAssociation: Object {
+      Properties: Object {
+        Application: Object {
+          Fn::GetAtt: Array [
+            AppRegistryApp5349BE86,
+            Id,
+          ],
+        },
+        Resource: Object {
+          Ref: AWS::StackId,
+        },
+        ResourceType: CFN_STACK,
+      },
+      Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
+    },
+    AppRegistryAttributeIdApplicationAttributeGroupAssociation870c0d9a3690195C5906: Object {
       Properties: Object {
         Application: Object {
           Fn::GetAtt: Array [
@@ -724,31 +739,13 @@ Object {
       },
       Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation,
     },
-    AppRegistryAppResourceAssociationbb30b2b6ffac2CF098B8: Object {
-      DependsOn: Array [
-        AppRegistryAttributeIdDF43F316,
-      ],
-      Properties: Object {
-        Application: Object {
-          Fn::GetAtt: Array [
-            AppRegistryApp5349BE86,
-            Id,
-          ],
-        },
-        Resource: Object {
-          Ref: AWS::StackId,
-        },
-        ResourceType: CFN_STACK,
-      },
-      Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
-    },
     AppRegistryAttributeIdDF43F316: Object {
       Properties: Object {
         Attributes: Object {
-          ApplicationType: AWS-Solutions,
-          SolutionID: SO0013,
-          SolutionName: Live Streaming on AWS,
-          SolutionVersion: %%VERSION%%,
+          applicationType: AWS-Solutions,
+          solutionID: SO0013,
+          solutionName: Live Streaming on AWS,
+          version: %%VERSION%%,
         },
         Description: Attribute group for solution information.,
         Name: Object {
@@ -1524,7 +1521,7 @@ Object {
           S3Bucket: Object {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: ea494b94c400ee5426d2a9ed9487f6d48b0d5d27957d7f1496a1ad733a66b9ba.zip,
+          S3Key: 6e66139b6e084ae1d8f50f115218670b409208079754c114067707ebe3041bb0.zip,
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: Object {

@@ -16,7 +16,7 @@
  import * as cdk from 'aws-cdk-lib';
  import { LiveStreaming } from '../lib/live-streaming';
  import { AwsSolutionsChecks } from 'cdk-nag';
- import { DefaultStackSynthesizer, Stack } from 'aws-cdk-lib';
+ import { DefaultStackSynthesizer } from 'aws-cdk-lib';
  
  const app = new cdk.App();
  new LiveStreaming(app, 'LiveStreaming', { // NOSONAR

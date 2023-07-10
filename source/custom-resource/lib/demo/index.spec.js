@@ -34,7 +34,11 @@ describe('#S3::', () => {
     destBucket:'destBucket',
     awsExport: 'filebody'
   }
-  const getData = {Body:"[\"console/file1\",\"console/file2\"]"};
+  const getData = {
+    "Body": {
+      transformToString: () => ('["asset-manifest.json","assets/favicon.ico","assets/apple-icon.png","assets/aws-exports.js","index.html","robots.txt","static/css/main.0b96ce14.css","static/css/main.0b96ce14.css.map","static/js/main.1b2a7f8e.js.LICENSE.txt","static/js/main.1b2a7f8e.js","static/js/main.1b2a7f8e.js.map"]')
+    }
+  };
 
   const listData = {
     Contents:[{

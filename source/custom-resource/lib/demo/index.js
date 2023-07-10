@@ -70,9 +70,9 @@ const delAssets = async (config) => {
 		};
 		let data = await s3.listObjects(params);
 		let objects = [];
-		for (let i = 0; i < data.Contents.length; i++) {
+		for (let content of data.Contents) {
 			objects.push({
-				Key: data.Contents[i].Key
+				Key: content.Key
 			});
 		}
 		params = {

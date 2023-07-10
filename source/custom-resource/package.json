@@ -15,15 +15,15 @@
     "uuid": "*"
   },
   "devDependencies": {
-    "@aws-sdk/client-lambda": "^3.348.0",
-    "@aws-sdk/client-medialive": "^3.348.0",
-    "@aws-sdk/client-mediapackage": "^3.348.0",
-    "@aws-sdk/client-s3": "^3.348.0",
-    "@aws-sdk/client-ssm": "^3.348.0",
-    "aws-sdk-client-mock": "^2.1.1",
+    "@aws-sdk/client-lambda": "^3.363.0",
+    "@aws-sdk/client-medialive": "^3.368.0",
+    "@aws-sdk/client-mediapackage": "^3.363.0",
+    "@aws-sdk/client-s3": "^3.367.0",
+    "@aws-sdk/client-ssm": "^3.363.0",
+    "aws-sdk-client-mock": "^3.0.0",
     "axios-mock-adapter": "*",
     "chai": "*",
-    "jest": "^26.6.3"
+    "jest": "^29.6.1"
   },
   "repository": {
     "type": "git",

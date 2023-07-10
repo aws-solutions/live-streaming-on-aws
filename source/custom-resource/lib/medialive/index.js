@@ -247,9 +247,6 @@ const createChannel = async (config) => {
         }
         console.log(`Creating Channel with a ${config.EncodingProfile} profile`);
         data = await medialive.send(new CreateChannelCommand(params));
-        params = {
-            ChannelId: data.Channel.Id
-        }
         responseData = {
             ChannelId: data.Channel.Id
         };

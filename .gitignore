@@ -1,5 +1,6 @@
 node_modules/
-coverage
+coverage/
+source/test/coverage-reports/jest/*
 build/
 dev/
 global-s3-assets/

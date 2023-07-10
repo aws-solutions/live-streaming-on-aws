@@ -10,11 +10,11 @@
  *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
-const AWS = require('aws-sdk');
-const url = require('url');
+const { MediaPackage } = require('@aws-sdk/client-mediapackage');
+const { SSM } = require('@aws-sdk/client-ssm');
 
 const createEndPoint = async (config) => {
-    const mediapackage = new AWS.MediaPackage({
+    const mediapackage = new MediaPackage({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
@@ -91,13 +91,13 @@ const createEndPoint = async (config) => {
                 console.log('Error EndPoint not defined');
         }
         // Create Endpoint & return detials
-        const data = await mediapackage.createOriginEndpoint(params).promise();
+        const data = await mediapackage.createOriginEndpoint(params);
 
         let Url;
         if (config.EndPoint === 'CMAF') {
-            Url = url.parse(data.CmafPackage.HlsManifests[0].Url);
+            Url = new URL(data.CmafPackage.HlsManifests[0].Url);
         } else {
-          Url = url.parse(data.Url);
+            Url = new URL(data.Url);
         }
 
         responseData = {
@@ -116,11 +116,11 @@ const createEndPoint = async (config) => {
 
 // FEATURE/P15424610:: Function updated to use Async
 const createChannel = async (config) => {
-    const mediapackage = new AWS.MediaPackage({
+    const mediapackage = new MediaPackage({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
-    const ssm = new AWS.SSM({
+    const ssm = new SSM({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
@@ -135,7 +135,7 @@ const createChannel = async (config) => {
                 SolutionId: 'SO0013'
             }
         };
-        let data = await mediapackage.createChannel(params).promise();
+        let data = await mediapackage.createChannel(params);
 
         responseData = {
             Arn: data.Arn,
@@ -157,7 +157,7 @@ const createChannel = async (config) => {
             Value: data.HlsIngest.IngestEndpoints[0].Password,
             Description: 'live-streaming-on-aws MediaPackage Primary Ingest Username'
         };
-        await ssm.putParameter(primary).promise();
+        await ssm.putParameter(primary);
 
         let secondary = {
             Name: data.HlsIngest.IngestEndpoints[1].Username,
@@ -165,7 +165,7 @@ const createChannel = async (config) => {
             Value: data.HlsIngest.IngestEndpoints[1].Password,
             Description: 'live-streaming-on-aws MediaPackage Secondary Ingest Username'
         };
-        await ssm.putParameter(secondary).promise();
+        await ssm.putParameter(secondary);
     } catch (err) {
         console.error(err);
         throw err;
@@ -176,7 +176,7 @@ const createChannel = async (config) => {
 
 // FEATURE/P15424610:: Function updated to use Async
 const deleteChannel = async (ChannelId) => {
-    const mediapackage = new AWS.MediaPackage({
+    const mediapackage = new MediaPackage({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
@@ -185,20 +185,20 @@ const deleteChannel = async (ChannelId) => {
             ChannelId: ChannelId
         };
         //Get a list of the endpoints Ids
-        let data = await mediapackage.listOriginEndpoints(params).promise();
+        let data = await mediapackage.listOriginEndpoints(params);
         //Delete the list of endpoints and wait for the deletes to complete.
         let endPoints = data.OriginEndpoints;
         await Promise.all(endPoints.map(async (endpoint) => {
             params = {
                 Id: endpoint.Id
             };
-            await mediapackage.deleteOriginEndpoint(params).promise();
+            await mediapackage.deleteOriginEndpoint(params);
         }));
         //Delete the Channel.
         params = {
             Id: ChannelId
         };
-        await mediapackage.deleteChannel(params).promise();
+        await mediapackage.deleteChannel(params);
     } catch (err) {
         console.error(err);
         throw err;

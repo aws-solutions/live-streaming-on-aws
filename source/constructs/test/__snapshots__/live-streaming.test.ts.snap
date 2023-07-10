@@ -1524,7 +1524,7 @@ Object {
           S3Bucket: Object {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: 09e61b0d6b987f1e34c37dca7fac2021462b7b3bd89ecf3fcdc0eccdae4d6b4a.zip,
+          S3Key: ea494b94c400ee5426d2a9ed9487f6d48b0d5d27957d7f1496a1ad733a66b9ba.zip,
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: Object {

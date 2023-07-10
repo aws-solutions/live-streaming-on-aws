@@ -11,7 +11,6 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 const axios = require('axios');
-const moment = require('moment');
 
 
 const send = async (config) => {
@@ -24,7 +23,7 @@ const send = async (config) => {
         const metrics = {
             Solution: config.SolutionId,
             UUID: config.UUID,
-            TimeStamp: moment().utc().format('YYYY-MM-DD HH:mm:ss.S'),
+            TimeStamp: new Date().toISOString(),
             Data: config
         };
         const params = {

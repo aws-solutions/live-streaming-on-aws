@@ -11,9 +11,24 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 const expect = require('chai').expect;
-const path = require('path');
-let AWS = require('aws-sdk-mock');
-AWS.setSDK(path.resolve('./node_modules/aws-sdk'));
+const { mockClient } = require('aws-sdk-client-mock');
+const {
+  MediaLiveClient,
+  CreateInputCommand,
+  DeleteInputCommand,
+  DescribeInputCommand,
+  CreateInputSecurityGroupCommand,
+  DeleteInputSecurityGroupCommand,
+  DescribeInputSecurityGroupCommand,
+  CreateChannelCommand,
+  StartChannelCommand,
+  StopChannelCommand,
+  DeleteChannelCommand
+} = require('@aws-sdk/client-medialive');
+const { 
+  SSMClient, 
+  PutParameterCommand 
+} = require('@aws-sdk/client-ssm');
 
 const lambda = require('./index.js');
 
@@ -87,114 +102,100 @@ const data = {
 
 describe('#MEDIALIVE::', () => {
 
-	afterEach(() => {
-    AWS.restore('MediaLive');
-    AWS.restore('SSM');
-	});
+  const mediaLiveClientMock = mockClient(MediaLiveClient);
+  const ssmClientMock = mockClient(SSMClient);
 
 	it('should return "responseData" when create PULL INPUT is successful', async () => {
-		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
-    AWS.mock('SSM', 'putParameter');
+    mediaLiveClientMock.on(CreateInputCommand).resolves(input_data);
+    ssmClientMock.on(PutParameterCommand).resolves();
     const response = await lambda.createInput(pull_config)
     expect(response.Id).to.equal('2468');
 	});
   it('should return "ERROR" on MediaLive create PULL INPUT', async () => {
-    AWS.mock('SSM', 'putParameter');
-    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(CreateInputCommand).rejects('ERROR');
     await lambda.createInput(pull_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('should return "responseData" when create PUSH INPUT is successful', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    mediaLiveClientMock.on(CreateInputSecurityGroupCommand).resolves(input_data);
+    mediaLiveClientMock.on(CreateInputCommand).resolves(input_data);
     const response = await lambda.createInput(push_config)
     expect(response.Id).to.equal('2468');
 	});
   it('should return "ERROR" on MediaLive create PUSH INPUT', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(CreateInputCommand).rejects('ERROR');
     await lambda.createInput(push_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('should return "responseData" when create RTMP PUSH INPUT is successful', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    mediaLiveClientMock.on(CreateInputCommand).resolves(input_data);
     const response = await lambda.createInput(rtmp_push_config)
     expect(response.Id).to.equal('2468');
 	});
   it('should return "ERROR" on MediaLive create RTMP PUSH INPUT', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(CreateInputCommand).rejects('ERROR');
     await lambda.createInput(rtmp_push_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('should return "responseData" when create MEDIACONNECT INPUT is successful', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-		AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    mediaLiveClientMock.on(CreateInputCommand).resolves(input_data);
     const response = await lambda.createInput(mediaconnect_config)
     expect(response.Id).to.equal('2468');
 	});
   it('should return "ERROR" on MediaLive create MEDIACONNECT INPUT', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-    AWS.mock('MediaLive', 'createInput', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(CreateInputCommand).rejects('ERROR');
     await lambda.createInput(mediaconnect_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('should return "input type not defined in request" on MediaLive create Invalid INPUT', async () => {
-    AWS.mock('MediaLive', 'createInputSecurityGroup', Promise.resolve(input_data));
-    AWS.mock('MediaLive', 'createInput', Promise.resolve(input_data));
+    mediaLiveClientMock.on(CreateInputCommand).resolves(input_data);
     await lambda.createInput(invalid_config).catch(err => {
       expect(err).to.equal('input type not defined in request');
     });
   });
   it('CREATE CHANNEL SUCCESS',async () => {
-    AWS.mock('MediaLive', 'createChannel', Promise.resolve(data));
-    AWS.mock('MediaLive', 'waitFor', Promise.resolve());
+    mediaLiveClientMock.on(CreateChannelCommand).resolves(data);
     const response = await lambda.createChannel(config)
     expect(response.ChannelId).to.equal('2468');
   });
   it('CREATE CHANNEL ERROR', async () => {
-    AWS.mock('MediaLive', 'createChannel', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(CreateChannelCommand).rejects('ERROR');
     await lambda.createChannel(config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('START CHANNEL SUCCESS', async () => {
-    AWS.mock('MediaLive', 'startChannel', Promise.resolve(data));
+    mediaLiveClientMock.on(StartChannelCommand).resolves(data);
     const response = await lambda.startChannel(config)
     expect(response).to.equal('success');
   });
   it('START CHANNEL ERROR', async () => {
-    AWS.mock('MediaLive', 'startChannel', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(StartChannelCommand).rejects('ERROR');
     await lambda.startChannel(config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('DELETE CHANNEL SUCCESS', async () => {
-    AWS.mock('MediaLive', 'stopChannel', Promise.resolve());
-    AWS.mock('MediaLive', 'waitFor', Promise.resolve());
-    AWS.mock('MediaLive', 'deleteChannel', Promise.resolve());
-    AWS.mock('MediaLive', 'waitFor', Promise.resolve());
+    mediaLiveClientMock.on(StopChannelCommand).resolves();
+    mediaLiveClientMock.on(DeleteChannelCommand).resolves();
     const response = await lambda.deleteChannel('1234')
     expect(response).to.equal('success');
   });
   it('DELETE CHANNEL ERROR', async () => {
-    AWS.mock('MediaLive', 'stopChannel', Promise.resolve());
-    AWS.mock('MediaLive', 'waitFor', Promise.resolve());
-    AWS.mock('MediaLive', 'deleteChannel', Promise.reject('ERROR'));
+    mediaLiveClientMock.on(DeleteChannelCommand).rejects('ERROR');
     await lambda.deleteChannel('1234').catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('DELETE INPUT SUCCESS', async () => {
-    AWS.mock('MediaLive', 'describeInput', Promise.resolve(input_data));
-    AWS.mock('MediaLive', 'deleteInput', Promise.resolve());
-    AWS.mock('MediaLive', 'describeInputSecurityGroup', Promise.resolve());
-    AWS.mock('MediaLive', 'deleteInputSecurityGroup', Promise.resolve());
+    mediaLiveClientMock.on(DescribeInputCommand).resolves(input_data);
+    mediaLiveClientMock.on(DeleteInputCommand).resolves();
+    mediaLiveClientMock.on(DescribeInputSecurityGroupCommand).resolves();
+    mediaLiveClientMock.on(DeleteInputSecurityGroupCommand).resolves();
     const response = await lambda.deleteInput('1357')
     expect(response).to.equal('success');
   });

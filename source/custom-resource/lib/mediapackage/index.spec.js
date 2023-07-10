@@ -11,9 +11,19 @@
  *  and limitations under the License.                                                                                *
  *********************************************************************************************************************/
 const expect = require('chai').expect;
-const path = require('path');
-let AWS = require('aws-sdk-mock');
-AWS.setSDK(path.resolve('./node_modules/aws-sdk'));
+const { mockClient } = require('aws-sdk-client-mock');
+const {
+  MediaPackageClient,
+  CreateChannelCommand,
+  DeleteChannelCommand,
+  CreateOriginEndpointCommand,
+  DeleteOriginEndpointCommand,
+  ListOriginEndpointsCommand
+} = require('@aws-sdk/client-mediapackage');
+const { 
+  SSMClient, 
+  PutParameterCommand 
+} = require('@aws-sdk/client-ssm');
 
 const lambda = require('./index.js');
 
@@ -52,47 +62,43 @@ const ChannelId = 'test';
 
 describe('#MEDIAPACKAGE::', () => {
 
-	afterEach(() => {
-    AWS.restore('MediaPackage');
-    AWS.restore('SSM');
-	});
+  const mediaPackageClientMock = mockClient(MediaPackageClient);
+  const ssmClientMock = mockClient(SSMClient);
 
 	it('should return "responseData" on mediapackage create EndPoint', async () => {
-		AWS.mock('MediaPackage', 'createOriginEndpoint', Promise.resolve(data));
+    mediaPackageClientMock.on(CreateOriginEndpointCommand).resolves(data);
 		const response = await lambda.createEndPoint(_config);
     expect(response.DomainName).to.equal('test.com');
 	});
   it('should return "ERROR" on mediapackage create EndPoint', async () => {
-    AWS.mock('MediaPackage', 'createOriginEndpoint', Promise.reject('ERROR'));
+    mediaPackageClientMock.on(CreateOriginEndpointCommand).rejects('ERROR');
     await lambda.createEndPoint(_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
 	it('should return "responseData" on mediapackage create Channel', async () => {
-		AWS.mock('MediaPackage', 'createChannel', Promise.resolve(data));
-    AWS.mock('SSM', 'putParameter');
-    AWS.mock('SSM', 'putParameter');
+    mediaPackageClientMock.on(CreateChannelCommand).resolves(data);
+    ssmClientMock.on(PutParameterCommand).resolves();
 		const response = await lambda.createChannel(_config)
 		expect(response.Arn).to.equal('mediapackage-arn');
 	});
   it('should return "ERROR" on mediapackage create Channel', async () => {
-    AWS.mock('MediaPackage', 'createChannel', Promise.reject('ERROR'));
-    AWS.mock('SSM', 'putParameter');
+    mediaPackageClientMock.on(CreateChannelCommand).rejects('ERROR');
     await lambda.createChannel(_config).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
   it('should return "responseData" on mediapackage delete channel',async () => {
-		AWS.mock('MediaPackage', 'listOriginEndpoints', Promise.resolve(data));
-    AWS.mock('MediaPackage', 'deleteOriginEndpoint');
-    AWS.mock('MediaPackage', 'deleteChannel');
+    mediaPackageClientMock.on(ListOriginEndpointsCommand).resolves(data);
+		mediaPackageClientMock.on(DeleteOriginEndpointCommand).resolves();
+    mediaPackageClientMock.on(DeleteChannelCommand).resolves();
     const response = await lambda.deleteChannel(ChannelId)
     expect(response).to.equal('success');
 	});
   it('should return "ERROR" on mediapackage delete Channel', async () => {
-    AWS.mock('MediaPackage', 'listOriginEndpoints', Promise.reject('ERROR'));
+    mediaPackageClientMock.on(ListOriginEndpointsCommand).rejects('ERROR');
     await lambda.deleteChannel(ChannelId).catch(err => {
-      expect(err).to.equal('ERROR');
+      expect(err.toString()).to.equal('Error: ERROR');
     });
   });
 

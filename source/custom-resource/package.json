@@ -18,15 +18,15 @@
     "aws-sdk-mock": "^5.8.0",
     "axios-mock-adapter": "^1.21.5",
     "chai": "^4.3.7",
-    "jest": "^29.5.0"
+    "jest": "^29.6.1"
   },
   "repository": {
     "type": "git",
     "url": "na"
   },
   "author": {
-      "name": "Amazon Web Services",
-      "url": "https://aws.amazon.com/solutions"
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
   },
   "license": "Apache-2.0",
   "readme": "./README.md"

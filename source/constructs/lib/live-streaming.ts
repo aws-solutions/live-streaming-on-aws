@@ -156,7 +156,7 @@ export class LiveStreaming extends cdk.Stack {
       }
     };
     /**
-     * Mapping for sending anonymous metrics to AWS Solution Builders API
+     * Mapping for sending anonymized metrics to AWS Solution Builders API
      */
     new cdk.CfnMapping(this, 'AnonymizedData', { // NOSONAR
       mapping: {
@@ -898,7 +898,7 @@ export class LiveStreaming extends cdk.Stack {
          applicationName: applicationName,
          description: `Service Catalog application to track and manage all your resources. The SolutionId is ${solutionId} and SolutionVersion is %%VERSION%%.`
      });
-     appRegistry.associateStack(this);
+     appRegistry.associateApplicationWithStack(this);
      cdk.Tags.of(appRegistry).add('solutionId', solutionId);
      cdk.Tags.of(appRegistry).add('SolutionName', solutionName);
      cdk.Tags.of(appRegistry).add('SolutionDomain', 'CloudFoundations');
@@ -906,17 +906,16 @@ export class LiveStreaming extends cdk.Stack {
      cdk.Tags.of(appRegistry).add('appRegistryApplicationName', 'live-streaming-on-aws-stack');
      cdk.Tags.of(appRegistry).add('ApplicationType', 'AWS-Solutions');
  
-     appRegistry.node.addDependency(attributeGroup);
-     appRegistry.associateAttributeGroup(attributeGroup);
+     attributeGroup.associateWith(appRegistry);
  
 
     /**
-     * AnonymousMetric
+     * AnonymizedMetric
      */
-    new cdk.CustomResource(this, 'AnonymousMetric', { // NOSONAR
+    new cdk.CustomResource(this, 'AnonymizedMetric', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
-        Resource: 'AnonymousMetric',
+        Resource: 'AnonymizedMetric',
         SolutionId: 'SO0013',
         UUID: uuid.getAttString('UUID'),
         Version: '%%VERSION%%',
@@ -924,7 +923,7 @@ export class LiveStreaming extends cdk.Stack {
         EncodingProfile: encodingProfile.valueAsString,
         Cidr: inputCIDR.valueAsString,
         ChannelStart: channelStart.valueAsString,
-        SendAnonymousMetric: cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')
+        SendAnonymizedMetric: cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')
       }
     });
 
@@ -933,11 +932,11 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Outputs
      */
-    if (cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')) {
-      new cdk.CfnOutput(this, 'AnonymousMetricUUID', { // NOSONAR
-        description: 'AnonymousMetric UUID',
+    if (cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data') === 'Yes') {
+      new cdk.CfnOutput(this, 'AnonymizedMetricUUID', { // NOSONAR
+        description: 'AnonymizedMetric UUID',
         value: uuid.getAttString('UUID'),
-        exportName: `${cdk.Aws.STACK_NAME}-AnonymousMetricUUID`
+        exportName: `${cdk.Aws.STACK_NAME}-AnonymizedMetricUUID`
       });
     }
 

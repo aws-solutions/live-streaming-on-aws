@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated npm packages
 
+### Fixed
+
+- Fixed an issue where anonymized data was sent even when customers opted out
+
 ## [4.2.1] - 2023-04-17
 
 ### Changed

@@ -102,6 +102,7 @@ exports[`LiveStreaming Stack Test 1`] = `
     },
   },
   Outputs: {
+<<<<<<< HEAD
     AnonymousMetricUUID: {
       Description: AnonymousMetric UUID,
       Export: {
@@ -124,6 +125,8 @@ exports[`LiveStreaming Stack Test 1`] = `
         ],
       },
     },
+=======
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
     AppRegistryConsole: {
       Description: AppRegistry,
       Export: {
@@ -634,7 +637,11 @@ exports[`LiveStreaming Stack Test 1`] = `
     },
   },
   Resources: {
+<<<<<<< HEAD
     AnonymousMetric: {
+=======
+    AnonymizedMetric: {
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
       DeletionPolicy: Delete,
       Properties: {
         ChannelStart: {
@@ -649,8 +656,13 @@ exports[`LiveStreaming Stack Test 1`] = `
         InputType: {
           Ref: InputType,
         },
+<<<<<<< HEAD
         Resource: AnonymousMetric,
         SendAnonymousMetric: {
+=======
+        Resource: AnonymizedMetric,
+        SendAnonymizedMetric: {
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
           Fn::FindInMap: [
             AnonymizedData,
             SendAnonymizedData,
@@ -676,6 +688,12 @@ exports[`LiveStreaming Stack Test 1`] = `
       UpdateReplacePolicy: Delete,
     },
     AppRegistryApp5349BE86: {
+<<<<<<< HEAD
+=======
+      DependsOn: [
+        AppRegistryAttributeIdDF43F316,
+      ],
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
       Properties: {
         Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
         Name: {
@@ -684,6 +702,7 @@ exports[`LiveStreaming Stack Test 1`] = `
             [
               live-streaming-on-aws-,
               {
+<<<<<<< HEAD
                 Ref: AWS::Region,
               },
               -,
@@ -692,12 +711,19 @@ exports[`LiveStreaming Stack Test 1`] = `
               },
               -,
               {
+=======
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
                 Ref: AWS::StackName,
               },
             ],
           ],
         },
         Tags: {
+<<<<<<< HEAD
+=======
+          ApplicationType: AWS-Solutions,
+          SolutionDomain: CloudFoundations,
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
           SolutionId: SO0013,
           Solutions:ApplicationType: AWS-Solutions,
           Solutions:SolutionID: SO0013,
@@ -707,7 +733,14 @@ exports[`LiveStreaming Stack Test 1`] = `
       },
       Type: AWS::ServiceCatalogAppRegistry::Application,
     },
+<<<<<<< HEAD
     AppRegistryAssociation: {
+=======
+    AppRegistryAppAttributeGroupAssociatione6a1c2e3176a77F7002D: {
+      DependsOn: [
+        AppRegistryAttributeIdDF43F316,
+      ],
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
       Properties: {
         Application: {
           Fn::GetAtt: [
@@ -715,6 +748,7 @@ exports[`LiveStreaming Stack Test 1`] = `
             Id,
           ],
         },
+<<<<<<< HEAD
         Resource: {
           Ref: AWS::StackId,
         },
@@ -730,6 +764,8 @@ exports[`LiveStreaming Stack Test 1`] = `
             Id,
           ],
         },
+=======
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
         AttributeGroup: {
           Fn::GetAtt: [
             AppRegistryAttributeIdDF43F316,
@@ -739,6 +775,7 @@ exports[`LiveStreaming Stack Test 1`] = `
       },
       Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation,
     },
+<<<<<<< HEAD
     AppRegistryAttributeIdDF43F316: {
       Properties: {
         Attributes: {
@@ -746,6 +783,30 @@ exports[`LiveStreaming Stack Test 1`] = `
           solutionID: SO0013,
           solutionName: Live Streaming on AWS,
           version: %%VERSION%%,
+=======
+    AppRegistryAssociation: {
+      Properties: {
+        Application: {
+          Fn::GetAtt: [
+            AppRegistryApp5349BE86,
+            Id,
+          ],
+        },
+        Resource: {
+          Ref: AWS::StackId,
+        },
+        ResourceType: CFN_STACK,
+      },
+      Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
+    },
+    AppRegistryAttributeIdDF43F316: {
+      Properties: {
+        Attributes: {
+          ApplicationType: AWS-Solutions,
+          SolutionID: SO0013,
+          SolutionName: Live Streaming on AWS,
+          SolutionVersion: %%VERSION%%,
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
         },
         Description: Attribute group for solution information.,
         Name: {
@@ -1521,7 +1582,11 @@ exports[`LiveStreaming Stack Test 1`] = `
           S3Bucket: {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
+<<<<<<< HEAD
           S3Key: 1762d82149376e48861baa86efeb435ea94de59312c6e0cba72cef0535c10758.zip,
+=======
+          S3Key: 3ad5a292a8fc93cdc7b3ef10379915107931512e47ac9c0958368d5b1d8420e2.zip,
+>>>>>>> 6197faaefca5967c8af1c9177ef8ea6a8d719506
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: {

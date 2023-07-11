@@ -115,6 +115,6 @@ aws s3 sync ./global-s3-assets/ s3://my-bucket-us-east-1/live-streaming-on-aws/<
 
 * This project is licensed under the terms of the Apache 2.0 license. See here `LICENSE`.
 
-This solution collects anonymous operational metrics to help AWS improve the
+This solution collects anonymized operational metrics to help AWS improve the
 quality of features of the solution. For more information, including how to disable
 this capability, please see the [implementation guide](https://docs.aws.amazon.com/solutions/latest/live-streaming/welcome.html).

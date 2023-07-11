@@ -60,9 +60,11 @@ exports.handler = async (event, context) => {
                     await demo.copyAssets(config);
                     break;
 
-                case ('AnonymousMetric'):
-                    if (config.SendAnonymousMetric) {
+                case ('AnonymizedMetric'):
+                    if (config.SendAnonymizedMetric === 'Yes') {
                         await metrics.send(config);
+                    } else {
+                        console.log('Anonymized metric not sent.');
                     }
                     break;
 

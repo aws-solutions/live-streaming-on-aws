@@ -10,8 +10,8 @@
     "url": "https://github.com/aws-solutions/live-stream-on-aws"
   },
   "author": {
-      "name": "Amazon Web Services",
-      "url": "https://aws.amazon.com/solutions"
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com/solutions"
   },
   "license": "Apache-2.0",
   "scripts": {

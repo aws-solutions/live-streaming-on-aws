@@ -27,11 +27,4 @@ phases:
   
 artifacts:  
   files:  
-      - deployment/**/* 
-      - source/**/*
-      - CHANGELOG.md 
-      - buildspec.yml
-      - .gitignore
-      - sonar-project.properties
-      - NOTICE.txt
-
+      - "**/*"

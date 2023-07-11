@@ -64,7 +64,8 @@ const input_data = {
       {Url:'http://123:5000'},
       {Url:'http://456:5000'}
     ]
-  }
+  },
+  State: "DETACHED"
 };
 const config = {
   Codec:'AVC',

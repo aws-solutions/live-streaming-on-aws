@@ -291,6 +291,17 @@ const deleteInput = async (InputId) => {
            InputId: InputId
        };
        data = await medialive.send(new DescribeInputCommand(params));
+       let state = data.State;
+       let retry = 5;
+       while (state !== 'DETACHED') {
+            await sleep(6000);
+            data = await medialive.send(new DescribeInputCommand(params));
+            state = data.State;
+            retry = retry - 1;
+            if (retry === 0 && state !== 'DETACHED') {
+                throw new Error(`Failed to delete Input, state: ${state} is not DETACHED`);
+            }
+       }
        await medialive.send(new DeleteInputCommand(params));
        if (data.SecurityGroups && data.SecurityGroups.length !== 0 ) {
            params = {
@@ -300,8 +311,8 @@ const deleteInput = async (InputId) => {
            * When the input is deleted the SG is detached however it can take a few seconds for the SG state
            * to change from IN_USE to IDLE
            */
-           let state = '';
-           let retry = 5;
+           state = '';
+           retry = 5;
            while (state !== 'IDLE') {
                await sleep(6000);
                data = await medialive.send(new DescribeInputSecurityGroupCommand(params));

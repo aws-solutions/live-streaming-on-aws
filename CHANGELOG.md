@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated npm packages
+- Upgraded lambda runtimes to NodeJS 18 and AWS SDK v3
 
 ### Fixed
 

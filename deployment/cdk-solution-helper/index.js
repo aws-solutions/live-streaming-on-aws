@@ -44,7 +44,6 @@ fs.readdirSync(global_s3_assets).forEach(file => {
         } else {
             console.warn(`No S3Bucket Property found for ${JSON.stringify(prop)}`);
         }
-    }
     });
 
     // Clean-up nested template stack dependencies

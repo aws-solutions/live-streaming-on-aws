@@ -14,7 +14,7 @@
     "react-bootstrap": "^1.5.2",
     "react-dom": "^18.2.0",
     "react-player": "^2.9.0",
-    "react-scripts": "^5.0.0"
+    "react-scripts": "^5.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.12.0",

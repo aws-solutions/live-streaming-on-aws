@@ -7,6 +7,7 @@ const {
     StartChannelCommand,
     StopChannelCommand,
     DeleteChannelCommand,
+    DescribeChannelCommand,
     DescribeInputCommand,
     DeleteInputCommand,
     DescribeInputSecurityGroupCommand,
@@ -251,14 +252,27 @@ const createChannel = async (config) => {
 
 const startChannel = async (config) => {
    console.log('Starting Channel.....');
+   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
    const medialive = new MediaLiveClient({
        region: process.env.AWS_REGION,
        customUserAgent: process.env.SOLUTION_IDENTIFIER
    });
-   try {
-       let params = {
-           ChannelId: config.ChannelId
-       };
+    try {
+        let params = {
+            ChannelId: config.ChannelId
+        };
+        let data = await medialive.send(new DescribeChannelCommand(params));
+        let state = data.State;
+        let retry = 5;
+        while (state !== 'IDLE') {
+            await sleep(6000);
+            data = await medialive.send(new DescribeChannelCommand(params));
+            state = data.State;
+            retry = retry - 1;
+            if (retry === 0 && state !== 'IDLE') {
+                throw new Error(`Failed to start channel, state: ${state} is not IDLE`);
+            }
+        }
        await medialive.send(new StartChannelCommand(params));
    } catch (err) {
        console.error(err);

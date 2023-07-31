@@ -14,7 +14,8 @@ const {
   CreateChannelCommand,
   StartChannelCommand,
   StopChannelCommand,
-  DeleteChannelCommand
+  DeleteChannelCommand,
+  DescribeChannelCommand
 } = require('@aws-sdk/client-medialive');
 const { 
   SSMClient, 
@@ -162,6 +163,7 @@ describe('#MEDIALIVE::', () => {
   });
   it('START CHANNEL SUCCESS', async () => {
     mediaLiveClientMock.on(StartChannelCommand).resolves(data);
+    mediaLiveClientMock.on(DescribeChannelCommand).resolves(data);
     const response = await lambda.startChannel(config)
     expect(response).to.equal('success');
   });

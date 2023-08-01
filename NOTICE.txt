@@ -40,5 +40,6 @@ ts-jest under the Massachusetts Institute of Technology (MIT) license
 ts-node under the Massachusetts Institute of Technology (MIT) license
 typescript under the Apache License Version 2.0
 @aws-cdk/aws-servicecatalogappregistry-alpha under the Apache License Version 2.0
+ansi-regex under the Massachusetts Institute of Technology (MIT) license
 
 The licenses for these third party components are included in LICENSE.txt

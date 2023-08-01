@@ -41,8 +41,8 @@ echo "--------------------------------------------------------------------------
 echo "Copying Source Folder"
 echo "------------------------------------------------------------------------------"
 cp -r $source_dir $dist_dir
-cp $source_template_dir/../LICENSE $dist_dir
-cp $source_template_dir/../NOTICE $dist_dir
+cp $source_template_dir/../LICENSE.txt $dist_dir
+cp $source_template_dir/../NOTICE.txt $dist_dir
 cp $source_template_dir/../README.md $dist_dir
 cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir
 cp $source_template_dir/../CONTRIBUTING.md $dist_dir

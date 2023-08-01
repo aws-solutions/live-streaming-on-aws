@@ -5,7 +5,7 @@ import React from 'react';
 import ReactPlayer from 'react-player';
 import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button';
-import CardDeck from 'react-bootstrap/CardDeck';
+import Stack from 'react-bootstrap/Stack';
 import Card from 'react-bootstrap/Card';
 
 declare var awsExports;
@@ -67,7 +67,7 @@ class App extends React.Component {
         <Button onClick={() => this.load(awsExports.dash_manifest,"DASH")} className="perview" size="sm" variant="success">Preview DASH</Button>
         <Button onClick={() => this.load(awsExports.cmaf_manifest,"CMAF")} className="perview" size="sm" variant="success">Preview CMAF</Button>
         
-        <CardDeck style={{ margin: '4rem auto'}}>
+        <Stack style={{ margin: '4rem auto'}} gap="3">
           <Card>
             <Card.Header>Resources</Card.Header>
             <ListGroup variant="flush">
@@ -84,7 +84,7 @@ class App extends React.Component {
               <ListGroup.Item><a href="https://aws.amazon.com/cloudfront/" target="_blank" rel="noopener noreferrer">Amazon CloudFront</a></ListGroup.Item>
             </ListGroup>
           </Card>
-        </CardDeck>
+        </Stack>
 
       </div>
     );

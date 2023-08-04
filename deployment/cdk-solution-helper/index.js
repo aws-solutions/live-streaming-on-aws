@@ -31,38 +31,19 @@ fs.readdirSync(global_s3_assets).forEach(file => {
             prop = fn.Properties.Content;
         }
 
-        console.debug(`fn: ${JSON.stringify(fn)}`);
-        console.debug(`prop: ${JSON.stringify(prop)}`);
-
-        if (prop.hasOwnProperty("S3Bucket")) {
+        if (prop.hasOwnProperty('S3Bucket')) {
             // Set the S3 key reference
             let artifactHash = Object.assign(prop.S3Key);
-            console.debug(`artifactHash is ${artifactHash}`);
             const assetPath = `asset${artifactHash}`;
             prop.S3Key = `%%SOLUTION_NAME%%/%%VERSION%%/${assetPath}`;
-     
+
             // Set the S3 bucket reference
             prop.S3Bucket = {
-            "Fn::Sub": "%%BUCKET_NAME%%-${AWS::Region}",
-        };
-      } else {
-        console.warn(`No S3Bucket Property found for ${JSON.stringify(prop)}`);
-      }
-    });
-
-    // Clean-up Lambda Layer code dependencies
-    const lambdaLayers = Object.keys(resources).filter(function (key) {
-    return resources[key].Type === "AWS::Lambda::LayerVersion";
-    });
-    lambdaLayers.forEach(function (l) {
-    const layer = template.Resources[l];
-    if (layer.Properties.Content.hasOwnProperty('S3Bucket')) {
-        let s3Key = Object.assign(layer.Properties.Content.S3Key);
-        layer.Properties.Content.S3Key = `%%SOLUTION_NAME%%/%%VERSION%%/${s3Key}`;
-        layer.Properties.Content.S3Bucket = {
-        'Fn::Sub': '%%BUCKET_NAME%%-${AWS::Region}'
+                'Fn::Sub': '%%BUCKET_NAME%%-${AWS::Region}'
+            };
+        } else {
+            console.warn(`No S3Bucket Property found for ${JSON.stringify(prop)}`);
         }
-    }
     });
 
     // Clean-up nested template stack dependencies

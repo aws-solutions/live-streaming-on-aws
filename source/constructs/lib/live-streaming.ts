@@ -1,15 +1,5 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/LICENSE-2.0                                                                    *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
 import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -166,7 +156,7 @@ export class LiveStreaming extends cdk.Stack {
       }
     };
     /**
-     * Mapping for sending anonymous metrics to AWS Solution Builders API
+     * Mapping for sending anonymized metrics to AWS Solution Builders API
      */
     new cdk.CfnMapping(this, 'AnonymizedData', { // NOSONAR
       mapping: {
@@ -893,40 +883,37 @@ export class LiveStreaming extends cdk.Stack {
      */
      const solutionId = 'SO0013';
      const solutionName = 'Live Streaming on AWS';
-     const applicationName = `live-streaming-on-aws-${cdk.Aws.STACK_NAME}`;
+     const applicationName = `live-streaming-on-aws-${cdk.Aws.REGION}-${cdk.Aws.ACCOUNT_ID}-${cdk.Aws.STACK_NAME}`;
      const attributeGroup = new appreg.AttributeGroup(this, 'AppRegistryAttributeId', {
-         attributeGroupName: `A30-${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
+        attributeGroupName: `A30-${cdk.Aws.REGION}-${cdk.Aws.STACK_NAME}`,
          description: "Attribute group for solution information.",
          attributes: {
-             ApplicationType: 'AWS-Solutions',
-             SolutionVersion: '%%VERSION%%',
-             SolutionID: solutionId,
-             SolutionName: solutionName
+          applicationType: 'AWS-Solutions',
+          version: '%%VERSION%%',
+          solutionID: solutionId,
+          solutionName: solutionName
          }
      });
      const appRegistry = new appreg.Application(this, 'AppRegistryApp', {
          applicationName: applicationName,
          description: `Service Catalog application to track and manage all your resources. The SolutionId is ${solutionId} and SolutionVersion is %%VERSION%%.`
      });
-     appRegistry.associateStack(this);
-     cdk.Tags.of(appRegistry).add('solutionId', solutionId);
-     cdk.Tags.of(appRegistry).add('SolutionName', solutionName);
-     cdk.Tags.of(appRegistry).add('SolutionDomain', 'CloudFoundations');
-     cdk.Tags.of(appRegistry).add('SolutionVersion', '%%VERSION%%');
-     cdk.Tags.of(appRegistry).add('appRegistryApplicationName', 'live-streaming-on-aws-stack');
-     cdk.Tags.of(appRegistry).add('ApplicationType', 'AWS-Solutions');
+     appRegistry.associateApplicationWithStack(this);
+     cdk.Tags.of(appRegistry).add('Solutions:SolutionID', solutionId);
+     cdk.Tags.of(appRegistry).add('Solutions:SolutionName', solutionName);
+     cdk.Tags.of(appRegistry).add('Solutions:SolutionVersion', '%%VERSION%%');
+     cdk.Tags.of(appRegistry).add('Solutions:ApplicationType', 'AWS-Solutions');
  
-     appRegistry.node.addDependency(attributeGroup);
-     appRegistry.associateAttributeGroup(attributeGroup);
+     attributeGroup.associateWith(appRegistry);
  
 
     /**
-     * AnonymousMetric
+     * AnonymizedMetric
      */
-    new cdk.CustomResource(this, 'AnonymousMetric', { // NOSONAR
+    new cdk.CustomResource(this, 'AnonymizedMetric', { // NOSONAR
       serviceToken: customResourceLambda.functionArn,
       properties: {
-        Resource: 'AnonymousMetric',
+        Resource: 'AnonymizedMetric',
         SolutionId: 'SO0013',
         UUID: uuid.getAttString('UUID'),
         Version: '%%VERSION%%',
@@ -934,7 +921,7 @@ export class LiveStreaming extends cdk.Stack {
         EncodingProfile: encodingProfile.valueAsString,
         Cidr: inputCIDR.valueAsString,
         ChannelStart: channelStart.valueAsString,
-        SendAnonymousMetric: cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')
+        SendAnonymizedMetric: cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')
       }
     });
 
@@ -943,11 +930,11 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * Outputs
      */
-    if (cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data')) {
-      new cdk.CfnOutput(this, 'AnonymousMetricUUID', { // NOSONAR
-        description: 'AnonymousMetric UUID',
+    if (cdk.Fn.findInMap('AnonymizedData', 'SendAnonymizedData', 'Data') === 'Yes') {
+      new cdk.CfnOutput(this, 'AnonymizedMetricUUID', { // NOSONAR
+        description: 'AnonymizedMetric UUID',
         value: uuid.getAttString('UUID'),
-        exportName: `${cdk.Aws.STACK_NAME}-AnonymousMetricUUID`
+        exportName: `${cdk.Aws.STACK_NAME}-AnonymizedMetricUUID`
       });
     }
 

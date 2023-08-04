@@ -1,25 +1,29 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/LICENSE-2.0                                                                    *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
-const AWS = require('aws-sdk');
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
+const { 
+    MediaLiveClient,
+    CreateChannelCommand,
+    StartChannelCommand,
+    StopChannelCommand,
+    DeleteChannelCommand,
+    DescribeChannelCommand,
+    DescribeInputCommand,
+    DeleteInputCommand,
+    DescribeInputSecurityGroupCommand,
+    DeleteInputSecurityGroupCommand,
+    CreateInputSecurityGroupCommand,
+    CreateInputCommand
+} = require('@aws-sdk/client-medialive');
+const { SSM } = require('@aws-sdk/client-ssm');
 
 const createInput = async (config) => {
 
-   const medialive = new AWS.MediaLive({
+   const medialive = new MediaLiveClient({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
-    const ssm = new AWS.SSM({
+    const ssm = new SSM({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
@@ -34,7 +38,7 @@ const createInput = async (config) => {
                         Cidr: config.Cidr
                     }]
                 };
-                data = await medialive.createInputSecurityGroup(params).promise();
+                data = await medialive.send(new CreateInputSecurityGroupCommand(params));
                 params = {
                     InputSecurityGroups: [data.SecurityGroup.Id],
                     Name: config.StreamName,
@@ -42,7 +46,7 @@ const createInput = async (config) => {
                     Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
-                data = await medialive.createInput(params).promise();
+                data = await medialive.send(new CreateInputCommand(params));
                 responseData = {
                     Id: data.Input.Id,
                     EndPoint1: data.Input.Destinations[0].Url,
@@ -58,7 +62,7 @@ const createInput = async (config) => {
                         Cidr: config.Cidr
                     }]
                 };
-                data = await medialive.createInputSecurityGroup(params).promise();
+                data = await medialive.send(new CreateInputSecurityGroupCommand(params));
                 params = {
                     InputSecurityGroups: [data.SecurityGroup.Id],
                     Name: config.StreamName,
@@ -73,7 +77,7 @@ const createInput = async (config) => {
                     Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
-                data = await medialive.createInput(params).promise();
+                data = await medialive.send(new CreateInputCommand(params));
                 responseData = {
                     Id: data.Input.Id,
                     EndPoint1: data.Input.Destinations[0].Url,
@@ -108,7 +112,7 @@ const createInput = async (config) => {
                         Value: config.PriPass,
                         Overwrite: true
                     };
-                    await ssm.putParameter(ssm_params).promise();
+                    await ssm.putParameter(ssm_params);
                 }
                 if (config.SecUser !== null && config.SecUser !== '') {
                     params.Sources[1].Username = config.SecUser;
@@ -120,10 +124,10 @@ const createInput = async (config) => {
                         Value: config.SecPass,
                         Overwrite: true
                     };
-                    await ssm.putParameter(ssm_params).promise();
+                    await ssm.putParameter(ssm_params);
                 }
                 //Create input
-                data = await medialive.createInput(params).promise();
+                data = await medialive.send(new CreateInputCommand(params));
                 responseData = {
                     Id: data.Input.Id,
                     EndPoint1: 'Push InputType only',
@@ -148,7 +152,7 @@ const createInput = async (config) => {
                     Tags: {'SolutionId': 'SO0109'}
                 };
                 //Create input
-                data = await medialive.createInput(params).promise();
+                data = await medialive.send(new CreateInputCommand(params));
                 responseData = {
                     Id: data.Input.Id,
                     EndPoint1: 'Push InputType only',
@@ -171,7 +175,7 @@ const createInput = async (config) => {
 
 
 const createChannel = async (config) => {
-    const medialive = new AWS.MediaLive({
+    const medialive = new MediaLiveClient({
         region: process.env.AWS_REGION,
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
@@ -234,11 +238,7 @@ const createChannel = async (config) => {
                 throw new Error(`EncodingProfile is invalid or undefined: ${config.EncodingProfile}`)
         }
         console.log(`Creating Channel with a ${config.EncodingProfile} profile`);
-        data = await medialive.createChannel(params).promise();
-        params = {
-            ChannelId: data.Channel.Id
-        }
-        await medialive.waitFor('channelCreated',params).promise();
+        data = await medialive.send(new CreateChannelCommand(params));
         responseData = {
             ChannelId: data.Channel.Id
         };
@@ -252,15 +252,28 @@ const createChannel = async (config) => {
 
 const startChannel = async (config) => {
    console.log('Starting Channel.....');
-   const medialive = new AWS.MediaLive({
+   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+   const medialive = new MediaLiveClient({
        region: process.env.AWS_REGION,
        customUserAgent: process.env.SOLUTION_IDENTIFIER
    });
-   try {
-       let params = {
-           ChannelId: config.ChannelId
-       };
-       await medialive.startChannel(params).promise();
+    try {
+        let params = {
+            ChannelId: config.ChannelId
+        };
+        let data = await medialive.send(new DescribeChannelCommand(params));
+        let state = data.State;
+        let retry = 5;
+        while (state !== 'IDLE') {
+            await sleep(6000);
+            data = await medialive.send(new DescribeChannelCommand(params));
+            state = data.State;
+            retry = retry - 1;
+            if (retry === 0 && state !== 'IDLE') {
+                throw new Error(`Failed to start channel, state: ${state} is not IDLE`);
+            }
+        }
+       await medialive.send(new StartChannelCommand(params));
    } catch (err) {
        console.error(err);
        throw err;
@@ -272,7 +285,7 @@ const startChannel = async (config) => {
 const deleteInput = async (InputId) => {
    console.log('Deleting Input.....');
    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-   const medialive = new AWS.MediaLive({
+   const medialive = new MediaLiveClient({
        region: process.env.AWS_REGION,
        customUserAgent: process.env.SOLUTION_IDENTIFIER
    });
@@ -282,8 +295,19 @@ const deleteInput = async (InputId) => {
        params = {
            InputId: InputId
        };
-       data = await medialive.describeInput(params).promise();
-       await medialive.deleteInput(params).promise();
+       data = await medialive.send(new DescribeInputCommand(params));
+       let state = data.State;
+       let retry = 5;
+       while (state !== 'DETACHED') {
+            await sleep(6000);
+            data = await medialive.send(new DescribeInputCommand(params));
+            state = data.State;
+            retry = retry - 1;
+            if (retry === 0 && state !== 'DETACHED') {
+                throw new Error(`Failed to delete Input, state: ${state} is not DETACHED`);
+            }
+       }
+       await medialive.send(new DeleteInputCommand(params));
        if (data.SecurityGroups && data.SecurityGroups.length !== 0 ) {
            params = {
                 InputSecurityGroupId: data.SecurityGroups[0]
@@ -292,18 +316,18 @@ const deleteInput = async (InputId) => {
            * When the input is deleted the SG is detached however it can take a few seconds for the SG state
            * to change from IN_USE to IDLE
            */
-           let state = '';
-           let retry = 5;
+           state = '';
+           retry = 5;
            while (state !== 'IDLE') {
                await sleep(6000);
-               data = await medialive.describeInputSecurityGroup(params).promise();
+               data = await medialive.send(new DescribeInputSecurityGroupCommand(params));
                state = data.State;
                retry = retry -1;
                if (retry === 0 && state !== 'IDLE') {
                    throw new Error(`Failed to delete Security Group, state: ${state} is not IDLE`);
                }
            }
-           await medialive.deleteInputSecurityGroup(params).promise();
+           await medialive.send(new DeleteInputSecurityGroupCommand(params));
        }
    } catch (err) {
        console.error(err);
@@ -315,7 +339,7 @@ const deleteInput = async (InputId) => {
 
 const deleteChannel = async (ChannelId) => {
    console.log('Deleting Channel.....');
-   const medialive = new AWS.MediaLive({
+   const medialive = new MediaLiveClient({
        region: process.env.AWS_REGION,
        customUserAgent: process.env.SOLUTION_IDENTIFIER
    });
@@ -324,10 +348,8 @@ const deleteChannel = async (ChannelId) => {
        params = {
            ChannelId: ChannelId
        };
-       await medialive.stopChannel(params).promise();
-       await medialive.waitFor('channelStopped',params).promise();
-       await medialive.deleteChannel(params).promise();
-       await medialive.waitFor('channelDeleted',params).promise();
+       await medialive.send(new StopChannelCommand(params));
+       await medialive.send(new DeleteChannelCommand(params));
 
    } catch (err) {
        console.error(err);

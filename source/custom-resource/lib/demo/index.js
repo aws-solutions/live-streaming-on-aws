@@ -1,26 +1,16 @@
-/*********************************************************************************************************************
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.                                           *
- *                                                                                                                    *
- *  Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance    *
- *  with the License. A copy of the License is located at                                                             *
- *                                                                                                                    *
- *      http://www.apache.org/licenses/LICENSE-2.0                                                                    *
- *                                                                                                                    *
- *  or in the 'license' file accompanying this file. This file is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES *
- *  OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions    *
- *  and limitations under the License.                                                                                *
- *********************************************************************************************************************/
-const AWS = require('aws-sdk');
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 
+const { S3 } = require('@aws-sdk/client-s3');
 
 /**
  * Copy Console assets and Container assets from source to destination buckets
  */
 const copyAssets = async (config) => {
 
-	const s3 = new AWS.S3({
-        customUserAgent: process.env.SOLUTION_IDENTIFIER
-    });
+	const s3 = new S3({
+		customUserAgent: process.env.SOLUTION_IDENTIFIER
+	});
 	const {srcBucket,srcPath,manifestFile,destBucket,awsExports} = config;
 
 	try {
@@ -30,8 +20,9 @@ const copyAssets = async (config) => {
 			Key: `${srcPath}/${manifestFile}`
 		};
 
-		const data = await s3.getObject(params).promise();
-		const manifest = JSON.parse(data.Body);
+		const data = await s3.getObject(params);
+		const dataBody = await data.Body.transformToString();
+		const manifest = JSON.parse(dataBody);
 		console.log('Manifest:', JSON.stringify(manifest, null, 2));
 
 		// Loop through manifest and copy files to the destination bucket
@@ -40,7 +31,7 @@ const copyAssets = async (config) => {
 				Bucket: destBucket,
 				CopySource: `${srcBucket}/${srcPath}/console/${file}`,
 				Key: file
-			}).promise();
+			});
 		}));
 
 		console.log(`creating config file: ${JSON.stringify(params)}`);
@@ -48,7 +39,7 @@ const copyAssets = async (config) => {
 			Bucket: destBucket,
 			Key: 'assets/aws-exports.js',
 			Body: awsExports
-		}).promise();
+		});
 
 	} catch (err) {
 		console.error(err);
@@ -60,7 +51,7 @@ const copyAssets = async (config) => {
 
 const delAssets = async (config) => {
 
-	const s3 = new AWS.S3({
+	const s3 = new S3({
         customUserAgent: process.env.SOLUTION_IDENTIFIER
     });
 
@@ -68,11 +59,11 @@ const delAssets = async (config) => {
 		let params = {
 			Bucket: config.destBucket
 		};
-		let data = await s3.listObjects(params).promise();
+		let data = await s3.listObjects(params);
 		let objects = [];
-		for (let i = 0; i < data.Contents.length; i++) {
+		for (let content of data.Contents) {
 			objects.push({
-				Key: data.Contents[i].Key
+				Key: content.Key
 			});
 		}
 		params = {
@@ -81,7 +72,7 @@ const delAssets = async (config) => {
 				Objects: objects
 			}
 		};
-		await s3.deleteObjects(params).promise();
+		await s3.deleteObjects(params);
 	} catch (err) {
 		console.error(err);
 		throw err;

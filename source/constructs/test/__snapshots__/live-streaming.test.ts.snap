@@ -1499,7 +1499,7 @@ exports[`LiveStreaming Stack Test 1`] = `
           S3Bucket: {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: d5870606274ee7017ab799ae515d14d7685d8dd503ef63ae768f297849966cff.zip,
+          S3Key: c593169f6c63fb08a61483b0287fae9e75f0fc69704691062ce5f32c52947736.zip,
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: {

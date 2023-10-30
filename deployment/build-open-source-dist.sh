@@ -48,6 +48,7 @@ cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir
 cp $source_template_dir/../CONTRIBUTING.md $dist_dir
 cp $source_template_dir/../CHANGELOG.md $dist_dir
 cp $source_template_dir/../.gitignore $dist_dir
+cp $source_template_dir/../solution-manifest.yaml $dist_dir
 
 echo "------------------------------------------------------------------------------"
 echo "Copying Architecture Diagram and GitHub Templates"

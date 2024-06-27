@@ -1,8 +1,8 @@
 id: SO0013
 name: live-streaming-on-aws
-version: v4.2.4
+version: v4.2.5
 cloudformation_templates:
   - template: live-streaming-on-aws.template
     main_template: true
 build_environment:
-  build_image: 'aws/codebuild/standard:7.0'
+  build_image: "aws/codebuild/standard:7.0"

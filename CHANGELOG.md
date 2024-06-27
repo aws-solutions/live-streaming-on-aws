@@ -7,25 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.2.5] - 2024-07-02
 
-### Changed
+### Security
 
 - Security updates for npm packages
 
 ## [4.2.4] - 2024-03-29
 
-### Changed
+### Security
 
 - Security updates for npm packages
 
 ## [4.2.3] - 2023-10-30
 
-### Changed
+### Security
 
 - Security updates for npm packages
 
 ## [4.2.2] - 2023-08-07
 
-### Changed
+### Security
 
 - Updated npm packages
 - Upgraded lambda runtimes to NodeJS 18 and AWS SDK v3

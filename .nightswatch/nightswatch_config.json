@@ -1,0 +1,15 @@
+{
+    "deployment": {
+      "SKIP_DOWNLOAD_TEMPLATE": false,
+      "SKIP_PRE_DEPLOY": false,
+      "SKIP_DEPLOY": false,
+      "SKIP_REGRESSION_TESTS": false,
+      "SKIP_UNDEPLOY": false,
+      "SKIP_POST_UNDEPLOY": false,
+      "SKIP_CLEANUP": false,
+      "SEQUENTIAL_DEPLOY": true,
+      "SEQUENTIAL_DEPLOY_WITH_DELAY_IN_SECONDS": 60
+    },
+    "functional": {}
+  }
+  

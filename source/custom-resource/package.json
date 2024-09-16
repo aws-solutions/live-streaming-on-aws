@@ -1,6 +1,6 @@
 {
   "name": "live-streaming-on-aws",
-  "version": "4.2.7",
+  "version": "4.2.8",
   "engines": {
     "node": ">=18"
   },
@@ -30,7 +30,8 @@
     "url": "na"
   },
   "overrides": {
-    "follow-redirects": ">=1.15.6"
+    "follow-redirects": ">=1.15.6",
+    "path-to-regexp": ">=8.1.0"
   },
   "author": {
     "name": "Amazon Web Services",

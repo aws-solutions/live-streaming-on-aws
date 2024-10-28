@@ -1,6 +1,6 @@
 {
   "name": "live-streaming-on-aws",
-  "version": "4.2.9",
+  "version": "4.2.10",
   "engines": {
     "node": ">=18"
   },

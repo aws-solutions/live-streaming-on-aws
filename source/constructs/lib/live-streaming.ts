@@ -174,6 +174,15 @@ export class LiveStreaming extends cdk.Stack {
     const mediaLiveRole = new iam.Role(this, 'MediaLiveRole', {
       assumedBy: new iam.ServicePrincipal('medialive.amazonaws.com'),
     });
+    /**
+     * MediaLive needs s3:PutObject access to show thumbnails in the console.
+     * It uses an internal bucket but doesn't expose a name for the bucket so we can't restrict by bucket name.
+     * https://docs.aws.amazon.com/medialive/latest/ug/thumbnails-enable.html#thumbnails-enable-iam
+     */
+    const thumbnailPolicyStatement = new iam.PolicyStatement({
+        actions: [ 's3:PutObject' ]
+    });
+    thumbnailPolicyStatement.addAllResources()
     const mediaLivePolicy = new iam.Policy(this, 'MediaLivePolicy', {
       statements: [
         new iam.PolicyStatement({
@@ -186,6 +195,7 @@ export class LiveStreaming extends cdk.Stack {
             'mediastore:PutObject'
           ]
         }),
+        thumbnailPolicyStatement,
         new iam.PolicyStatement({
           resources: [`arn:${cdk.Aws.PARTITION}:mediaconnect:${cdk.Aws.REGION}:${cdk.Aws.ACCOUNT_ID}:*`],
           actions: [

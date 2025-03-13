@@ -1,6 +1,6 @@
 {
   "name": "live-streaming-on-aws",
-  "version": "4.2.11",
+  "version": "4.2.12",
   "engines": {
     "node": ">=18"
   },
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "ansi-regex": "^6.0.1",
-    "axios": "^1.7.4",
+    "axios": "^1.8.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -21,7 +21,7 @@
     "@aws-sdk/client-s3": "^3.622.0",
     "@aws-sdk/client-ssm": "^3.622.0",
     "aws-sdk-client-mock": "^3.1.0",
-    "axios-mock-adapter": "^1.21.5",
+    "axios-mock-adapter": "^2.1.0",
     "chai": "^4.3.7",
     "jest": "^29.7.0"
   },

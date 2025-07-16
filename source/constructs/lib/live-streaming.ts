@@ -334,7 +334,7 @@ export class LiveStreaming extends cdk.Stack {
     );
 
     const customResourceLambda = new lambda.Function(this, 'CustomResource', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       description: 'Used to deploy custom resources and send AnonymizedData',
       environment: {
@@ -782,10 +782,14 @@ export class LiveStreaming extends cdk.Stack {
         versioned: false
       },
       loggingBucketProps: {
-        versioned: false
+        versioned: false,
+        serverAccessLogsPrefix: 'ui-s3-log/',
+        serverAccessLogsBucket: logsBucket,
       },
       cloudFrontLoggingBucketProps: {
-        versioned: false
+        versioned: false,
+        serverAccessLogsPrefix: 'ui-cf-log/',
+        serverAccessLogsBucket: logsBucket
       },
       insertHttpSecurityHeaders: false
     });

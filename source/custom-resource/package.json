@@ -1,8 +1,8 @@
 {
   "name": "live-streaming-on-aws",
-  "version": "4.2.12",
+  "version": "4.2.13",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "description": "cfn custom resources for vod workflow",
   "main": "na",
@@ -15,11 +15,11 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-lambda": "^3.622.0",
-    "@aws-sdk/client-medialive": "^3.622.0",
-    "@aws-sdk/client-mediapackage": "^3.622.0",
-    "@aws-sdk/client-s3": "^3.622.0",
-    "@aws-sdk/client-ssm": "^3.622.0",
+    "@aws-sdk/client-lambda": "^3.844.0",
+    "@aws-sdk/client-medialive": "^3.844.0",
+    "@aws-sdk/client-mediapackage": "^3.844.0",
+    "@aws-sdk/client-s3": "^3.844.0",
+    "@aws-sdk/client-ssm": "^3.844.0",
     "aws-sdk-client-mock": "^3.1.0",
     "axios-mock-adapter": "^2.1.0",
     "chai": "^4.3.7",

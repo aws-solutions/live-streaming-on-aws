@@ -1,6 +1,6 @@
 {
   "name": "player",
-  "version": "4.2.12",
+  "version": "4.2.13",
   "description": "Demo HTML preview player",
   "license": "Apache-2.0",
   "author": {
@@ -54,7 +54,9 @@
     "body-parser": ">=1.20.3",
     "rollup": ">=4.22.4",
     "postcss": ">=8.4.31",
-    "path-to-regexp": ">=8.1.0"
+    "path-to-regexp": ">=8.1.0",
+    "http-proxy-middleware": ">=3.0.5",
+    "webpack-dev-server": ">=5.2.2"
   },
   "resolutions": {
     "nth-check": "2.1.1"

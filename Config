@@ -1,6 +1,6 @@
 package.Live-streaming-on-aws = {
     interfaces = (1.0);
-    build-system = custom-build;
+    build-system = custom-build.sh;
     build-tools = {
         1.0 = {
         };

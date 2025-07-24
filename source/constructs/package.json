@@ -33,7 +33,6 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@aws-cdk/aws-servicecatalogappregistry-alpha": "^2.204.0-alpha.0",
     "@aws-solutions-constructs/aws-cloudfront-s3": "^2.85.6",
     "aws-cdk-lib": "^2.204.0",
     "cdk-nag": "2.21.52",

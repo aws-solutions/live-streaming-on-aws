@@ -102,40 +102,6 @@ exports[`LiveStreaming Stack Test 1`] = `
     },
   },
   Outputs: {
-    AppRegistryConsole: {
-      Description: AppRegistry,
-      Export: {
-        Name: {
-          Fn::Join: [
-            ,
-            [
-              {
-                Ref: AWS::StackName,
-              },
-              -AppRegistry,
-            ],
-          ],
-        },
-      },
-      Value: {
-        Fn::Join: [
-          ,
-          [
-            https://,
-            {
-              Ref: AWS::Region,
-            },
-            .console.aws.amazon.com/servicecatalog/home?#applications/,
-            {
-              Fn::GetAtt: [
-                AppRegistryApp5349BE86,
-                Id,
-              ],
-            },
-          ],
-        ],
-      },
-    },
     CloudFrontCmafEndpoint: {
       Description: CMAF CloudFront URL,
       Export: {
@@ -653,100 +619,6 @@ exports[`LiveStreaming Stack Test 1`] = `
       Type: AWS::CloudFormation::CustomResource,
       UpdateReplacePolicy: Delete,
     },
-    AppRegistryApp5349BE86: {
-      Properties: {
-        Description: Service Catalog application to track and manage all your resources. The SolutionId is SO0013 and SolutionVersion is %%VERSION%%.,
-        Name: {
-          Fn::Join: [
-            ,
-            [
-              live-streaming-on-aws-,
-              {
-                Ref: AWS::Region,
-              },
-              -,
-              {
-                Ref: AWS::AccountId,
-              },
-              -,
-              {
-                Ref: AWS::StackName,
-              },
-            ],
-          ],
-        },
-        Tags: {
-          SolutionId: SO0013,
-          Solutions:ApplicationType: AWS-Solutions,
-          Solutions:SolutionID: SO0013,
-          Solutions:SolutionName: Live Streaming on AWS,
-          Solutions:SolutionVersion: %%VERSION%%,
-        },
-      },
-      Type: AWS::ServiceCatalogAppRegistry::Application,
-    },
-    AppRegistryAssociation: {
-      Properties: {
-        Application: {
-          Fn::GetAtt: [
-            AppRegistryApp5349BE86,
-            Id,
-          ],
-        },
-        Resource: {
-          Ref: AWS::StackId,
-        },
-        ResourceType: CFN_STACK,
-      },
-      Type: AWS::ServiceCatalogAppRegistry::ResourceAssociation,
-    },
-    AppRegistryAttributeIdApplicationAttributeGroupAssociation870c0d9a3690195C5906: {
-      Properties: {
-        Application: {
-          Fn::GetAtt: [
-            AppRegistryApp5349BE86,
-            Id,
-          ],
-        },
-        AttributeGroup: {
-          Fn::GetAtt: [
-            AppRegistryAttributeIdDF43F316,
-            Id,
-          ],
-        },
-      },
-      Type: AWS::ServiceCatalogAppRegistry::AttributeGroupAssociation,
-    },
-    AppRegistryAttributeIdDF43F316: {
-      Properties: {
-        Attributes: {
-          applicationType: AWS-Solutions,
-          solutionID: SO0013,
-          solutionName: Live Streaming on AWS,
-          version: %%VERSION%%,
-        },
-        Description: Attribute group for solution information.,
-        Name: {
-          Fn::Join: [
-            ,
-            [
-              A30-,
-              {
-                Ref: AWS::Region,
-              },
-              -,
-              {
-                Ref: AWS::StackName,
-              },
-            ],
-          ],
-        },
-        Tags: {
-          SolutionId: SO0013,
-        },
-      },
-      Type: AWS::ServiceCatalogAppRegistry::AttributeGroup,
-    },
     CachePolicy26D8A535: {
       Properties: {
         CachePolicyConfig: {
@@ -1092,18 +964,14 @@ exports[`LiveStreaming Stack Test 1`] = `
                 ],
               },
               Id: LiveStreamingCloudFrontToS3CloudFrontDistributionOrigin1940508AB,
+              OriginAccessControlId: {
+                Fn::GetAtt: [
+                  CloudFrontToS3CloudFrontOacFB5D4E73,
+                  Id,
+                ],
+              },
               S3OriginConfig: {
-                OriginAccessIdentity: {
-                  Fn::Join: [
-                    ,
-                    [
-                      origin-access-identity/cloudfront/,
-                      {
-                        Ref: CloudFrontToS3CloudFrontDistributionOrigin1S3OriginB0637B8F,
-                      },
-                    ],
-                  ],
-                },
+                OriginAccessIdentity: ,
               },
             },
           ],
@@ -1117,13 +985,37 @@ exports[`LiveStreaming Stack Test 1`] = `
       },
       Type: AWS::CloudFront::Distribution,
     },
-    CloudFrontToS3CloudFrontDistributionOrigin1S3OriginB0637B8F: {
+    CloudFrontToS3CloudFrontOacFB5D4E73: {
       Properties: {
-        CloudFrontOriginAccessIdentityConfig: {
-          Comment: Identity for LiveStreamingCloudFrontToS3CloudFrontDistributionOrigin1940508AB,
+        OriginAccessControlConfig: {
+          Description: Origin access control provisioned by aws-cloudfront-s3,
+          Name: {
+            Fn::Join: [
+              ,
+              [
+                aws-cloudfront-s3-CloutToS3-,
+                {
+                  Fn::Select: [
+                    2,
+                    {
+                      Fn::Split: [
+                        /,
+                        {
+                          Ref: AWS::StackId,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+          OriginAccessControlOriginType: s3,
+          SigningBehavior: always,
+          SigningProtocol: sigv4,
         },
       },
-      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity,
+      Type: AWS::CloudFront::OriginAccessControl,
     },
     CloudFrontToS3CloudfrontLoggingBucket8350BE9B: {
       DeletionPolicy: Retain,
@@ -1133,14 +1025,6 @@ exports[`LiveStreaming Stack Test 1`] = `
             {
               id: AwsSolutions-S1,
               reason: Used to store access logs for other buckets,
-            },
-          ],
-        },
-        cfn_nag: {
-          rules_to_suppress: [
-            {
-              id: W35,
-              reason: This S3 bucket is used as the access logging bucket for CloudFront Distribution,
             },
           ],
         },
@@ -1155,6 +1039,12 @@ exports[`LiveStreaming Stack Test 1`] = `
               },
             },
           ],
+        },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: LogsBucket9C4D8843,
+          },
+          LogFilePrefix: ui-cf-log/,
         },
         OwnershipControls: {
           Rules: [
@@ -1312,14 +1202,32 @@ exports[`LiveStreaming Stack Test 1`] = `
             },
             {
               Action: s3:GetObject,
+              Condition: {
+                StringEquals: {
+                  AWS:SourceArn: {
+                    Fn::Join: [
+                      ,
+                      [
+                        arn:,
+                        {
+                          Ref: AWS::Partition,
+                        },
+                        :cloudfront::,
+                        {
+                          Ref: AWS::AccountId,
+                        },
+                        :distribution/,
+                        {
+                          Ref: CloudFrontToS3CloudFrontDistribution241D9866,
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
               Effect: Allow,
               Principal: {
-                CanonicalUser: {
-                  Fn::GetAtt: [
-                    CloudFrontToS3CloudFrontDistributionOrigin1S3OriginB0637B8F,
-                    S3CanonicalUserId,
-                  ],
-                },
+                Service: cloudfront.amazonaws.com,
               },
               Resource: {
                 Fn::Join: [
@@ -1333,6 +1241,42 @@ exports[`LiveStreaming Stack Test 1`] = `
                     },
                     /*,
                   ],
+                ],
+              },
+            },
+            {
+              Action: s3:ListBucket,
+              Condition: {
+                StringEquals: {
+                  AWS:SourceArn: {
+                    Fn::Join: [
+                      ,
+                      [
+                        arn:,
+                        {
+                          Ref: AWS::Partition,
+                        },
+                        :cloudfront::,
+                        {
+                          Ref: AWS::AccountId,
+                        },
+                        :distribution/,
+                        {
+                          Ref: CloudFrontToS3CloudFrontDistribution241D9866,
+                        },
+                      ],
+                    ],
+                  },
+                },
+              },
+              Effect: Allow,
+              Principal: {
+                Service: cloudfront.amazonaws.com,
+              },
+              Resource: {
+                Fn::GetAtt: [
+                  CloudFrontToS3S3Bucket9CE6AB04,
+                  Arn,
                 ],
               },
             },
@@ -1371,6 +1315,12 @@ exports[`LiveStreaming Stack Test 1`] = `
               },
             },
           ],
+        },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: LogsBucket9C4D8843,
+          },
+          LogFilePrefix: ui-s3-log/,
         },
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: true,
@@ -1499,7 +1449,7 @@ exports[`LiveStreaming Stack Test 1`] = `
           S3Bucket: {
             Fn::Sub: cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region},
           },
-          S3Key: a698a43ac50066f2c0c6f9f62fb02332f35d7e06ba8019ab17ce72f40973699a.zip,
+          S3Key: 95ca53120f51e542f43f4e0765c72e0ac732b75bcab280fcd5055df68dd8725b.zip,
         },
         Description: Used to deploy custom resources and send AnonymizedData,
         Environment: {
@@ -1514,7 +1464,7 @@ exports[`LiveStreaming Stack Test 1`] = `
             Arn,
           ],
         },
-        Runtime: nodejs18.x,
+        Runtime: nodejs22.x,
         Tags: [
           {
             Key: SolutionId,
@@ -1719,10 +1669,10 @@ exports[`LiveStreaming Stack Test 1`] = `
     DemoConsole: {
       DeletionPolicy: Delete,
       DependsOn: [
-        CloudFrontToS3CloudFrontDistributionOrigin1S3OriginB0637B8F,
         CloudFrontToS3CloudFrontDistribution241D9866,
         CloudFrontToS3CloudfrontLoggingBucketPolicy416B82D9,
         CloudFrontToS3CloudfrontLoggingBucket8350BE9B,
+        CloudFrontToS3CloudFrontOacFB5D4E73,
         CloudFrontToS3S3BucketPolicy2495300D,
         CloudFrontToS3S3Bucket9CE6AB04,
         CloudFrontToS3S3LoggingBucketPolicy360F3875,
@@ -1949,6 +1899,7 @@ exports[`LiveStreaming Stack Test 1`] = `
         },
       },
       Properties: {
+        AccessControl: LogDeliveryWrite,
         BucketEncryption: {
           ServerSideEncryptionConfiguration: [
             {

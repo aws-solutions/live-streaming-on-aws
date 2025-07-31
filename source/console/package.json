@@ -1,6 +1,6 @@
 {
   "name": "player",
-  "version": "4.2.12",
+  "version": "4.2.13",
   "description": "Demo HTML preview player",
   "license": "Apache-2.0",
   "author": {
@@ -17,7 +17,7 @@
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3"
   },
@@ -54,7 +54,10 @@
     "body-parser": ">=1.20.3",
     "rollup": ">=4.22.4",
     "postcss": ">=8.4.31",
-    "path-to-regexp": ">=8.1.0"
+    "path-to-regexp": ">=8.1.0",
+    "http-proxy-middleware": ">=3.0.5",
+    "webpack-dev-server": ">=5.2.2",
+    "form-data": "4.0.4"
   },
   "resolutions": {
     "nth-check": "2.1.1"

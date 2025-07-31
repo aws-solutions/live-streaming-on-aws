@@ -1,6 +1,6 @@
 id: SO0013
 name: live-streaming-on-aws
-version: v4.2.12
+version: v4.2.13
 cloudformation_templates:
   - template: live-streaming-on-aws.template
     main_template: true

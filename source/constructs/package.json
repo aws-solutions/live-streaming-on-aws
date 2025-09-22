@@ -1,6 +1,6 @@
 {
   "name": "live-streaming-on-aws",
-  "version": "4.2.13",
+  "version": "4.2.14",
   "description": "cdk construct for the live streaming on aws solution",
   "bin": {
     "live-stream": "bin/live-streaming.js"

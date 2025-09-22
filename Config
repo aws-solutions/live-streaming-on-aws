@@ -1,8 +1,8 @@
 package.Live-streaming-on-aws = {
-    interfaces = (4.2.13);
+    interfaces = (4.2.14);
     build-system = custom-build.sh;
     build-tools = {
-        4.2.13 = {
+        4.2.14 = {
         };
     };
 
@@ -11,12 +11,12 @@ package.Live-streaming-on-aws = {
     # Use dependencies instead if you intend for these dependencies to
     # be exported to other packages that build against you.
     dependencies = {
-        4.2.13 = {
+        4.2.14 = {
         };
     };
 
     runtime-dependencies = {
-        4.2.13 = {
+        4.2.14 = {
         };
     };
 

@@ -361,8 +361,16 @@ export class LiveStreaming extends cdk.Stack {
       }
     };
 
-    
-
+    //cdk_nag
+    NagSuppressions.addResourceSuppressions(
+      customResourceLambda,
+      [
+        {
+          id: 'AwsSolutions-L1',
+          reason: 'Lambda function is using the latest runtime version (NODEJS_22_X)'
+        }
+      ]
+    );
 
     /**
      * IAM: MediaPackage Policy

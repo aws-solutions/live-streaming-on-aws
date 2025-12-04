@@ -360,7 +360,7 @@ export class LiveStreaming extends cdk.Stack {
         }]
       }
     };
-
+    
     //cdk_nag
     NagSuppressions.addResourceSuppressions(
       customResourceLambda,

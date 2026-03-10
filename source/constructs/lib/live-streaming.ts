@@ -18,7 +18,7 @@ export class LiveStreaming extends cdk.Stack {
     /**
      * CloudFormation Template Descrption
      */
-    this.templateOptions.description = '(SO0013) Live Streaming on AWS Solution %%VERSION%%';
+    this.templateOptions.description = '(SO9671) Live Streaming on AWS Solution %%VERSION%%';
     /**
        * Cfn Parameters
        */
